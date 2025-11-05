@@ -80,7 +80,7 @@
             </svg>
         );
 
-        // ALL 126 Berkeley paths
+        // All 105 developed Berkeley paths (undeveloped paths removed)
         const paths = [
           { id: 1, name: "Acacia Steps", location: "537-543 Spruce St. - 598-600 Cragmont Ave.", lat: 37.8920, lng: -122.2450, developed: true },
           { id: 2, name: "Acacia Walk", location: "619-625 Spruce St. - 610-620 Cragmont Ave.", lat: 37.8922, lng: -122.2448, developed: true },
@@ -187,33 +187,47 @@
           { id: 103, name: "Willow Walk", location: "163-171 Alvarado Rd. - 275-277 Alvarado Rd.", lat: 37.8569, lng: -122.2375, developed: true },
           { id: 104, name: "Wilson Walk", location: "9-14 Wilson Circle - 1504-1506 Summit Rd.", lat: 37.8817, lng: -122.2484, developed: true },
           { id: 105, name: "Yosemite Steps", location: "751-801 The Alameda - 1986-1992 Yosemite Rd.", lat: 37.8960, lng: -122.2780, developed: true },
-          { id: 106, name: "Avenida Path", location: "130-140 Avenida Dr. - 1448-1452 Grizzly Peak Blvd.", lat: 37.8838, lng: -122.2488, developed: false },
-          { id: 107, name: "Columbia Path (Upper)", location: "1399-1407 Queens Rd. - 17-18 Columbia Circle", lat: 37.8842, lng: -122.2468, developed: false },
-          { id: 108, name: "Cragmont Path", location: "1177-1197 Cragmont Ave. - 1166-1170 Keeler Ave.", lat: 37.8910, lng: -122.2605, developed: false },
-          { id: 109, name: "Delmar Path", location: "Opposite 1421 Glendale Ave. - 31-35 Delmar Ave.", lat: 37.8852, lng: -122.2538, developed: false },
-          { id: 110, name: "Devon Lane (Upper)", location: "763-765 San Diego Rd. - 163-168 Southampton Ave.", lat: 37.8955, lng: -122.2735, developed: false },
-          { id: 111, name: "Eleanor Hall Gibson Path", location: "Dead end - 1160-1168 Keith Ave.", lat: 37.8881, lng: -122.2585, developed: false },
-          { id: 112, name: "Grizzly Path", location: "185 Hill Rd. - 1328-1336 Summit Rd.", lat: 37.8862, lng: -122.2484, developed: false },
-          { id: 113, name: "Harding Path", location: "West of 1569 Campus Dr. - 1504-1510 Olympus Ave.", lat: 37.8815, lng: -122.2555, developed: false },
-          { id: 114, name: "Highland Path", location: "Highland Ave. & Ridge Rd. - Lawrence Berkeley Lab", lat: 37.8766, lng: -122.2559, developed: false },
-          { id: 115, name: "Hill Path", location: "1251-1269 Grizzly Peak Blvd. - 80-100 Hill Rd.", lat: 37.8884, lng: -122.2512, developed: false },
-          { id: 116, name: "Laurel Lane", location: "767-771 San Diego Rd. - dead end", lat: 37.8960, lng: -122.2738, developed: false },
-          { id: 117, name: "Le Conte Path", location: "Top of Le Conte Ave. - Lawrence Berkeley Lab", lat: 37.8758, lng: -122.2565, developed: false },
-          { id: 118, name: "Miller Path West", location: "1011-1013 Miller Ave. - 998-1002 Grizzly Peak Blvd.", lat: 37.8942, lng: -122.2600, developed: false },
-          { id: 119, name: "Parnassus Path", location: "3079-3085 Buena Vista Way - 8-9 West Parnassus Ct.", lat: 37.8812, lng: -122.2544, developed: false },
-          { id: 120, name: "Path 74", location: "Wildcat Canyon Rd. - Hillview Rd.", lat: 37.8932, lng: -122.2534, developed: false },
-          { id: 121, name: "Patricia De Vito Path", location: "1099-1105 Sterling Ave. - 1096-1100 Miller Ave.", lat: 37.8919, lng: -122.2569, developed: false },
-          { id: 122, name: "Rose Glen Alley", location: "2235-2241 Rose St. - 2204 Glen Ave.", lat: 37.8828, lng: -122.2655, developed: false },
-          { id: 123, name: "Shasta Walk", location: "1187-1195 Keeler Ave. - 2885-2887 Shasta Rd.", lat: 37.8898, lng: -122.2545, developed: false },
-          { id: 124, name: "Summit Path", location: "1419-1425 Grizzly Peak Blvd. - 1396-1400 Summit Rd.", lat: 37.8855, lng: -122.2490, developed: false },
-          { id: 125, name: "Twain Way", location: "1137-1149 Cragmont Ave. - 1122-1124 Keeler Ave.", lat: 37.8905, lng: -122.2608, developed: false },
-          { id: 126, name: "Wilson Path", location: "1585-1589 Campus Dr. - 1572-1580 Olympus Ave.", lat: 37.8810, lng: -122.2548, developed: false },
         ];
 
         function InteractiveMap({ paths, userLocation, pathData, onPathClick }) {
           const mapRef = useRef(null);
           const leafletMap = useRef(null);
-          const markers = useRef([]);
+          const pathLines = useRef([]);
+
+          // Helper function to parse location and extract approximate end coordinates
+          const getEndCoordinates = (startLat, startLng, location) => {
+            // Simple offset based on typical path length (roughly 100-300 feet)
+            // This creates a small line segment to represent the path
+            const offset = 0.001; // roughly 300 feet
+            
+            // Parse location to determine direction
+            const loc = location.toLowerCase();
+            let latOffset = 0, lngOffset = 0;
+            
+            // Determine general direction based on street names
+            if (loc.includes('north') || loc.includes('up')) {
+              latOffset = offset;
+            } else if (loc.includes('south') || loc.includes('down')) {
+              latOffset = -offset;
+            }
+            
+            if (loc.includes('east')) {
+              lngOffset = offset;
+            } else if (loc.includes('west')) {
+              lngOffset = -offset;
+            }
+            
+            // If no clear direction, create a small diagonal line
+            if (latOffset === 0 && lngOffset === 0) {
+              latOffset = offset * 0.5;
+              lngOffset = offset * 0.5;
+            }
+            
+            return {
+              lat: startLat + latOffset,
+              lng: startLng + lngOffset
+            };
+          };
 
           useEffect(() => {
             if (!leafletMap.current && mapRef.current) {
@@ -237,30 +251,50 @@
           useEffect(() => {
             if (!leafletMap.current) return;
 
-            // Clear existing markers
-            markers.current.forEach(marker => marker.remove());
-            markers.current = [];
+            // Clear existing path lines
+            pathLines.current.forEach(line => line.remove());
+            pathLines.current = [];
 
-            // Add path markers
+            // Draw path lines
             paths.forEach(path => {
               const isCompleted = pathData[path.id]?.completed;
               const isNearby = path.distance && path.distance < 0.5;
               
               const color = isCompleted ? '#22c55e' : isNearby ? '#3b82f6' : '#94a3b8';
+              const weight = isNearby ? 4 : isCompleted ? 3 : 2;
               
-              const marker = L.circleMarker([path.lat, path.lng], {
-                radius: isNearby ? 8 : 5,
+              // Get end coordinates
+              const endCoords = getEndCoordinates(path.lat, path.lng, path.location);
+              
+              // Draw line from start to end
+              const polyline = L.polyline(
+                [[path.lat, path.lng], [endCoords.lat, endCoords.lng]], 
+                {
+                  color: color,
+                  weight: weight,
+                  opacity: isNearby ? 1 : 0.7
+                }
+              ).addTo(leafletMap.current);
+
+              polyline.bindPopup(`<strong>${path.name}</strong><br>${path.location}`);
+              polyline.on('click', () => onPathClick(path));
+              
+              pathLines.current.push(polyline);
+              
+              // Add a small circle marker at the start point
+              const startMarker = L.circleMarker([path.lat, path.lng], {
+                radius: 4,
                 fillColor: color,
                 color: '#fff',
-                weight: 2,
+                weight: 1,
                 opacity: 1,
-                fillOpacity: isNearby ? 1 : 0.7
+                fillOpacity: 1
               }).addTo(leafletMap.current);
-
-              marker.bindPopup(`<strong>${path.name}</strong><br>${path.location}`);
-              marker.on('click', () => onPathClick(path));
               
-              markers.current.push(marker);
+              startMarker.bindPopup(`<strong>${path.name}</strong><br>${path.location}`);
+              startMarker.on('click', () => onPathClick(path));
+              
+              pathLines.current.push(startMarker);
             });
 
             // Add user location marker
@@ -275,7 +309,7 @@
               }).addTo(leafletMap.current);
 
               userMarker.bindPopup('<strong>You are here</strong>');
-              markers.current.push(userMarker);
+              pathLines.current.push(userMarker);
 
               // Center map on user location
               leafletMap.current.setView([userLocation.lat, userLocation.lng], 14);
@@ -469,11 +503,6 @@
                               }`}>
                                 {path.name}
                               </h3>
-                              {!path.developed && (
-                                <span className="text-xs px-2 py-1 bg-orange-100 text-orange-700 rounded-full">
-                                  Undeveloped
-                                </span>
-                              )}
                               {path.distance && (
                                 <span className={`text-xs px-2 py-1 rounded-full ${
                                   path.distance < 0.5 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
@@ -525,11 +554,6 @@
                         <div>
                           <h2 className="text-2xl font-bold text-gray-800">{selectedPath.name}</h2>
                           <p className="text-sm text-gray-600 mt-1">{selectedPath.location}</p>
-                          {!selectedPath.developed && (
-                            <span className="inline-block mt-2 px-3 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">
-                              Undeveloped Path
-                            </span>
-                          )}
                         </div>
                         <button onClick={() => setSelectedPath(null)} className="text-gray-500 hover:text-gray-700">
                           <X />
