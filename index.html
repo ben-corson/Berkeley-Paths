@@ -13,6 +13,15 @@
     <style>
         body { -webkit-user-select: none; -webkit-touch-callout: none; }
         #map { height: 600px; width: 100%; }
+        .path-label { 
+            background: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: bold;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
@@ -25,7 +34,7 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // Lucide icons as SVG components
+        // Lucide icons
         const MapPin = () => (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
@@ -80,162 +89,126 @@
             </svg>
         );
 
-        // All 105 developed Berkeley paths (undeveloped paths removed)
+        // Developed paths with coordinates extracted from Google Maps links
         const paths = [
-          { id: 1, name: "Acacia Steps", location: "537-543 Spruce St. - 598-600 Cragmont Ave.", lat: 37.8920, lng: -122.2450, developed: true },
-          { id: 2, name: "Acacia Walk", location: "619-625 Spruce St. - 610-620 Cragmont Ave.", lat: 37.8922, lng: -122.2448, developed: true },
-          { id: 3, name: "Acton Crescent Path", location: "1471-1480 Acton Crescent - 2132-2138 Sacramento St.", lat: 37.8875, lng: -122.2585, developed: true },
-          { id: 4, name: "Alta Vista Path", location: "731-733 Santa Barbara Ave. - 710-714 Spruce St.", lat: 37.8978, lng: -122.2740, developed: true },
-          { id: 5, name: "Anne Brower Path", location: "1129-1133 Miller Ave. - 65-69 Stevenson Ave.", lat: 37.8915, lng: -122.2570, developed: true },
-          { id: 6, name: "Arden Path", location: "95-100 Arden Rd. - Panoramic Way", lat: 37.8688, lng: -122.2490, developed: true },
-          { id: 7, name: "Arden Steps", location: "Opposite 37 Mosswood Rd. - 95-100 Arden Rd.", lat: 37.8692, lng: -122.2488, developed: true },
-          { id: 8, name: "Atlas Path", location: "1311-1321 Grizzly Peak Blvd. - 150-156 Hill Rd.", lat: 37.8868, lng: -122.2510, developed: true },
-          { id: 9, name: "Avalon Walk", location: "2827-2828 Palm Ct. - 2901-2904 Avalon Ave.", lat: 37.8600, lng: -122.2494, developed: true },
-          { id: 10, name: "Bancroft Steps", location: "Bancroft Way & Warring St. - Bancroft Way & Prospect St.", lat: 37.8694, lng: -122.2527, developed: true },
-          { id: 11, name: "Berryman Path", location: "Berryman St. & Shattuck Ave. - south of 1256 Spruce St.", lat: 37.8900, lng: -122.2700, developed: true },
-          { id: 12, name: "Betty Olds Path", location: "Twain Ave. & Sterling Ave. - 85-91 Whitaker Ave.", lat: 37.8910, lng: -122.2590, developed: true },
-          { id: 13, name: "Billie Jean Walk", location: "911-917 Euclid Ave. - 918-924 Hilldale Ave.", lat: 37.8949, lng: -122.2633, developed: true },
-          { id: 14, name: "Black Path", location: "Solano Ave. and Contra Costa Ave. - 928 Mendocino Ave.", lat: 37.8909, lng: -122.2749, developed: true },
-          { id: 15, name: "Boynton Walk", location: "463-469 Arlington Ave. - 450-452 Boynton Ave.", lat: 37.9021, lng: -122.2760, developed: true },
-          { id: 16, name: "Bret Harte Path", location: "1099-1101 Keeler Ave. - 1082-1084 Sterling Ave.", lat: 37.8907, lng: -122.2582, developed: true },
-          { id: 17, name: "Bret Harte Way", location: "1099-1101 Euclid Ave. - 1098-1104 Keith Ave.", lat: 37.8897, lng: -122.2620, developed: true },
-          { id: 18, name: "Cedar Path", location: "Cedar St. & La Loma Ave. - 2710 Cedar St.", lat: 37.8880, lng: -122.2530, developed: true },
-          { id: 19, name: "Chester Lane", location: "117-131 Southampton Ave. - 682-690 San Luis Rd.", lat: 37.8971, lng: -122.2733, developed: true },
-          { id: 20, name: "Claremont Path", location: "267 Hillcrest Rd. - 165-220 El Camino Real", lat: 37.8522, lng: -122.2410, developed: true },
-          { id: 21, name: "Columbia Path (Lower)", location: "1365-1373 Campus Dr. - 1398-1400 Queens Rd.", lat: 37.8840, lng: -122.2475, developed: true },
-          { id: 22, name: "Columbia Walk", location: "151-157 Fairlawn Dr. - 1338-1342 Grizzly Peak Blvd.", lat: 37.8845, lng: -122.2470, developed: true },
-          { id: 23, name: "Covert Path", location: "1175-1177 Keith Ave. - 1138-1146 Keeler Ave.", lat: 37.8887, lng: -122.2580, developed: true },
-          { id: 24, name: "Crescent Park Path", location: "2-10 The Crescent - 56-60 The Crescent", lat: 37.8945, lng: -122.2547, developed: true },
-          { id: 25, name: "The Crossways", location: "64-70 The Uplands - 145-151 Hillcrest Rd.", lat: 37.8537, lng: -122.2454, developed: true },
-          { id: 26, name: "The Cutoff", location: "95-99 The Plaza Dr. - 62-66 El Camino Real", lat: 37.8552, lng: -122.2420, developed: true },
-          { id: 27, name: "Devon Lane (Lower)", location: "Somerset Pl. and Southampton Ave. - 763-765 San Diego Rd.", lat: 37.8946, lng: -122.2740, developed: true },
-          { id: 28, name: "Easter Way", location: "933-937 Spruce St. - 950 Regal Rd. & Cragmont Park", lat: 37.8925, lng: -122.2655, developed: true },
-          { id: 29, name: "El Mirador Path", location: "1125-1133 Euclid Ave. - 1112-1116 Cragmont Ave.", lat: 37.8889, lng: -122.2615, developed: true },
-          { id: 30, name: "El Paseo", location: "675-679 Vicente Ave. - 646-650 The Alameda", lat: 37.8957, lng: -122.2816, developed: true },
-          { id: 31, name: "Encina Walk", location: "12 Oakvale Ave. - 2 Encina Pl.", lat: 37.8551, lng: -122.2465, developed: true },
-          { id: 32, name: "Eunice Steps", location: "2015 Eunice St. - Eunice St. at Sutter St.", lat: 37.8854, lng: -122.2715, developed: true },
-          { id: 33, name: "Florida Walk", location: "69-70 Florida Ave. - 458-460 Michigan Ave.", lat: 37.9007, lng: -122.2748, developed: true },
-          { id: 34, name: "The Footway", location: "22-26 The Uplands - 15-18 Hillcrest Ct.", lat: 37.8539, lng: -122.2473, developed: true },
-          { id: 35, name: "Fountain Walk", location: "Sutter St. and Del Norte St. - Marin Circle", lat: 37.8895, lng: -122.2723, developed: true },
-          { id: 36, name: "Fred Herbert Path", location: "1131-1141 Park Hills Rd. - Wildcat Canyon Rd.", lat: 37.8920, lng: -122.2522, developed: true },
-          { id: 37, name: "Garber Path", location: "2825-2826 Garber St. - 2844-2845 Garber St.", lat: 37.8700, lng: -122.2473, developed: true },
-          { id: 38, name: "Geneva's Path", location: "1336-1345 Neilson Ave. - 1313 Curtis St.", lat: 37.8780, lng: -122.2920, developed: true },
-          { id: 39, name: "Glendale Path", location: "1295-1305 Campus Dr. - 98-100 Fairlawn Dr.", lat: 37.8850, lng: -122.2540, developed: true },
-          { id: 40, name: "Great Stoneface Path", location: "Yosemite Rd. & San Fernando Ave.", lat: 37.8968, lng: -122.2782, developed: true },
-          { id: 41, name: "Halkin Walk", location: "695-701 Cragmont Ave. - 698-702 Hilldale Ave.", lat: 37.8965, lng: -122.2670, developed: true },
-          { id: 42, name: "Hawthorne Steps", location: "1409-1423 Scenic Ave. - 1410-1414 Hawthorne Terrace", lat: 37.8824, lng: -122.2628, developed: true },
-          { id: 43, name: "Hilgard Path", location: "1647-1675 La Loma Ave. - 1650 La Vereda Rd.", lat: 37.8795, lng: -122.2575, developed: true },
-          { id: 44, name: "Hill Court Steps", location: "2519-2522 Hill Ct. - 1542-1544 Le Roy Ave.", lat: 37.8801, lng: -122.2603, developed: true },
-          { id: 45, name: "Holmes Path", location: "451-457 Kentucky Ave. - 456-460 Vassar Ave.", lat: 37.9027, lng: -122.2720, developed: true },
-          { id: 46, name: "Ina Coolbrith Path", location: "1097-1101 Miller Ave. - 1098-1100 Grizzly Peak Blvd.", lat: 37.8923, lng: -122.2565, developed: true },
-          { id: 47, name: "Indian Rock Path", location: "899-901 The Alameda - Shattuck Ave.", lat: 37.8950, lng: -122.2760, developed: true },
-          { id: 48, name: "Indian Trail", location: "715-717 The Alameda - 1890-1900 Yosemite Rd.", lat: 37.8959, lng: -122.2788, developed: true },
-          { id: 49, name: "Jacque Ensign Way", location: "Solano Ave. - Los Angeles Ave.", lat: 37.8905, lng: -122.2742, developed: true },
-          { id: 50, name: "John Muir Path", location: "699-701 Grizzly Peak Blvd. - 698-700 Creston Rd.", lat: 37.8850, lng: -122.2480, developed: true },
-          { id: 51, name: "Keeler Path", location: "1049 Keeler Ave - 1070 Keeler Ave.", lat: 37.8919, lng: -122.2600, developed: true },
-          { id: 52, name: "Keoncrest Path", location: "1488-1545 Keoncrest Dr. - 1548-1552 Sacramento St.", lat: 37.8870, lng: -122.2595, developed: true },
-          { id: 53, name: "La Loma Path", location: "North of 1403 Glendale Ave. - 1310-1320 Campus Dr.", lat: 37.8848, lng: -122.2541, developed: true },
-          { id: 54, name: "La Loma Steps", location: "1497-1501 Le Roy Ave. - 2593-2597 Buena Vista Way", lat: 37.8848, lng: -122.2541, developed: true },
-          { id: 55, name: "La Vereda Steps", location: "Top of Virginia St. - end of La Vereda Rd.", lat: 37.8795, lng: -122.2560, developed: true },
-          { id: 56, name: "Latham Walk", location: "Grizzly Peak Blvd. and Latham Ln. - 1048-1050 Creston Rd.", lat: 37.8942, lng: -122.2580, developed: true },
-          { id: 57, name: "Le Roy Steps", location: "1666-1675 Le Roy Ave. - 2580-2600 Hilgard Ave.", lat: 37.8787, lng: -122.2590, developed: true },
-          { id: 58, name: "Martinez Path", location: "1147-1159 Keith Ave. - 1146-1148 Cragmont Ave.", lat: 37.8886, lng: -122.2591, developed: true },
-          { id: 59, name: "Maryland Walk", location: "439-441 Boynton Ave. - 408-416 Vermont Ave.", lat: 37.9028, lng: -122.2753, developed: true },
-          { id: 60, name: "Mendocino Path", location: "853-861 Arlington Ave. - 45-49 San Mateo Rd.", lat: 37.8932, lng: -122.2740, developed: true },
-          { id: 61, name: "Miller Path East", location: "Opposite 982 Grizzly Peak Blvd - 990-1000 Creston Rd.", lat: 37.8952, lng: -122.2592, developed: true },
-          { id: 62, name: "Mosswood Lane", location: "1-3 Orchard Lane - 13-31 Mosswood Rd.", lat: 37.8694, lng: -122.2490, developed: true },
-          { id: 63, name: "North Path", location: "555-561 Cragmont Ave. - 580-582 Euclid Ave.", lat: 37.9016, lng: -122.2682, developed: true },
-          { id: 64, name: "Northgate Path", location: "2754-2760 Shasta Rd. - 90-99 Northgate Ave.", lat: 37.8864, lng: -122.2570, developed: true },
-          { id: 65, name: "Oak Knoll Path", location: "2933-2937 Russell St. - 2934-2938 Avalon Ave.", lat: 37.8593, lng: -122.2471, developed: true },
-          { id: 66, name: "Oak Street Path", location: "2335 Oak St. - 1176-1178 Euclid Ave.", lat: 37.8876, lng: -122.2638, developed: true },
-          { id: 67, name: "Oakridge Path", location: "North of 1 Hazel Rd. - 30-34 Oak Ridge Rd.", lat: 37.8568, lng: -122.2445, developed: true },
-          { id: 68, name: "Oakridge Steps", location: "85-91 El Camino Real - 92 Oak Ridge Rd.", lat: 37.8549, lng: -122.2406, developed: true },
-          { id: 69, name: "Orchard Lane", location: "7 Panoramic Way - 59-65 Arden Rd.", lat: 37.8692, lng: -122.2487, developed: true },
-          { id: 70, name: "Oxford School Way", location: "1125 Walnut St. - 1128 Oxford St.", lat: 37.8876, lng: -122.2687, developed: true },
-          { id: 71, name: "Park Path", location: "45-51 El Camino Real - 49 Oak Ridge Rd.", lat: 37.8562, lng: -122.2422, developed: true },
-          { id: 72, name: "Patty Kates Path", location: "1088-1100 Woodside Rd. - 1077-1103 Park Hills Rd.", lat: 37.8927, lng: -122.2537, developed: true },
-          { id: 73, name: "Pine Path", location: "2851-2901 Russell St. - 2920-2922 Avalon Ave.", lat: 37.8595, lng: -122.2487, developed: true },
-          { id: 74, name: "Pinnacle Path", location: "979-981 Regal Rd. - 58-66 Poppy Ln.", lat: 37.8930, lng: -122.2616, developed: true },
-          { id: 75, name: "Poplar Path", location: "743-747 Spruce St. - 756-760 Cragmont Ave.", lat: 37.8966, lng: -122.2687, developed: true },
-          { id: 76, name: "Poppy Path", location: "Poppy Ln. - 1036-1042 Miller Ave.", lat: 37.8928, lng: -122.2598, developed: true },
-          { id: 77, name: "Redwood Terrace", location: "1147-1149 Euclid Ave. - 1138-1140 Keith Ave.", lat: 37.8883, lng: -122.2605, developed: true },
-          { id: 78, name: "Rock Walk", location: "42-46 Rock Ln. - 800-810 Euclid Ave.", lat: 37.8960, lng: -122.2662, developed: true },
-          { id: 79, name: "Rose Steps", location: "Opposite 2637 Rose St. - opposite 1401 La Loma Ave.", lat: 37.8834, lng: -122.2580, developed: true },
-          { id: 80, name: "Rose Walk", location: "Opposite 1400 Euclid Ave. - 1400 Le Roy Ave.", lat: 37.8832, lng: -122.2611, developed: true },
-          { id: 81, name: "Ruth Armstrong Path", location: "Hearst Ave. - Berkeley Way", lat: 37.8737, lng: -122.2673, developed: true },
-          { id: 82, name: "Santa Barbara Path", location: "597-601 San Luis Rd. - 572-576 Santa Barbara Rd.", lat: 37.9000, lng: -122.2747, developed: true },
-          { id: 83, name: "Scott Newhall Path", location: "90-100 Hill Rd. - 48-75 Hill Rd.", lat: 37.8882, lng: -122.2508, developed: true },
-          { id: 84, name: "Shasta Path", location: "2901-2905 Shasta Rd. - Shasta Rd. & Miller Ave.", lat: 37.8895, lng: -122.2537, developed: true },
-          { id: 85, name: "South Crossways", location: "14-15 Roslyn Ct. - 142-152 Hillcrest Rd.", lat: 37.8524, lng: -122.2456, developed: true },
-          { id: 86, name: "The Steps", location: "81-85 Hillcrest Rd.", lat: 37.8525, lng: -122.2474, developed: true },
-          { id: 87, name: "Sterling Path", location: "1097-1099 Cragmont Ave. - 1070-1072 Keeler Ave.", lat: 37.8910, lng: -122.2603, developed: true },
-          { id: 88, name: "Stevenson Path", location: "1179-1181 Keeler Ave. - 1160-1168 Miller Ave.", lat: 37.8900, lng: -122.2555, developed: true },
-          { id: 89, name: "Stoddard Path", location: "1165-1169 Miller Ave. - 1160-1162 Grizzly Peak Blvd.", lat: 37.8923, lng: -122.2575, developed: true },
-          { id: 90, name: "Sunset Trail", location: "Eucalyptus Path - Willow Walk", lat: 37.8573, lng: -122.2387, developed: true },
-          { id: 91, name: "Tamalpais Path", location: "Eunice St. & Euclid Ave. - 137 Tamalpais Rd.", lat: 37.8865, lng: -122.2612, developed: true },
-          { id: 92, name: "Tanglewood Path", location: "North of 3 Tanglewood Rd. - 100 Stonewall Rd.", lat: 37.8626, lng: -122.2447, developed: true },
-          { id: 93, name: "Terrace Walk", location: "Sutter St. - 1042-1100 Shattuck Ave.", lat: 37.8888, lng: -122.2713, developed: true },
-          { id: 94, name: "Tilden Path", location: "2944-2946 Shasta Rd. - 1246-1250 Grizzly Peak Blvd.", lat: 37.8885, lng: -122.2523, developed: true },
-          { id: 95, name: "Tunbridge Lane", location: "729-735 Arlington Ave. - 89-101 Southampton Ave.", lat: 37.8960, lng: -122.2738, developed: true },
-          { id: 96, name: "Upton Lane", location: "775 San Diego Rd. - 768 San Luis Rd.", lat: 37.8960, lng: -122.2718, developed: true },
-          { id: 97, name: "Vincente Walk", location: "456 Vincente Ave. - 536-540 The Alameda", lat: 37.8998, lng: -122.2817, developed: true },
-          { id: 98, name: "Vine Lane", location: "Vine St. & Hawthorne Terrace - 1496-1500 Euclid Ave.", lat: 37.8812, lng: -122.2620, developed: true },
-          { id: 99, name: "Visalia Walk", location: "495-505 Vicente Ave. - 59-69 Menlo Place", lat: 37.8989, lng: -122.2829, developed: true },
-          { id: 100, name: "Vistamont Trail", location: "626-641 Vistamont Ave. - 616-619 Vistamont Ave.", lat: 37.9016, lng: -122.2630, developed: true },
-          { id: 101, name: "Whitaker Path", location: "1153-1155 Keeler Ave. - 1138-1144 Sterling Ave.", lat: 37.8912, lng: -122.2595, developed: true },
-          { id: 102, name: "Wildcat Path", location: "Wildcat Canyon Rd. - 1149 Hillview Rd.", lat: 37.8924, lng: -122.2502, developed: true },
-          { id: 103, name: "Willow Walk", location: "163-171 Alvarado Rd. - 275-277 Alvarado Rd.", lat: 37.8569, lng: -122.2375, developed: true },
-          { id: 104, name: "Wilson Walk", location: "9-14 Wilson Circle - 1504-1506 Summit Rd.", lat: 37.8817, lng: -122.2484, developed: true },
-          { id: 105, name: "Yosemite Steps", location: "751-801 The Alameda - 1986-1992 Yosemite Rd.", lat: 37.8960, lng: -122.2780, developed: true },
+          { id: 1, name: "Acacia Steps", location: "537-543 Spruce St. - 598-600 Cragmont Ave.", lat: 37.8920, lng: -122.2450 },
+          { id: 2, name: "Acacia Walk", location: "619-625 Spruce St. - 610-620 Cragmont Ave.", lat: 37.8922, lng: -122.2448 },
+          { id: 3, name: "Acton Crescent Path", location: "1471-1480 Acton Crescent", lat: 37.8875, lng: -122.2585 },
+          { id: 4, name: "Alta Vista Path", location: "731-733 Santa Barbara Ave.", lat: 37.8978, lng: -122.2740 },
+          { id: 5, name: "Anne Brower Path", location: "1129-1133 Miller Ave.", lat: 37.8915, lng: -122.2570 },
+          { id: 6, name: "Arden Path", location: "95-100 Arden Rd.", lat: 37.8688, lng: -122.2490 },
+          { id: 7, name: "Arden Steps", location: "Opposite 37 Mosswood Rd.", lat: 37.8692, lng: -122.2488 },
+          { id: 8, name: "Atlas Path", location: "1311-1321 Grizzly Peak Blvd.", lat: 37.886845, lng: -122.251025 },
+          { id: 9, name: "Avalon Walk", location: "2827-2828 Palm Ct.", lat: 37.860214, lng: -122.249814 },
+          { id: 10, name: "Bancroft Steps", location: "Bancroft Way & Warring St.", lat: 37.869421, lng: -122.2505864 },
+          { id: 11, name: "Berryman Path", location: "Berryman St. & Shattuck Ave.", lat: 37.8900, lng: -122.2700 },
+          { id: 12, name: "Betty Olds Path", location: "Twain Ave. & Sterling Ave.", lat: 37.8910, lng: -122.2590 },
+          { id: 13, name: "Billie Jean Walk", location: "911-917 Euclid Ave.", lat: 37.894731, lng: -122.263853 },
+          { id: 14, name: "Black Path", location: "Solano Ave. & Contra Costa Ave.", lat: 37.890895, lng: -122.275549 },
+          { id: 15, name: "Boynton Walk", location: "463-469 Arlington Ave.", lat: 37.902048, lng: -122.276377 },
+          { id: 16, name: "Bret Harte Path", location: "1099-1101 Keeler Ave.", lat: 37.890699, lng: -122.258310 },
+          { id: 17, name: "Bret Harte Way", location: "1099-1101 Euclid Ave.", lat: 37.889572, lng: -122.262454 },
+          { id: 18, name: "Cedar Path", location: "Cedar St. & La Loma Ave.", lat: 37.8880, lng: -122.2530 },
+          { id: 19, name: "Chester Lane", location: "117-131 Southampton Ave.", lat: 37.896804, lng: -122.273983 },
+          { id: 20, name: "Claremont Path", location: "267 Hillcrest Rd.", lat: 37.852046, lng: -122.241172 },
+          { id: 21, name: "Columbia Path (Lower)", location: "1365-1373 Campus Dr.", lat: 37.8840, lng: -122.2475 },
+          { id: 22, name: "Columbia Walk", location: "151-157 Fairlawn Dr.", lat: 37.8845, lng: -122.2470 },
+          { id: 23, name: "Covert Path", location: "1175-1177 Keith Ave.", lat: 37.887926, lng: -122.258066 },
+          { id: 24, name: "Crescent Park Path", location: "2-10 The Crescent", lat: 37.894929, lng: -122.254983 },
+          { id: 25, name: "The Crossways", location: "64-70 The Uplands", lat: 37.853770, lng: -122.245378 },
+          { id: 26, name: "The Cutoff", location: "95-99 The Plaza Dr.", lat: 37.854998, lng: -122.242395 },
+          { id: 27, name: "Devon Lane (Lower)", location: "Somerset Pl.", lat: 37.8946289, lng: -122.2739996 },
+          { id: 28, name: "Easter Way", location: "933-937 Spruce St.", lat: 37.892314, lng: -122.266913 },
+          { id: 29, name: "El Mirador Path", location: "1125-1133 Euclid Ave.", lat: 37.888607, lng: -122.261588 },
+          { id: 30, name: "El Paseo", location: "675-679 Vicente Ave.", lat: 37.895286, lng: -122.282274 },
+          { id: 31, name: "Encina Walk", location: "12 Oakvale Ave.", lat: 37.855215, lng: -122.246751 },
+          { id: 32, name: "Eunice Steps", location: "2015 Eunice St.", lat: 37.885414, lng: -122.271513 },
+          { id: 33, name: "Florida Walk", location: "69-70 Florida Ave.", lat: 37.9007329, lng: -122.2726253 },
+          { id: 34, name: "The Footway", location: "22-26 The Uplands", lat: 37.854262, lng: -122.247022 },
+          { id: 35, name: "Fountain Walk", location: "Sutter St. & Del Norte St.", lat: 37.889101, lng: -122.272334 },
+          { id: 36, name: "Fred Herbert Path", location: "1131-1141 Park Hills Rd.", lat: 37.8934229, lng: -122.2521887 },
+          { id: 37, name: "Garber Path", location: "2825-2826 Garber St.", lat: 37.869978, lng: -122.247647 },
+          { id: 38, name: "Geneva's Path", location: "1336-1345 Neilson Ave.", lat: 37.8780, lng: -122.2920 },
+          { id: 39, name: "Glendale Path", location: "1295-1305 Campus Dr.", lat: 37.8850, lng: -122.2540 },
+          { id: 40, name: "Great Stoneface Path", location: "Yosemite Rd.", lat: 37.896494, lng: -122.278543 },
+          { id: 41, name: "Halkin Walk", location: "695-701 Cragmont Ave.", lat: 37.8965, lng: -122.2670 },
+          { id: 42, name: "Hawthorne Steps", location: "1409-1423 Scenic Ave.", lat: 37.882380, lng: -122.263201 },
+          { id: 43, name: "Hilgard Path", location: "1647-1675 La Loma Ave.", lat: 37.8795, lng: -122.2575 },
+          { id: 44, name: "Hill Court Steps", location: "2519-2522 Hill Ct.", lat: 37.879960, lng: -122.260408 },
+          { id: 45, name: "Holmes Path", location: "451-457 Kentucky Ave.", lat: 37.902481, lng: -122.272331 },
+          { id: 46, name: "Ina Coolbrith Path", location: "1097-1101 Miller Ave.", lat: 37.892055, lng: -122.25675 },
+          { id: 47, name: "Indian Rock Path", location: "899-901 The Alameda", lat: 37.8950, lng: -122.2760 },
+          { id: 48, name: "Indian Trail", location: "715-717 The Alameda", lat: 37.895476, lng: -122.278863 },
+          { id: 49, name: "Jacque Ensign Way", location: "Solano Ave.", lat: 37.8906513, lng: -122.2750368 },
+          { id: 50, name: "John Muir Path", location: "699-701 Grizzly Peak Blvd.", lat: 37.8850, lng: -122.2480 },
+          { id: 51, name: "Keeler Path", location: "1049 Keeler Ave", lat: 37.8918953, lng: -122.2599651 },
+          { id: 52, name: "Keoncrest Path", location: "1488-1545 Keoncrest Dr.", lat: 37.8870, lng: -122.2595 },
+          { id: 53, name: "La Loma Path", location: "North of 1403 Glendale Ave.", lat: 37.884620, lng: -122.254514 },
+          { id: 54, name: "La Loma Steps", location: "1497-1501 Le Roy Ave.", lat: 37.8847874, lng: -122.2541496 },
+          { id: 55, name: "La Vereda Steps", location: "Top of Virginia St.", lat: 37.8795, lng: -122.2560 },
+          { id: 56, name: "Latham Walk", location: "Grizzly Peak Blvd. & Latham Ln.", lat: 37.894145, lng: -122.25825 },
+          { id: 57, name: "Le Roy Steps", location: "1666-1675 Le Roy Ave.", lat: 37.878515, lng: -122.258965 },
+          { id: 58, name: "Martinez Path", location: "1147-1159 Keith Ave.", lat: 37.888313, lng: -122.259157 },
+          { id: 59, name: "Maryland Walk", location: "439-441 Boynton Ave.", lat: 37.902660, lng: -122.275733 },
+          { id: 60, name: "Mendocino Path", location: "853-861 Arlington Ave.", lat: 37.893169, lng: -122.27468 },
+          { id: 61, name: "Miller Path East", location: "982 Grizzly Peak Blvd", lat: 37.894998, lng: -122.259712 },
+          { id: 62, name: "Mosswood Lane", location: "1-3 Orchard Lane", lat: 37.869049, lng: -122.249222 },
+          { id: 63, name: "North Path", location: "555-561 Cragmont Ave.", lat: 37.901713, lng: -122.268534 },
+          { id: 64, name: "Northgate Path", location: "2754-2760 Shasta Rd.", lat: 37.886753, lng: -122.257316 },
+          { id: 65, name: "Oak Knoll Path", location: "2933-2937 Russell St.", lat: 37.858868, lng: -122.247073 },
+          { id: 66, name: "Oak Street Path", location: "2335 Oak St.", lat: 37.887764, lng: -122.264484 },
+          { id: 67, name: "Oakridge Path", location: "North of 1 Hazel Rd.", lat: 37.856789, lng: -122.246335 },
+          { id: 68, name: "Oakridge Steps", location: "85-91 El Camino Real", lat: 37.854778, lng: -122.240947 },
+          { id: 69, name: "Orchard Lane", location: "7 Panoramic Way", lat: 37.86892, lng: -122.2495946 },
+          { id: 70, name: "Oxford School Way", location: "1125 Walnut St.", lat: 37.887438, lng: -122.269261 },
+          { id: 71, name: "Park Path", location: "45-51 El Camino Real", lat: 37.856034, lng: -122.242245 },
+          { id: 72, name: "Patty Kates Path", location: "1088-1100 Woodside Rd.", lat: 37.893113, lng: -122.253524 },
+          { id: 73, name: "Pine Path", location: "2851-2901 Russell St.", lat: 37.858781, lng: -122.248554 },
+          { id: 74, name: "Pinnacle Path", location: "979-981 Regal Rd.", lat: 37.8930077, lng: -122.2616004 },
+          { id: 75, name: "Poplar Path", location: "743-747 Spruce St.", lat: 37.896527, lng: -122.269218 },
+          { id: 76, name: "Poppy Path", location: "Poppy Ln. & Keeler Ave.", lat: 37.892638, lng: -122.2605 },
+          { id: 77, name: "Redwood Terrace", location: "1147-1149 Euclid Ave.", lat: 37.888126, lng: -122.260994 },
+          { id: 78, name: "Rock Walk", location: "42-46 Rock Ln.", lat: 37.896039, lng: -122.266575 },
+          { id: 79, name: "Rose Steps", location: "Opposite 2637 Rose St.", lat: 37.8835719, lng: -122.2580325 },
+          { id: 80, name: "Rose Walk", location: "Opposite 1400 Euclid Ave.", lat: 37.8831579, lng: -122.2611143 },
+          { id: 81, name: "Ruth Armstrong Path", location: "Hearst Ave.", lat: 37.8732728, lng: -122.2671839 },
+          { id: 82, name: "Santa Barbara Path", location: "597-601 San Luis Rd.", lat: 37.899833, lng: -122.275235 },
+          { id: 83, name: "Scott Newhall Path", location: "90-100 Hill Rd.", lat: 37.8881631, lng: -122.2507755 },
+          { id: 84, name: "Shasta Path", location: "2901-2905 Shasta Rd.", lat: 37.889123, lng: -122.254034 },
+          { id: 85, name: "South Crossways", location: "14-15 Roslyn Ct.", lat: 37.852118, lng: -122.245338 },
+          { id: 86, name: "The Steps", location: "81-85 Hillcrest Rd.", lat: 37.8525002, lng: -122.2473575 },
+          { id: 87, name: "Sterling Path", location: "1097-1099 Cragmont Ave.", lat: 37.890654, lng: -122.260834 },
+          { id: 88, name: "Stevenson Path", location: "1179-1181 Keeler Ave.", lat: 37.889026, lng: -122.255662 },
+          { id: 89, name: "Stoddard Path", location: "1165-1169 Miller Ave.", lat: 37.8923, lng: -122.2575 },
+          { id: 90, name: "Sunset Trail", location: "Eucalyptus Path", lat: 37.858467, lng: -122.239911 },
+          { id: 91, name: "Tamalpais Path", location: "Eunice St. & Euclid Ave.", lat: 37.886664, lng: -122.262337 },
+          { id: 92, name: "Tanglewood Path", location: "North of 3 Tanglewood Rd.", lat: 37.862579, lng: -122.245437 },
+          { id: 93, name: "Terrace Walk", location: "Sutter St. & Del Norte St.", lat: 37.889095, lng: -122.272331 },
+          { id: 94, name: "Tilden Path", location: "2944-2946 Shasta Rd.", lat: 37.888473, lng: -122.252668 },
+          { id: 95, name: "Tunbridge Lane", location: "729-735 Arlington Ave.", lat: 37.8960069, lng: -122.2723643 },
+          { id: 96, name: "Upton Lane", location: "775 San Diego Rd.", lat: 37.895856, lng: -122.272122 },
+          { id: 97, name: "Vincente Walk", location: "456 Vincente Ave.", lat: 37.899958, lng: -122.282130 },
+          { id: 98, name: "Vine Lane", location: "Vine St. & Hawthorne Terrace", lat: 37.881120, lng: -122.262522 },
+          { id: 99, name: "Visalia Walk", location: "495-505 Vicente Ave.", lat: 37.899231, lng: -122.283219 },
+          { id: 100, name: "Vistamont Trail", location: "626-641 Vistamont Ave.", lat: 37.901301, lng: -122.262953 },
+          { id: 101, name: "Whitaker Path", location: "1153-1155 Keeler Ave.", lat: 37.8912, lng: -122.2595 },
+          { id: 102, name: "Wildcat Path", location: "Wildcat Canyon Rd.", lat: 37.8923779, lng: -122.2502494 },
+          { id: 103, name: "Willow Walk", location: "163-171 Alvarado Rd.", lat: 37.856369, lng: -122.237672 },
+          { id: 104, name: "Wilson Walk", location: "9-14 Wilson Circle", lat: 37.881580, lng: -122.248738 },
+          { id: 105, name: "Yosemite Steps", location: "751-801 The Alameda", lat: 37.8960, lng: -122.2780 },
         ];
 
         function InteractiveMap({ paths, userLocation, pathData, onPathClick }) {
           const mapRef = useRef(null);
           const leafletMap = useRef(null);
-          const pathLines = useRef([]);
-
-          // Helper function to parse location and extract approximate end coordinates
-          const getEndCoordinates = (startLat, startLng, location) => {
-            // Simple offset based on typical path length (roughly 100-300 feet)
-            // This creates a small line segment to represent the path
-            const offset = 0.001; // roughly 300 feet
-            
-            // Parse location to determine direction
-            const loc = location.toLowerCase();
-            let latOffset = 0, lngOffset = 0;
-            
-            // Determine general direction based on street names
-            if (loc.includes('north') || loc.includes('up')) {
-              latOffset = offset;
-            } else if (loc.includes('south') || loc.includes('down')) {
-              latOffset = -offset;
-            }
-            
-            if (loc.includes('east')) {
-              lngOffset = offset;
-            } else if (loc.includes('west')) {
-              lngOffset = -offset;
-            }
-            
-            // If no clear direction, create a small diagonal line
-            if (latOffset === 0 && lngOffset === 0) {
-              latOffset = offset * 0.5;
-              lngOffset = offset * 0.5;
-            }
-            
-            return {
-              lat: startLat + latOffset,
-              lng: startLng + lngOffset
-            };
-          };
+          const markers = useRef([]);
 
           useEffect(() => {
             if (!leafletMap.current && mapRef.current) {
-              // Initialize Leaflet map with OpenStreetMap tiles
               leafletMap.current = L.map(mapRef.current).setView([37.8792, -122.2595], 13);
               
               L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors',
+                attribution: '© OpenStreetMap',
                 maxZoom: 19
               }).addTo(leafletMap.current);
             }
@@ -251,53 +224,42 @@
           useEffect(() => {
             if (!leafletMap.current) return;
 
-            // Clear existing path lines
-            pathLines.current.forEach(line => line.remove());
-            pathLines.current = [];
+            markers.current.forEach(marker => marker.remove());
+            markers.current = [];
 
-            // Draw path lines
             paths.forEach(path => {
               const isCompleted = pathData[path.id]?.completed;
               const isNearby = path.distance && path.distance < 0.5;
               
               const color = isCompleted ? '#22c55e' : isNearby ? '#3b82f6' : '#94a3b8';
-              const weight = isNearby ? 4 : isCompleted ? 3 : 2;
+              const radius = isNearby ? 8 : 6;
               
-              // Get end coordinates
-              const endCoords = getEndCoordinates(path.lat, path.lng, path.location);
-              
-              // Draw line from start to end
-              const polyline = L.polyline(
-                [[path.lat, path.lng], [endCoords.lat, endCoords.lng]], 
-                {
-                  color: color,
-                  weight: weight,
-                  opacity: isNearby ? 1 : 0.7
-                }
-              ).addTo(leafletMap.current);
-
-              polyline.bindPopup(`<strong>${path.name}</strong><br>${path.location}`);
-              polyline.on('click', () => onPathClick(path));
-              
-              pathLines.current.push(polyline);
-              
-              // Add a small circle marker at the start point
-              const startMarker = L.circleMarker([path.lat, path.lng], {
-                radius: 4,
+              const marker = L.circleMarker([path.lat, path.lng], {
+                radius: radius,
                 fillColor: color,
                 color: '#fff',
-                weight: 1,
+                weight: 2,
                 opacity: 1,
                 fillOpacity: 1
               }).addTo(leafletMap.current);
+
+              marker.bindPopup(`<strong>${path.name}</strong><br>${path.location}`);
+              marker.on('click', () => onPathClick(path));
               
-              startMarker.bindPopup(`<strong>${path.name}</strong><br>${path.location}`);
-              startMarker.on('click', () => onPathClick(path));
+              // Add path name label for nearby paths
+              if (isNearby) {
+                const icon = L.divIcon({
+                  className: 'path-label',
+                  html: path.name,
+                  iconSize: null
+                });
+                const labelMarker = L.marker([path.lat, path.lng], { icon: icon }).addTo(leafletMap.current);
+                markers.current.push(labelMarker);
+              }
               
-              pathLines.current.push(startMarker);
+              markers.current.push(marker);
             });
 
-            // Add user location marker
             if (userLocation) {
               const userMarker = L.circleMarker([userLocation.lat, userLocation.lng], {
                 radius: 10,
@@ -309,9 +271,7 @@
               }).addTo(leafletMap.current);
 
               userMarker.bindPopup('<strong>You are here</strong>');
-              pathLines.current.push(userMarker);
-
-              // Center map on user location
+              markers.current.push(userMarker);
               leafletMap.current.setView([userLocation.lat, userLocation.lng], 14);
             }
           }, [paths, userLocation, pathData, onPathClick]);
@@ -591,7 +551,7 @@
 
                         <div className="border-t pt-4">
                           <a
-                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedPath.name + ' Berkeley CA')}`}
+                            href={`https://www.google.com/maps/search/?api=1&query=${selectedPath.lat},${selectedPath.lng}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
@@ -599,7 +559,7 @@
                             <MapPin /> Open in Google Maps
                           </a>
                           <p className="text-xs text-gray-500 mt-2">
-                            Starting point: {selectedPath.location.split(' - ')[0]}
+                            Starting point: {selectedPath.location}
                           </p>
                         </div>
                       </div>
@@ -630,3 +590,4 @@
     </script>
 </body>
 </html>
+            
