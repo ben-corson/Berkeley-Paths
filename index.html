@@ -196,7 +196,7 @@
 
           useEffect(() => {
             if (!leafletMap.current && mapRef.current) {
-              leafletMap.current = L.map(mapRef.current).setView([37.8792, -122.2595], 13);
+              leafletMap.current = L.map(mapRef.current).setView([37.8792, -122.2595], 15);
               
               // Expose map instance to parent
               if (mapInstanceRef) {
@@ -244,7 +244,7 @@
               pathLines.current.push(polyline);
             });
 
-            if (userLocation) {
+            if (userLocation && !pathLines.current.some(line => line instanceof L.CircleMarker)) {
               const userMarker = L.circleMarker([userLocation.lat, userLocation.lng], {
                 radius: 10,
                 fillColor: '#ef4444',
@@ -256,7 +256,8 @@
 
               userMarker.bindPopup('<strong>You are here</strong>');
               pathLines.current.push(userMarker);
-              leafletMap.current.setView([userLocation.lat, userLocation.lng], 14);
+              // Only set view to user location on initial load
+              leafletMap.current.setView([userLocation.lat, userLocation.lng], 15);
             }
           }, [paths, userLocation, pathData, onPathClick]);
 
@@ -392,17 +393,17 @@
           });
 
           const handlePathNameClick = (path) => {
-            setViewMode('map');
             setSelectedPath(path);
-            // Small delay to ensure map is rendered before zooming
+            setViewMode('map');
+            // Longer delay to ensure map is fully rendered and ref is set
             setTimeout(() => {
               if (mapRef.current) {
                 // Calculate center point between start and end
                 const centerLat = (path.start[0] + path.end[0]) / 2;
                 const centerLng = (path.start[1] + path.end[1]) / 2;
-                mapRef.current.setView([centerLat, centerLng], 17);
+                mapRef.current.setView([centerLat, centerLng], 18);
               }
-            }, 100);
+            }, 300);
           };
 
           return (
