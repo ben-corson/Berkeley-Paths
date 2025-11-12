@@ -193,6 +193,7 @@
           const mapRef = useRef(null);
           const leafletMap = useRef(null);
           const pathLines = useRef([]);
+          const hasSetInitialView = useRef(false);
 
           useEffect(() => {
             if (!leafletMap.current && mapRef.current) {
@@ -256,8 +257,12 @@
 
               userMarker.bindPopup('<strong>You are here</strong>');
               pathLines.current.push(userMarker);
-              // Only set view to user location on initial load
-              leafletMap.current.setView([userLocation.lat, userLocation.lng], 18);
+              
+              // Only set view to user location on very first load
+              if (!hasSetInitialView.current) {
+                leafletMap.current.setView([userLocation.lat, userLocation.lng], 18);
+                hasSetInitialView.current = true;
+              }
             }
           }, [paths, userLocation, pathData, onPathClick]);
 
@@ -420,6 +425,16 @@
             }, 300);
           };
 
+          const handleMapPathClick = (path) => {
+            setSelectedPath(path);
+            // Center the map on the clicked path
+            if (mapRef.current) {
+              const centerLat = (path.start[0] + path.end[0]) / 2;
+              const centerLng = (path.start[1] + path.end[1]) / 2;
+              mapRef.current.setView([centerLat, centerLng], 18);
+            }
+          };
+
           return (
             <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
               <div className="bg-white shadow-md sticky top-0 z-10">
@@ -549,7 +564,7 @@
                       paths={sortedPaths} 
                       userLocation={userLocation}
                       pathData={pathData}
-                      onPathClick={setSelectedPath}
+                      onPathClick={handleMapPathClick}
                       mapInstanceRef={mapRef}
                     />
                   </div>
@@ -557,7 +572,7 @@
               </div>
 
               {selectedPath && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setSelectedPath(null)}>
+                <div className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center p-4" onClick={() => setSelectedPath(null)}>
                   <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                     <div className="p-6">
                       <div className="flex justify-between items-start mb-4">
