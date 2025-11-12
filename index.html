@@ -11,15 +11,37 @@
     <!-- Custom App Icon for iOS Home Screen -->
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><defs><linearGradient id='bg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' style='stop-color:%2310b981;stop-opacity:1' /><stop offset='100%25' style='stop-color:%23059669;stop-opacity:1' /></linearGradient></defs><rect width='180' height='180' fill='url(%23bg)' rx='40'/><path d='M45 135 Q60 90 75 105 T105 90 Q120 75 135 90' stroke='white' stroke-width='8' fill='none' stroke-linecap='round' stroke-linejoin='round'/><circle cx='45' cy='135' r='8' fill='white'/><circle cx='135' cy='90' r='8' fill='white'/><path d='M85 45 L75 60 L90 70 L95 50 Z' fill='white' opacity='0.9'/><text x='90' y='165' font-family='Arial, sans-serif' font-size='16' font-weight='bold' fill='white' text-anchor='middle'>BERKELEY</text></svg>">
     
+    <!-- Custom Fonts -->
+    <!-- Using similar web-safe alternatives since ITC Rennie Mackintosh and Trade Gothic are commercial fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Arts & Crafts style font for title (similar to Rennie Mackintosh's aesthetic) -->
+    <link href="https://fonts.googleapis.com/css2?family=Alike&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        body { -webkit-user-select: none; -webkit-touch-callout: none; }
+        body { 
+            -webkit-user-select: none; 
+            -webkit-touch-callout: none;
+            font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
         #map { height: 600px; width: 100%; }
+        
+        /* Custom font for main title */
+        .app-title {
+            font-family: 'Alike', serif;
+            letter-spacing: 0.02em;
+        }
+        
+        /* Trade Gothic alternative for body text */
+        .body-font {
+            font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
     </style>
 </head>
-<body>
+<body class="body-font">
     <div id="app"></div>
     
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -443,7 +465,7 @@
             <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
               <div className="bg-white shadow-md sticky top-0 z-10">
                 <div className="max-w-4xl mx-auto px-4 py-4">
-                  <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                  <h1 className="app-title text-xl font-bold text-gray-800 flex items-center gap-2">
                     <MapPin />
                     Berkeley Paths Tracker
                   </h1>
