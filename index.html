@@ -189,7 +189,7 @@
           { id: 105, name: "Yosemite Steps", location: "751-801 The Alameda - 1986-1992 Yosemite Rd.", start: [37.896, -122.278], end: [37.8962, -122.2778] }
         ];
 
-        function InteractiveMap({ paths, userLocation, pathData, onPathClick }) {
+        function InteractiveMap({ paths, userLocation, pathData, onPathClick, mapInstanceRef }) {
           const mapRef = useRef(null);
           const leafletMap = useRef(null);
           const pathLines = useRef([]);
@@ -197,6 +197,11 @@
           useEffect(() => {
             if (!leafletMap.current && mapRef.current) {
               leafletMap.current = L.map(mapRef.current).setView([37.8792, -122.2595], 13);
+              
+              // Expose map instance to parent
+              if (mapInstanceRef) {
+                mapInstanceRef.current = leafletMap.current;
+              }
               
               // Use a more artistic/vintage map style similar to the Berkeley Paths map
               L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -230,7 +235,7 @@
               const polyline = L.polyline([path.start, path.end], {
                 color: color,
                 weight: weight,
-                opacity: 0.8
+                opacity: 0.5
               }).addTo(leafletMap.current);
 
               polyline.bindPopup(`<strong>${path.name}</strong><br>${path.location}`);
@@ -297,6 +302,7 @@
           const [filter, setFilter] = useState('all');
           const [selectedPath, setSelectedPath] = useState(null);
           const [userLocation, setUserLocation] = useState(null);
+          const mapRef = useRef(null);
 
           useEffect(() => {
             const saved = localStorage.getItem('berkeleyPathsData');
@@ -385,6 +391,20 @@
             return true;
           });
 
+          const handlePathNameClick = (path) => {
+            setViewMode('map');
+            setSelectedPath(path);
+            // Small delay to ensure map is rendered before zooming
+            setTimeout(() => {
+              if (mapRef.current) {
+                // Calculate center point between start and end
+                const centerLat = (path.start[0] + path.end[0]) / 2;
+                const centerLng = (path.start[1] + path.end[1]) / 2;
+                mapRef.current.setView([centerLat, centerLng], 17);
+              }
+            }, 100);
+          };
+
           return (
             <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
               <div className="bg-white shadow-md sticky top-0 z-10">
@@ -457,9 +477,9 @@
                         }`}
                       >
                         <div className="flex items-start justify-between">
-                          <div className="flex-1 cursor-pointer" onClick={() => setSelectedPath(path)}>
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <h3 className={`font-semibold text-lg ${
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 flex-wrap cursor-pointer" onClick={() => handlePathNameClick(path)}>
+                              <h3 className={`font-semibold text-lg hover:text-blue-600 transition-colors ${
                                 pathData[path.id]?.completed ? 'text-gray-500 line-through' : 'text-gray-800'
                               }`}>
                                 {path.name}
@@ -502,6 +522,7 @@
                       userLocation={userLocation}
                       pathData={pathData}
                       onPathClick={setSelectedPath}
+                      mapInstanceRef={mapRef}
                     />
                   </div>
                 )}
