@@ -1,0 +1,38 @@
+{
+  "name": "berkeley-paths-tracker",
+  "version": "1.0.0",
+  "description": "A progressive web app for tracking your progress through all 105 developed paths in Berkeley, California",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "dev": "python -m http.server 8000",
+    "serve": "npx http-server -p 8000",
+    "validate-json": "node -e \"require('./data/paths-data.json')\" && echo 'JSON is valid!'",
+    "build": "bash scripts/build.sh",
+    "deploy": "echo 'Deploy to your hosting service'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/berkeley-paths-tracker.git"
+  },
+  "keywords": [
+    "berkeley",
+    "paths",
+    "hiking",
+    "walking",
+    "tracker",
+    "progressive-web-app",
+    "pwa",
+    "react",
+    "leaflet",
+    "maps"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yourusername/berkeley-paths-tracker/issues"
+  },
+  "homepage": "https://github.com/yourusername/berkeley-paths-tracker#readme",
+  "devDependencies": {},
+  "dependencies": {}
+}

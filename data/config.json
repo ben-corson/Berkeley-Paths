@@ -1,0 +1,21 @@
+{
+  "version": "1.0.0",
+  "appName": "Berkeley Paths Tracker",
+  "lastUpdated": "2025-01-XX",
+  "totalPaths": 105,
+  "dataSource": "https://www.berkeleypath.org/",
+  "repository": "https://github.com/yourusername/berkeley-paths-tracker",
+  "defaultMapCenter": {
+    "lat": 37.8792,
+    "lng": -122.2595
+  },
+  "defaultMapZoom": 18,
+  "nearbyDistanceThreshold": 0.5,
+  "colors": {
+    "berkeleyBurgundy": "#941B1E",
+    "berkeleyBurgundyDark": "#6B1214",
+    "berkeleyGold": "#EAA636",
+    "berkeleyTan": "#C9984A",
+    "berkeleyLightTan": "#D4A574"
+  }
+}

@@ -1,0 +1,48 @@
+:root {
+    /* City of Berkeley Brand Colors */
+    --berkeley-burgundy: #941B1E;
+    --berkeley-burgundy-dark: #6B1214;
+    --berkeley-gold: #EAA636;
+    --berkeley-tan: #C9984A;
+    --berkeley-light-tan: #D4A574;
+}
+
+body { 
+    -webkit-user-select: none; 
+    -webkit-touch-callout: none;
+    font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #941B1E 0%, #6B1214 100%);
+}
+
+#map { 
+    height: 600px; 
+    width: 100%; 
+}
+
+/* Custom font for main title */
+.app-title {
+    font-family: 'Alike', serif;
+    letter-spacing: 0.02em;
+    color: var(--berkeley-gold);
+}
+
+/* Berkeley themed elements */
+.berkeley-burgundy-bg { 
+    background-color: var(--berkeley-burgundy); 
+}
+
+.berkeley-gold-bg { 
+    background-color: var(--berkeley-gold); 
+}
+
+.berkeley-gold-text { 
+    color: var(--berkeley-gold); 
+}
+
+.berkeley-burgundy-text { 
+    color: var(--berkeley-burgundy); 
+}
+
+.berkeley-tan-bg { 
+    background-color: var(--berkeley-tan); 
+}
