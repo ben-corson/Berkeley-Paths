@@ -8,24 +8,32 @@
     <meta name="apple-mobile-web-app-title" content="Berkeley Paths">
     <title>Berkeley Paths Tracker</title>
     
-    <!-- Custom App Icon for iOS Home Screen -->
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><defs><linearGradient id='bg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' style='stop-color:%2310b981;stop-opacity:1' /><stop offset='100%25' style='stop-color:%23059669;stop-opacity:1' /></linearGradient></defs><rect width='180' height='180' fill='url(%23bg)' rx='40'/><path d='M45 135 Q60 90 75 105 T105 90 Q120 75 135 90' stroke='white' stroke-width='8' fill='none' stroke-linecap='round' stroke-linejoin='round'/><circle cx='45' cy='135' r='8' fill='white'/><circle cx='135' cy='90' r='8' fill='white'/><path d='M85 45 L75 60 L90 70 L95 50 Z' fill='white' opacity='0.9'/><text x='90' y='165' font-family='Arial, sans-serif' font-size='16' font-weight='bold' fill='white' text-anchor='middle'>BERKELEY</text></svg>">
+    <!-- Custom App Icon for iOS Home Screen - PNG format for iOS compatibility -->
+    <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAADe0lEQVR4nO3d4U3jQBSFUbPaPpYKlkJodymEDihlf0SCCLjGTmy/mfE5BaBI8/HGjB3z8O/P3wm+86v6A9AucRCJg0gcROIgEgeROIjEQSQOInEQiYNIHETiIBIHkTiIxEEkDiJxEImDSBxE4iASB5E4iMRBJA4icRCJg0gcROIgEgeROIjEQSQOInEQiYNIHETiIBIHkTiIxo/j+e21+iP0avw4pml6fnuVyA0exn6D8dcmXh6fSj5Jj04xOa6ZIsuNPDl+jMAUmXe6yXHNFJk3bBwLV93wmDFsHNxvzDiMjU2MGQebGDAOY2MrA8bx8vhk4Tcx8jnHlKeIepYYcHJcM0XuMfjkuPY+ReSy0OCT45opstaJJgdrnWhysJY4iMRBJA4icRCJg0gcROIgEgeROIjEQSQOInEQ/a7+AEzTlyfWGnm0wC37YjOPQ5cnYlupNP+gfPlXNcVRZsna1/YhjhrLV72wDxeku3t+e315fCrfI25gcuxoq1c8VIVlcuzi03L2ODYmcWyu0w6+JY5tjNTEO3Hca8gsLsRxu8OyqDoqFcctBp4W18RxkK+//e2/ZMaNt9XWjo2Z1W38TaniWGHDLJb8zPK7suJYankZNyyq5zl6tWsWLXNB+oP2Lxv3I47ozFlciON7S8oYOIsLcXwmi3fi+GAf+UQc5/1j5EfnjWOPE63BnC6OG+6ZnTCLi7PEcfN91NOWMQ0fxz331s+cxcXIT58r407DxqGM+w24rbi82MpocfhjZEPjxOHcYnODxOGUcw/dx+GGyH76jsMd1F31GocsDtDlOYcyjtHT5HB5cbBuJocyjtfT5Jgni831MTka/9rgqDqYHPNlyGI/fUyORBm7aj2Olr9nPLym41BGrabjSJRxjHbjOMmrlVrWaBw2lBY0GkeijCM1dM5hH2lNE3G4b9Km+m1FGc0qjsNW0rLKOJTRuPpthWaVxbF2bBgzxzM5iMRBJA4icRCVxbH2UMsh2PFMDqLKOJYPA2OjRPHkWLLqyqhSv63Mr70yCjX0z3ja/G9FZ9ZQHLSmfluhWeIgEgeROIjEQSQOInEQiYNIHETiIBIHkTiIxEEkDiJxEImDSBxE4iASB5E4iMRBJA4icRCJg0gcROIgEgeROIjEQSQOInEQiYNIHETiIBIHkTiIxEEkDiJxEImDSBxE4iD6D6kN7n/pcz3PAAAAAElFTkSuQmCC">
     
     <!-- Custom Fonts -->
-    <!-- Using similar web-safe alternatives since ITC Rennie Mackintosh and Trade Gothic are commercial fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Arts & Crafts style font for title (similar to Rennie Mackintosh's aesthetic) -->
     <link href="https://fonts.googleapis.com/css2?family=Alike&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
+        :root {
+            /* City of Berkeley Brand Colors */
+            --berkeley-burgundy: #941B1E;
+            --berkeley-burgundy-dark: #6B1214;
+            --berkeley-gold: #EAA636;
+            --berkeley-tan: #C9984A;
+            --berkeley-light-tan: #D4A574;
+        }
+        
         body { 
             -webkit-user-select: none; 
             -webkit-touch-callout: none;
             font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #941B1E 0%, #6B1214 100%);
         }
         #map { height: 600px; width: 100%; }
         
@@ -33,12 +41,15 @@
         .app-title {
             font-family: 'Alike', serif;
             letter-spacing: 0.02em;
+            color: var(--berkeley-gold);
         }
         
-        /* Trade Gothic alternative for body text */
-        .body-font {
-            font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        }
+        /* Berkeley themed elements */
+        .berkeley-burgundy-bg { background-color: var(--berkeley-burgundy); }
+        .berkeley-gold-bg { background-color: var(--berkeley-gold); }
+        .berkeley-gold-text { color: var(--berkeley-gold); }
+        .berkeley-burgundy-text { color: var(--berkeley-burgundy); }
+        .berkeley-tan-bg { background-color: var(--berkeley-tan); }
     </style>
 </head>
 <body class="body-font">
@@ -255,7 +266,7 @@
               const isCompleted = pathData[path.id]?.completed;
               const isNearby = path.distance && path.distance < 0.5;
               
-              const color = isCompleted ? '#22c55e' : isNearby ? '#3b82f6' : '#d97706';
+              const color = isCompleted ? '#941B1E' : isNearby ? '#EAA636' : '#C9984A';
               const weight = isNearby ? 6 : isCompleted ? 5 : 4;
               
               // Draw line from start to end
@@ -298,15 +309,15 @@
               <div className="mt-4 bg-white border border-gray-200 rounded-lg p-3">
                 <div className="flex items-center gap-4 text-sm flex-wrap">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-1 bg-orange-500"></div>
+                    <div className="w-8 h-1" style={{backgroundColor: '#C9984A'}}></div>
                     <span>Not completed</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-1 bg-blue-500" style={{height: '5px'}}></div>
+                    <div className="w-8 h-1" style={{height: '5px', backgroundColor: '#EAA636'}}></div>
                     <span>Nearby (within 0.5 mi)</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-1 bg-green-500" style={{height: '4px'}}></div>
+                    <div className="w-8 h-1" style={{height: '4px', backgroundColor: '#941B1E'}}></div>
                     <span>Completed</span>
                   </div>
                   {userLocation && (
@@ -462,21 +473,21 @@
           };
 
           return (
-            <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
-              <div className="bg-white shadow-md sticky top-0 z-10">
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-50">
+              <div className="berkeley-burgundy-bg shadow-md sticky top-0 z-10">
                 <div className="max-w-4xl mx-auto px-4 py-4">
-                  <h1 className="app-title text-xl font-bold text-gray-800 flex items-center gap-2">
+                  <h1 className="app-title text-xl font-bold flex items-center gap-2">
                     <MapPin />
                     Berkeley Paths Tracker
                   </h1>
                   <div className="mt-3">
-                    <div className="flex justify-between text-sm text-gray-600 mb-1">
+                    <div className="flex justify-between text-sm text-gray-100 mb-1">
                       <span>{completedCount} of {totalPaths} paths</span>
-                      <span className="font-semibold text-green-600">{percentage}%</span>
+                      <span className="font-semibold berkeley-gold-text">{percentage}%</span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div className="w-full bg-gray-700 rounded-full h-3">
                       <div 
-                        className="bg-gradient-to-r from-green-500 to-blue-500 h-3 rounded-full transition-all duration-500"
+                        className="berkeley-gold-bg h-3 rounded-full transition-all duration-500"
                         style={{ width: `${percentage}%` }}
                       />
                     </div>
@@ -491,7 +502,7 @@
                       onClick={() => setViewMode('list')}
                       className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-1 ${
                         viewMode === 'list' 
-                          ? 'bg-green-600 text-white shadow-md' 
+                          ? 'berkeley-gold-bg berkeley-burgundy-text shadow-md' 
                           : 'bg-white text-gray-700'
                       }`}
                     >
@@ -501,7 +512,7 @@
                       onClick={() => setViewMode('map')}
                       className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-1 ${
                         viewMode === 'map' 
-                          ? 'bg-green-600 text-white shadow-md' 
+                          ? 'berkeley-gold-bg berkeley-burgundy-text shadow-md' 
                           : 'bg-white text-gray-700'
                       }`}
                     >
@@ -542,8 +553,9 @@
                       <div
                         key={path.id}
                         className={`bg-white rounded-lg p-4 shadow-sm transition-all hover:shadow-md ${
-                          pathData[path.id]?.completed ? 'border-l-4 border-green-500' : ''
+                          pathData[path.id]?.completed ? 'border-l-4' : ''
                         }`}
+                        style={pathData[path.id]?.completed ? {borderColor: '#941B1E'} : {}}
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
@@ -555,15 +567,16 @@
                               </h3>
                               {path.distance && (
                                 <span className={`text-xs px-2 py-1 rounded-full ${
-                                  path.distance < 0.5 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
-                                }`}>
+                                  path.distance < 0.5 ? 'text-gray-800' : 'bg-gray-100 text-gray-600'
+                                }`}
+                                style={path.distance < 0.5 ? {backgroundColor: '#EAA636'} : {}}>
                                   {path.distance.toFixed(1)} mi
                                 </span>
                               )}
                             </div>
                             <p className="text-sm text-gray-600 mt-1">{path.location}</p>
                             {pathData[path.id]?.dateCompleted && (
-                              <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                              <p className="text-xs mt-1 flex items-center gap-1" style={{color: '#941B1E'}}>
                                 <Calendar />
                                 Completed {new Date(pathData[path.id].dateCompleted).toLocaleDateString()}
                               </p>
@@ -616,7 +629,7 @@
                           onClick={() => togglePath(selectedPath.id)}
                           className={`w-full py-3 px-4 rounded-lg font-medium transition-all ${
                             pathData[selectedPath.id]?.completed
-                              ? 'bg-green-600 text-white hover:bg-green-700'
+                              ? 'berkeley-gold-bg berkeley-burgundy-text hover:opacity-90'
                               : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                           }`}
                         >
@@ -635,7 +648,8 @@
                             value={pathData[selectedPath.id]?.notes || ''}
                             onChange={(e) => updatePathNotes(selectedPath.id, e.target.value)}
                             placeholder="Add your thoughts, difficulty level, highlights..."
-                            className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                            className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:border-transparent"
+                            style={{'--tw-ring-color': '#941B1E'}}
                             rows="4"
                           />
                         </div>
@@ -645,7 +659,7 @@
                             href={`https://www.google.com/maps/dir/${selectedPath.start[0]},${selectedPath.start[1]}/${selectedPath.end[0]},${selectedPath.end[1]}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
+                            className="inline-flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-all berkeley-gold-bg hover:opacity-90"
                           >
                             <MapPin /> Get Directions in Google Maps
                           </a>
