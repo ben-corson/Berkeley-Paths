@@ -301,6 +301,7 @@
           const [pathData, setPathData] = useState({});
           const [viewMode, setViewMode] = useState('map');
           const [filter, setFilter] = useState('all');
+          const [sortBy, setSortBy] = useState('distance'); // 'distance' or 'alphabetical'
           const [selectedPath, setSelectedPath] = useState(null);
           const [userLocation, setUserLocation] = useState(null);
           const mapRef = useRef(null);
@@ -379,7 +380,7 @@
           const pathsWithDistance = userLocation ? paths.map(path => ({
             ...path,
             distance: calculateDistance(userLocation.lat, userLocation.lng, path.start[0], path.start[1])
-          })).sort((a, b) => a.distance - b.distance) : paths;
+          })) : paths;
 
           const completedCount = Object.values(pathData).filter(d => d.completed).length;
           const totalPaths = paths.length;
@@ -390,6 +391,19 @@
             if (filter === 'remaining') return !pathData[path.id]?.completed;
             if (filter === 'nearby') return path.distance && path.distance < 0.5;
             return true;
+          });
+
+          // Apply sorting based on sortBy state
+          const sortedPaths = [...filteredPaths].sort((a, b) => {
+            if (sortBy === 'alphabetical') {
+              return a.name.localeCompare(b.name);
+            } else {
+              // Sort by distance (default)
+              if (!a.distance && !b.distance) return 0;
+              if (!a.distance) return 1;
+              if (!b.distance) return -1;
+              return a.distance - b.distance;
+            }
           });
 
           const handlePathNameClick = (path) => {
@@ -454,15 +468,29 @@
                     </button>
                   </div>
                   
-                  <select 
-                    value={filter}
-                    onChange={(e) => setFilter(e.target.value)}
-                    className="px-4 py-2 rounded-lg bg-white border border-gray-300 text-gray-700"
-                  >
-                    <option value="all">All Paths ({totalPaths})</option>
-                    <option value="nearby">Nearby ({pathsWithDistance.filter(p => p.distance && p.distance < 0.5).length})</option>
-                    <option value="completed">Completed ({completedCount})</option>
-                    <option value="remaining">Remaining ({totalPaths - completedCount})</option>
+                  <div className="flex gap-2 flex-wrap">
+                    {viewMode === 'list' && (
+                      <select 
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value)}
+                        className="px-4 py-2 rounded-lg bg-white border border-gray-300 text-gray-700"
+                      >
+                        <option value="distance">Sort: Distance</option>
+                        <option value="alphabetical">Sort: A-Z</option>
+                      </select>
+                    )}
+                    
+                    <select 
+                      value={filter}
+                      onChange={(e) => setFilter(e.target.value)}
+                      className="px-4 py-2 rounded-lg bg-white border border-gray-300 text-gray-700"
+                    >
+                      <option value="all">All Paths ({totalPaths})</option>
+                      <option value="nearby">Nearby ({pathsWithDistance.filter(p => p.distance && p.distance < 0.5).length})</option>
+                      <option value="completed">Completed ({completedCount})</option>
+                      <option value="remaining">Remaining ({totalPaths - completedCount})</option>
+                    </select>
+                  </div>
                   </select>
                 </div>
               </div>
@@ -470,7 +498,7 @@
               <div className="max-w-4xl mx-auto px-4 pb-8">
                 {viewMode === 'list' ? (
                   <div className="space-y-2">
-                    {filteredPaths.map(path => (
+                    {sortedPaths.map(path => (
                       <div
                         key={path.id}
                         className={`bg-white rounded-lg p-4 shadow-sm transition-all hover:shadow-md ${
@@ -519,7 +547,7 @@
                 ) : (
                   <div className="bg-white rounded-lg shadow-md overflow-hidden p-4">
                     <InteractiveMap 
-                      paths={filteredPaths} 
+                      paths={sortedPaths} 
                       userLocation={userLocation}
                       pathData={pathData}
                       onPathClick={setSelectedPath}
