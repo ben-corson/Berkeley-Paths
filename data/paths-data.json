@@ -9,7 +9,7 @@
   { "id": 8, "name": "Atlas Path", "location": "1311-1321 Grizzly Peak Blvd. - 150-156 Hill Rd.", "start": [37.886845, -122.251025], "end": [37.886998, -122.24996] },
   { "id": 9, "name": "Avalon Walk", "location": "2827-2828 Palm Ct. - 2901-2904 Avalon Ave.", "start": [37.860214, -122.249814], "end": [37.859876, -122.249248] },
   { "id": 10, "name": "Bancroft Steps", "location": "Bancroft Way & Warring St. - Bancroft Way & Prospect St.", "start": [37.869413, -122.250188], "end": [37.869328, -122.250927] },
-  { "id": 11, "name": "Berryman Path", "location": "Berryman St. & Shattuck Ave. - south of 1256 Spruce St.", "start": [37.89, -122.27], "end": [37.8905, -122.2695] },
+  { "id": 11, "name": "Berryman Path", "location": "Berryman St. & Shattuck Ave. - south of 1256 Spruce St.", "start": [37.884251, -122.267661], "end": [37.883913, -122.269754] },
   { "id": 12, "name": "Betty Olds Path", "location": "Twain Ave. & Sterling Ave. - 85-91 Whitaker Ave.", "start": [37.890814, -122.256082], "end": [37.890665, -122.256739] },
   { "id": 13, "name": "Billie Jean Walk", "location": "911-917 Euclid Ave. - 918-924 Hilldale Ave.", "start": [37.894731, -122.263853], "end": [37.895099, -122.262791] },
   { "id": 14, "name": "Black Path", "location": "Solano Ave. and Contra Costa Ave. - 928 Mendocino Ave.", "start": [37.890895, -122.275549], "end": [37.890895, -122.274219] },
