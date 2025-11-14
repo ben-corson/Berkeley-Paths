@@ -103,5 +103,9 @@
   { "id": 102, "name": "Wildcat Path", "location": "Wildcat Canyon Rd. - 1149 Hillview Rd.", "start": [37.892132, -122.250709], "end": [37.892764, -122.250011] },
   { "id": 103, "name": "Willow Walk", "location": "163-171 Alvarado Rd. - 275-277 Alvarado Rd.", "start": [37.856369, -122.237672], "end": [37.857258, -122.237476] },
   { "id": 104, "name": "Wilson Walk", "location": "9-14 Wilson Circle - 1504-1506 Summit Rd.", "start": [37.88158, -122.248738], "end": [37.881767, -122.248062] },
-  { "id": 105, "name": "Yosemite Steps", "location": "751-801 The Alameda - 1986-1992 Yosemite Rd.", "start": [37.896, -122.278], "end": [37.8962, -122.2778] }
+  { "id": 105, "name": "Yosemite Steps", "location": "751-801 The Alameda - 1986-1992 Yosemite Rd.", "start": [37.896, -122.278], "end": [37.8962, -122.2778] },
+  { "id": 106, "name": "Ardmore Path", "location": "Ardmore Road - Coventry Road". "start": [37.903888, -122.278482], "end": [37.903554, -122.280555] },
+  { "id": 107, "name": "Public Path #2", "location": "Coventry Road - Straford Road". "start": [37.903617, -122.281588], "end": [37.903547, -122.282567] },
+  { "id": 108, "name": "Public Path #3 Path", "location": "Coventry Road - Coventry Road". "start": [37.902587, -122.280456], "end": [37.902245, -122.281318] },
+  { "id": 109, "name": "Public Path #1 Path", "location": "Marchnat Court - Coventry Road". "start": [37.901797, -122.283691], "end": [37.901123, -122.283777] }
 ]
