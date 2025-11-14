@@ -35,7 +35,7 @@
   { "id": 34, "name": "The Footway", "location": "22-26 The Uplands - 15-18 Hillcrest Ct.", "start": [37.854262, -122.247022], "end": [37.853522, -122.247473] },
   { "id": 35, "name": "Fountain Walk", "location": "Sutter St. and Del Norte St. - Marin Circle", "start": [37.889101, -122.272334], "end": [37.890041, -122.272323] },
   { "id": 36, "name": "Fred Herbert Path", "location": "1131-1141 Park Hills Rd. - Wildcat Canyon Rd.", "start": [37.8934229, -122.2521887], "end": [37.891545, -122.252204] },
-  { "id": 37, "name": "Garber Path", "location": "2825-2826 Garber St. - 2844-2845 Garber St.", "start": [37.869978, -122.247647], "end": [37.869904, -122.246955] },
+  { "id": 37, "name": "Garber Path", "location": "2825-2826 Garber St. - 2844-2845 Garber St.", "start": [37.860961, -122.249191], "end": [37.860882, -122.249857] },
   { "id": 38, "name": "Geneva's Path", "location": "1336-1345 Neilson Ave. - 1313 Curtis St.", "start": [37.880119, -122.289568], "end": [37.881274, -122.290048] },
   { "id": 39, "name": "Glendale Path", "location": "1295-1305 Campus Dr. - 98-100 Fairlawn Dr.", "start": [37.886354, -122.251920], "end": [37.885533, -122.254323] },
   { "id": 40, "name": "Great Stoneface Path", "location": "Yosemite Rd. & San Fernando Ave.", "start": [37.896494, -122.278543], "end": [37.89708, -122.278185] },
