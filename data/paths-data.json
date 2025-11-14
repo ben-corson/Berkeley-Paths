@@ -48,7 +48,7 @@
   { "id": 47, "name": "Indian Rock Path", "location": "899-901 The Alameda - Shattuck Ave.", "start": [37.891837, -122.272458], "end": [37.891572, -122.277129] },
   { "id": 48, "name": "Indian Trail", "location": "715-717 The Alameda - 1890-1900 Yosemite Rd.", "start": [37.895476, -122.278863], "end": [37.896468, -122.278651] },
   { "id": 49, "name": "Jacque Ensign Way", "location": "Solano Ave. - Los Angeles Ave.", "start": [37.8906513, -122.2750368], "end": [37.8904467, -122.2733127] },
-  { "id": 50, "name": "John Muir Path", "location": "699-701 Grizzly Peak Blvd. - 698-700 Creston Rd.", "start": [37.900103, -122.264439], "end": [37.899242, -122.264954] },
+  { "id": 50, "name": "John Muir Path", "location": "699-701 Grizzly Peak Blvd. - 698-700 Creston Rd.", "start": [37.900108, -122.264433], "end": [37.899234, -122.264950] },
   { "id": 51, "name": "Keeler Path", "location": "1049 Keeler Ave - 1070 Keeler Ave.", "start": [37.891149, -122.259865], "end": [37.892355, -122.260312] },
   { "id": 52, "name": "Keoncrest Path", "location": "1488-1545 Keoncrest Dr. - 1548-1552 Sacramento St.", "start": [37.877261, -122.282862], "end": [37.877223, -122.283604] },
   { "id": 53, "name": "La Loma Path", "location": "North of 1403 Glendale Ave. - 1310-1320 Campus Dr.", "start": [37.88462, -122.254514], "end": [37.885041, -122.253865] },
