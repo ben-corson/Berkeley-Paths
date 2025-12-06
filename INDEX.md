@@ -1,6 +1,6 @@
 # Berkeley Paths Tracker - Documentation Index
 
-Welcome! This is your complete guide to navigating all the documentation for the Berkeley Paths Tracker project.
+Welcome! This is your complete guide to navigating the documentation for the Berkeley Paths Tracker project.
 
 ## 📚 Documentation Files
 
