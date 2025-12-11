@@ -25,7 +25,7 @@
   { "id": 24, "name": "Crescent Park Path", "location": "2-10 The Crescent - 56-60 The Crescent", "start": [37.894929, -122.254983], "end": [37.89403, -122.254318] },
   { "id": 25, "name": "The Crossways", "location": "64-70 The Uplands - 145-151 Hillcrest Rd.", "start": [37.85377, -122.245378], "end": [37.852809, -122.24544] },
   { "id": 26, "name": "The Cutoff", "location": "95-99 The Plaza Dr. - 62-66 El Camino Real", "start": [37.854998, -122.242395], "end": [37.855382, -122.241615] },
-  { "id": 27, "name": "Devon Lane (Lower)", "location": "Somerset Pl. and Southampton Ave. - 763-765 San Diego Rd.", "start": [37.8956200, -122.2733417], "end": [37.894656, -122.273995] },
+  { "id": 27, "name": "Devon Lane", "location": "Somerset Pl. and Southampton Ave. - 763-765 San Diego Rd.", "start": [37.8956200, -122.2733417], "end": [37.894656, -122.273995] },
   { "id": 28, "name": "Easter Way", "location": "933-937 Spruce St. - 950 Regal Rd.", "start": [37.892314, -122.266913], "end": [37.892807, -122.263673] },
   { "id": 29, "name": "El Mirador Path", "location": "1125-1133 Euclid Ave. - 1112-1116 Cragmont Ave.", "start": [37.888607, -122.261588], "end": [37.8897271, -122.2604742] },
   { "id": 30, "name": "El Paseo", "location": "675-679 Vicente Ave. - 646-650 The Alameda", "start": [37.895286, -122.282274], "end": [37.896016, -122.280895] },
