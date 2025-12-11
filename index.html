@@ -16,20 +16,50 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alike&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- External Libraries -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'berkeley-burgundy': '#941B1E',
+              'berkeley-gold': '#EAA636',
+            }
+          }
+        }
+      }
+    </script>
     
     <!-- Custom Styles -->
     <link rel="stylesheet" href="./src/styles.css">
+    
+    <style>
+      #map {
+        height: 500px;
+        width: 100%;
+        border-radius: 0.5rem;
+      }
+      
+      @media (max-width: 768px) {
+        #map {
+          height: 400px;
+        }
+      }
+    </style>
 </head>
 <body class="body-font">
-    <div id="app"></div>
+    <div id="root"></div>
+    
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <!-- React -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
     <!-- App Code -->
