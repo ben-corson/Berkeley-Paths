@@ -109,6 +109,6 @@
   { "id": 108, "name": "Public Path #3 Path", "location": "Coventry Road - Coventry Road", "start": [37.902587, -122.280456], "end": [37.902245, -122.281318] },
   { "id": 109, "name": "Public Path #1 Path", "location": "Marchant Court - Coventry Road", "start": [37.901797, -122.283691], "end": [37.901123, -122.283777] },
   { "id": 110, "name": "Eucalyptus Path", "location": "671-685 Alvarado Rd. - 4 Alvarado Place", "start": [37.8588315, -122.2388659], "end": [37.8582910, -122.2404444] },
-  { "id": 111, "name": "Short Cut", "location": "73 Alvarado Rd. - Claremont Hotel parking lot”, "start": [37.8580834, -122.2408363], "end": [37.8576565, -122.2415904] },
-  { "id": 112, "name": "Evergreen Path", "location": "1 Evergreen Ln. - 30 Alvarado Pl.”, "start": [37.8593397], -122.2403710], "end": [37.8588641, -122.2407528] }
+  { "id": 111, "name": "Short Cut", "location": "73 Alvarado Rd. - Claremont Hotel parking lot", "start": [37.8580834, -122.2408363], "end": [37.8576565, -122.2415904] },
+  { "id": 112, "name": "Evergreen Path", "location": "1 Evergreen Ln. - 30 Alvarado Pl.", "start": [37.8593397, -122.2403710], "end": [37.8588641, -122.2407528] }
 ]
