@@ -21,7 +21,7 @@
   { "id": 20, "name": "Claremont Path", "location": "267 Hillcrest Rd. - 165-220 El Camino Real", "start": [37.852046, -122.241172], "end": [37.852309, -122.240832] },
   { "id": 21, "name": "Columbia Path (Lower)", "location": "1365-1373 Campus Dr. - 1398-1400 Queens Rd.", "start": [37.884719, -122.251875], "end": [37.884434, -122.252462] },
   { "id": 22, "name": "Columbia Walk", "location": "151-157 Fairlawn Dr. - 1338-1342 Grizzly Peak Blvd.", "start": [37.886072, -122.25027], "end": [37.885542, -122.250791] },
-  { "id": 23, "name": "Covert Path", "location": "1175-1177 Keith Ave. - 1138-1146 Keeler Ave.", "start": [37.887926, -122.258066], "end": [37.889554, -122.2577117] },
+  { "id": 23, "name": "Covert Path", "location": "1175-1177 Keith Ave. - 1138-1146 Keeler Ave.", "start": [37.887926, -122.258066], "end": [37.889554, -122.257712] },
   { "id": 24, "name": "Crescent Park Path", "location": "2-10 The Crescent - 56-60 The Crescent", "start": [37.894929, -122.254983], "end": [37.89403, -122.254318] },
   { "id": 25, "name": "The Crossways", "location": "64-70 The Uplands - 145-151 Hillcrest Rd.", "start": [37.85377, -122.245378], "end": [37.852809, -122.24544] },
   { "id": 26, "name": "The Cutoff", "location": "95-99 The Plaza Dr. - 62-66 El Camino Real", "start": [37.854998, -122.242395], "end": [37.855382, -122.241615] },
