@@ -38,7 +38,7 @@
   { "id": 37, "name": "Garber Path", "location": "2825-2826 Garber St. - 2844-2845 Garber St.", "start": [37.860961, -122.249191], "end": [37.860882, -122.249857] },
   { "id": 38, "name": "Geneva's Path", "location": "1336-1345 Neilson Ave. - 1313 Curtis St.", "start": [37.880119, -122.289568], "end": [37.881274, -122.290048] },
   { "id": 39, "name": "Glendale Path", "location": "1295-1305 Campus Dr. - 98-100 Fairlawn Dr.", "start": [37.886354, -122.251920], "end": [37.885533, -122.254323] },
-  { "id": 40, "name": "Great Stoneface Path", "location": "Yosemite Rd. & San Fernando Ave.", "start": [37.896494, -122.278543], "end": [37.89708, -122.278185] },
+  { "id": 40, "name": "Great Stoneface Path", "location": "Yosemite Rd. & San Fernando Ave.", "start": [37.8970763, -122.2781663], "end": [37.8966995, -122.2778733] },
   { "id": 41, "name": "Halkin Walk", "location": "695-701 Cragmont Ave. - 698-702 Hilldale Ave.", "start": [37.898692, -122.266163], "end": [37.898512, -122.268139] },
   { "id": 42, "name": "Hawthorne Steps", "location": "1409-1423 Scenic Ave. - 1410-1414 Hawthorne Terrace", "start": [37.88238, -122.263201], "end": [37.882457, -122.262549] },
   { "id": 43, "name": "Hilgard Path", "location": "1647-1675 La Loma Ave. - 1650 La Vereda Rd.", "start": [37.879239, -122.256917], "end": [37.879111, -122.257322] },
