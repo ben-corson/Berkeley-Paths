@@ -9,7 +9,7 @@ const BerkeleyPathsTracker = () => {
   const [userLocation, setUserLocation] = useState(null);
   const [userHeading, setUserHeading] = useState(null);
   const [nearbyPaths, setNearbyPaths] = useState([]);
-  const [view, setView] = useState('list'); // 'list' or 'map'
+  const [view, setView] = useState('map'); // 'list' or 'map'
   const [filterCompleted, setFilterCompleted] = useState('all'); // 'all', 'completed', 'incomplete'
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
@@ -159,7 +159,7 @@ const BerkeleyPathsTracker = () => {
     if (view === 'map' && mapRef.current && !mapInstanceRef.current && paths.length > 0 && typeof L !== 'undefined') {
       // Create map centered on user location if available, otherwise Berkeley
       const center = userLocation ? [userLocation.lat, userLocation.lng] : [37.8715, -122.2730];
-      const zoom = userLocation ? 15 : 13;
+      const zoom = userLocation ? 17 : 13;
       const map = L.map(mapRef.current).setView(center, zoom);
       
       // Add tile layer
@@ -176,18 +176,32 @@ const BerkeleyPathsTracker = () => {
         const userIcon = L.divIcon({
           className: 'user-location-marker',
           html: `
-            <div style="width: 40px; height: 40px; position: relative;">
+            <div style="width: 60px; height: 60px; position: relative;">
+              ${userHeading !== null ? `
+                <!-- Directional beam (cone of vision) -->
+                <div style="
+                  position: absolute;
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -50%) rotate(${rotation}deg);
+                  width: 0;
+                  height: 0;
+                  border-left: 30px solid transparent;
+                  border-right: 30px solid transparent;
+                  border-bottom: 50px solid rgba(59, 130, 246, 0.25);
+                  transform-origin: 50% 100%;
+                "></div>
+              ` : ''}
+              <!-- Center dot with pulse ring -->
               <div style="
                 position: absolute;
                 top: 50%;
                 left: 50%;
-                transform: translate(-50%, -50%) rotate(${rotation}deg);
-                width: 0;
-                height: 0;
-                border-left: 12px solid transparent;
-                border-right: 12px solid transparent;
-                border-bottom: 24px solid #3B82F6;
-                filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+                transform: translate(-50%, -50%);
+                background: rgba(59, 130, 246, 0.2);
+                border-radius: 50%;
+                width: 28px;
+                height: 28px;
               "></div>
               <div style="
                 position: absolute;
@@ -199,12 +213,13 @@ const BerkeleyPathsTracker = () => {
                 border-radius: 50%;
                 width: 16px;
                 height: 16px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                box-shadow: 0 0 0 rgba(59, 130, 246, 0.4);
+                animation: pulse 2s infinite;
               "></div>
             </div>
           `,
-          iconSize: [40, 40],
-          iconAnchor: [20, 20]
+          iconSize: [60, 60],
+          iconAnchor: [30, 30]
         });
         
         const marker = L.marker([userLocation.lat, userLocation.lng], { icon: userIcon })
@@ -252,18 +267,32 @@ const BerkeleyPathsTracker = () => {
       const userIcon = L.divIcon({
         className: 'user-location-marker',
         html: `
-          <div style="width: 40px; height: 40px; position: relative;">
+          <div style="width: 60px; height: 60px; position: relative;">
+            ${userHeading !== null ? `
+              <!-- Directional beam (cone of vision) -->
+              <div style="
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) rotate(${rotation}deg);
+                width: 0;
+                height: 0;
+                border-left: 30px solid transparent;
+                border-right: 30px solid transparent;
+                border-bottom: 50px solid rgba(59, 130, 246, 0.25);
+                transform-origin: 50% 100%;
+              "></div>
+            ` : ''}
+            <!-- Center dot with pulse ring -->
             <div style="
               position: absolute;
               top: 50%;
               left: 50%;
-              transform: translate(-50%, -50%) rotate(${rotation}deg);
-              width: 0;
-              height: 0;
-              border-left: 12px solid transparent;
-              border-right: 12px solid transparent;
-              border-bottom: 24px solid #3B82F6;
-              filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+              transform: translate(-50%, -50%);
+              background: rgba(59, 130, 246, 0.2);
+              border-radius: 50%;
+              width: 28px;
+              height: 28px;
             "></div>
             <div style="
               position: absolute;
@@ -275,12 +304,12 @@ const BerkeleyPathsTracker = () => {
               border-radius: 50%;
               width: 16px;
               height: 16px;
-              box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+              box-shadow: 0 0 0 rgba(59, 130, 246, 0.4);
             "></div>
           </div>
         `,
-        iconSize: [40, 40],
-        iconAnchor: [20, 20]
+        iconSize: [60, 60],
+        iconAnchor: [30, 30]
       });
       
       // Update marker position and icon
@@ -661,7 +690,7 @@ const BerkeleyPathsTracker = () => {
                 <button
                   onClick={() => {
                     if (mapInstanceRef.current) {
-                      mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 15);
+                      mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 17);
                     }
                   }}
                   className="absolute bottom-4 right-4 bg-white text-berkeley-burgundy px-4 py-2 rounded-lg shadow-lg hover:bg-gray-50 transition-colors font-medium flex items-center gap-2"
