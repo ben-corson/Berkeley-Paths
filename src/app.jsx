@@ -12,6 +12,7 @@ const BerkeleyPathsTracker = () => {
   const [nearbyPaths, setNearbyPaths] = useState([]);
   const [view, setView] = useState('map'); // 'list' or 'map'
   const [filterCompleted, setFilterCompleted] = useState('all'); // 'all', 'completed', 'incomplete'
+  const [sortBy, setSortBy] = useState('alphabetical'); // 'alphabetical' or 'distance'
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -72,10 +73,12 @@ const BerkeleyPathsTracker = () => {
 
   // Get user's location and track orientation
   useEffect(() => {
+    console.log('Location effect: Starting geolocation setup');
     if (navigator.geolocation) {
       // Watch position continuously for updates
       const watchId = navigator.geolocation.watchPosition(
         (position) => {
+          console.log('Location obtained:', position.coords.latitude, position.coords.longitude);
           setUserLocation({
             lat: position.coords.latitude,
             lng: position.coords.longitude
@@ -84,6 +87,7 @@ const BerkeleyPathsTracker = () => {
           
           // Some devices provide heading from GPS
           if (position.coords.heading !== null && position.coords.heading !== undefined) {
+            console.log('GPS heading:', position.coords.heading);
             setUserHeading(position.coords.heading);
           }
         },
@@ -118,11 +122,13 @@ const BerkeleyPathsTracker = () => {
       const handleOrientation = (event) => {
         if (event.webkitCompassHeading !== undefined) {
           // iOS
+          console.log('iOS compass heading:', event.webkitCompassHeading);
           setUserHeading(event.webkitCompassHeading);
         } else if (event.alpha !== null) {
           // Android - alpha is 0-360 degrees
           // Convert to compass heading (0 = North)
           const heading = 360 - event.alpha;
+          console.log('Android heading:', heading);
           setUserHeading(heading);
         }
       };
@@ -131,6 +137,7 @@ const BerkeleyPathsTracker = () => {
       if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
         DeviceOrientationEvent.requestPermission()
           .then(permissionState => {
+            console.log('Device orientation permission:', permissionState);
             if (permissionState === 'granted') {
               window.addEventListener('deviceorientation', handleOrientation);
             }
@@ -149,6 +156,7 @@ const BerkeleyPathsTracker = () => {
       };
     } else {
       setLocationError('Geolocation is not supported by your browser.');
+      console.log('Geolocation not supported');
     }
   }, []);
 
@@ -170,7 +178,9 @@ const BerkeleyPathsTracker = () => {
 
   // Initialize map
   useEffect(() => {
+    console.log('Map init effect - view:', view, 'mapRef.current:', !!mapRef.current, 'mapInstance:', !!mapInstanceRef.current, 'paths:', paths.length);
     if (view === 'map' && mapRef.current && !mapInstanceRef.current && paths.length > 0 && typeof L !== 'undefined') {
+      console.log('Creating map instance');
       // Create map centered on Berkeley initially (will update when location comes in)
       const map = L.map(mapRef.current).setView([37.8715, -122.2730], 13);
       
@@ -181,25 +191,31 @@ const BerkeleyPathsTracker = () => {
       }).addTo(map);
 
       mapInstanceRef.current = map;
+      console.log('Map instance created');
 
       // Add path markers
       paths.forEach(path => {
         addPathMarker(map, path);
       });
+      console.log('Path markers added');
     }
 
     return () => {
       if (mapInstanceRef.current) {
+        console.log('Cleaning up map');
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
         markersRef.current = {};
+        userMarkerRef.current = null;
       }
     };
   }, [view, paths]);
 
   // Add/update user location marker when location is available
   useEffect(() => {
+    console.log('User location effect triggered:', userLocation, 'Map exists:', !!mapInstanceRef.current);
     if (mapInstanceRef.current && userLocation && typeof L !== 'undefined') {
+      console.log('Adding/updating user marker at:', userLocation.lat, userLocation.lng);
       const rotation = userHeading !== null ? userHeading : 0;
       const userIcon = L.divIcon({
         className: 'user-location-marker',
@@ -252,6 +268,7 @@ const BerkeleyPathsTracker = () => {
       
       // If marker doesn't exist, create it and center map on user location
       if (!userMarkerRef.current) {
+        console.log('Creating new user marker and centering map at zoom 17');
         const marker = L.marker([userLocation.lat, userLocation.lng], { icon: userIcon })
           .addTo(mapInstanceRef.current)
           .bindPopup('Your Location');
@@ -260,7 +277,9 @@ const BerkeleyPathsTracker = () => {
         
         // Center map on user location at zoom 17 when first location is obtained
         mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 17);
+        console.log('Map centered on user location');
       } else {
+        console.log('Updating existing user marker position');
         // Update existing marker position and icon
         userMarkerRef.current.setLatLng([userLocation.lat, userLocation.lng]);
         userMarkerRef.current.setIcon(userIcon);
@@ -427,7 +446,7 @@ const BerkeleyPathsTracker = () => {
     });
   };
 
-  // Filter paths based on criteria
+  // Filter and sort paths based on criteria
   const getFilteredPaths = () => {
     let filtered = paths;
 
@@ -445,6 +464,27 @@ const BerkeleyPathsTracker = () => {
         path.name.toLowerCase().includes(query) ||
         path.location.toLowerCase().includes(query)
       );
+    }
+
+    // Sort paths
+    if (sortBy === 'alphabetical') {
+      filtered = [...filtered].sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortBy === 'distance' && userLocation) {
+      filtered = [...filtered].sort((a, b) => {
+        const distA = calculateDistance(
+          userLocation.lat,
+          userLocation.lng,
+          a.start[0],
+          a.start[1]
+        );
+        const distB = calculateDistance(
+          userLocation.lat,
+          userLocation.lng,
+          b.start[0],
+          b.start[1]
+        );
+        return distA - distB;
+      });
     }
 
     return filtered;
@@ -635,6 +675,35 @@ const BerkeleyPathsTracker = () => {
                   Incomplete ({paths.length - completedPaths.size})
                 </button>
               </div>
+
+              {/* Sort buttons */}
+              <div className="flex gap-2 flex-wrap items-center">
+                <span className="text-sm font-medium text-gray-700">Sort by:</span>
+                <button
+                  onClick={() => setSortBy('alphabetical')}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    sortBy === 'alphabetical'
+                      ? 'bg-berkeley-gold text-white'
+                      : 'bg-white text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  A-Z
+                </button>
+                <button
+                  onClick={() => setSortBy('distance')}
+                  disabled={!userLocation}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    sortBy === 'distance'
+                      ? 'bg-berkeley-gold text-white'
+                      : userLocation
+                      ? 'bg-white text-gray-700 hover:bg-gray-100'
+                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  }`}
+                  title={!userLocation ? 'Location required for distance sorting' : 'Sort by distance from your location'}
+                >
+                  📍 Nearest
+                </button>
+              </div>
             </div>
 
             {/* Nearby paths section */}
@@ -709,7 +778,15 @@ const BerkeleyPathsTracker = () => {
                   No paths found matching your criteria
                 </div>
               ) : (
-                filteredPaths.map(path => (
+                filteredPaths.map(path => {
+                  const distance = userLocation ? calculateDistance(
+                    userLocation.lat,
+                    userLocation.lng,
+                    path.start[0],
+                    path.start[1]
+                  ) : null;
+
+                  return (
                   <div
                     key={path.id}
                     onClick={() => setSelectedPath(path)}
@@ -728,13 +805,19 @@ const BerkeleyPathsTracker = () => {
                           )}
                         </div>
                         <p className="text-gray-600 text-sm mt-1">{path.location}</p>
+                        {sortBy === 'distance' && distance !== null && (
+                          <p className="text-berkeley-gold text-sm font-medium mt-1">
+                            📍 {distance < 0.1 ? '< 0.1' : distance.toFixed(1)} miles away
+                          </p>
+                        )}
                       </div>
                       <div className="text-gray-400 text-sm ml-4">
                         #{path.id}
                       </div>
                     </div>
                   </div>
-                ))
+                  );
+                })
               )}
             </div>
           </>
