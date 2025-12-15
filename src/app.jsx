@@ -7,6 +7,7 @@ const BerkeleyPathsTracker = () => {
   const [pathNotes, setPathNotes] = useState({});
   const [selectedPath, setSelectedPath] = useState(null);
   const [userLocation, setUserLocation] = useState(null);
+  const [userHeading, setUserHeading] = useState(null);
   const [nearbyPaths, setNearbyPaths] = useState([]);
   const [view, setView] = useState('list'); // 'list' or 'map'
   const [filterCompleted, setFilterCompleted] = useState('all'); // 'all', 'completed', 'incomplete'
@@ -17,6 +18,7 @@ const BerkeleyPathsTracker = () => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markersRef = useRef({});
+  const userMarkerRef = useRef(null);
 
   // Fix for default marker icons in Leaflet
   useEffect(() => {
@@ -76,20 +78,63 @@ const BerkeleyPathsTracker = () => {
     localStorage.setItem('pathNotes', JSON.stringify(pathNotes));
   }, [pathNotes]);
 
-  // Get user's location
+  // Get user's location and track orientation
   useEffect(() => {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
+      // Watch position continuously for updates
+      const watchId = navigator.geolocation.watchPosition(
         (position) => {
           setUserLocation({
             lat: position.coords.latitude,
             lng: position.coords.longitude
           });
+          
+          // Some devices provide heading from GPS
+          if (position.coords.heading !== null && position.coords.heading !== undefined) {
+            setUserHeading(position.coords.heading);
+          }
         },
         (error) => {
           console.log('Location access denied or unavailable:', error);
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 0,
+          timeout: 5000
         }
       );
+
+      // Also try to get device orientation (compass heading)
+      const handleOrientation = (event) => {
+        if (event.webkitCompassHeading !== undefined) {
+          // iOS
+          setUserHeading(event.webkitCompassHeading);
+        } else if (event.alpha !== null) {
+          // Android - alpha is 0-360 degrees
+          // Convert to compass heading (0 = North)
+          const heading = 360 - event.alpha;
+          setUserHeading(heading);
+        }
+      };
+
+      // Request permission for iOS 13+
+      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+        DeviceOrientationEvent.requestPermission()
+          .then(permissionState => {
+            if (permissionState === 'granted') {
+              window.addEventListener('deviceorientation', handleOrientation);
+            }
+          })
+          .catch(console.error);
+      } else {
+        // Non-iOS devices
+        window.addEventListener('deviceorientation', handleOrientation);
+      }
+
+      return () => {
+        navigator.geolocation.clearWatch(watchId);
+        window.removeEventListener('deviceorientation', handleOrientation);
+      };
     }
   }, []);
 
@@ -112,8 +157,10 @@ const BerkeleyPathsTracker = () => {
   // Initialize map
   useEffect(() => {
     if (view === 'map' && mapRef.current && !mapInstanceRef.current && paths.length > 0 && typeof L !== 'undefined') {
-      // Create map centered on Berkeley
-      const map = L.map(mapRef.current).setView([37.8715, -122.2730], 13);
+      // Create map centered on user location if available, otherwise Berkeley
+      const center = userLocation ? [userLocation.lat, userLocation.lng] : [37.8715, -122.2730];
+      const zoom = userLocation ? 15 : 13;
+      const map = L.map(mapRef.current).setView(center, zoom);
       
       // Add tile layer
       L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -125,15 +172,46 @@ const BerkeleyPathsTracker = () => {
 
       // Add user location marker if available
       if (userLocation) {
+        const rotation = userHeading !== null ? userHeading : 0;
         const userIcon = L.divIcon({
           className: 'user-location-marker',
-          html: '<div style="background: #3B82F6; border: 3px solid white; border-radius: 50%; width: 20px; height: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
-          iconSize: [20, 20],
-          iconAnchor: [10, 10]
+          html: `
+            <div style="width: 40px; height: 40px; position: relative;">
+              <div style="
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) rotate(${rotation}deg);
+                width: 0;
+                height: 0;
+                border-left: 12px solid transparent;
+                border-right: 12px solid transparent;
+                border-bottom: 24px solid #3B82F6;
+                filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+              "></div>
+              <div style="
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: #3B82F6;
+                border: 3px solid white;
+                border-radius: 50%;
+                width: 16px;
+                height: 16px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+              "></div>
+            </div>
+          `,
+          iconSize: [40, 40],
+          iconAnchor: [20, 20]
         });
-        L.marker([userLocation.lat, userLocation.lng], { icon: userIcon })
+        
+        const marker = L.marker([userLocation.lat, userLocation.lng], { icon: userIcon })
           .addTo(map)
           .bindPopup('Your Location');
+        
+        userMarkerRef.current = marker;
       }
 
       // Add path markers
@@ -166,6 +244,50 @@ const BerkeleyPathsTracker = () => {
       });
     }
   }, [completedPaths, paths]);
+
+  // Update user location marker when position or heading changes
+  useEffect(() => {
+    if (userMarkerRef.current && userLocation && typeof L !== 'undefined') {
+      const rotation = userHeading !== null ? userHeading : 0;
+      const userIcon = L.divIcon({
+        className: 'user-location-marker',
+        html: `
+          <div style="width: 40px; height: 40px; position: relative;">
+            <div style="
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%) rotate(${rotation}deg);
+              width: 0;
+              height: 0;
+              border-left: 12px solid transparent;
+              border-right: 12px solid transparent;
+              border-bottom: 24px solid #3B82F6;
+              filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+            "></div>
+            <div style="
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              background: #3B82F6;
+              border: 3px solid white;
+              border-radius: 50%;
+              width: 16px;
+              height: 16px;
+              box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            "></div>
+          </div>
+        `,
+        iconSize: [40, 40],
+        iconAnchor: [20, 20]
+      });
+      
+      // Update marker position and icon
+      userMarkerRef.current.setLatLng([userLocation.lat, userLocation.lng]);
+      userMarkerRef.current.setIcon(userIcon);
+    }
+  }, [userLocation, userHeading]);
 
   // Helper function to create path marker icon
   const createPathIcon = (isCompleted) => {
@@ -527,16 +649,34 @@ const BerkeleyPathsTracker = () => {
         ) : (
           /* Map view */
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <div
-              ref={mapRef}
-              className="w-full"
-              style={{ height: 'calc(100vh - 250px)', minHeight: '500px' }}
-            ></div>
+            <div className="relative">
+              <div
+                ref={mapRef}
+                className="w-full"
+                style={{ height: 'calc(100vh - 250px)', minHeight: '500px' }}
+              ></div>
+              
+              {/* Re-center button */}
+              {userLocation && (
+                <button
+                  onClick={() => {
+                    if (mapInstanceRef.current) {
+                      mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 15);
+                    }
+                  }}
+                  className="absolute bottom-4 right-4 bg-white text-berkeley-burgundy px-4 py-2 rounded-lg shadow-lg hover:bg-gray-50 transition-colors font-medium flex items-center gap-2"
+                  title="Center on my location"
+                >
+                  📍 My Location
+                </button>
+              )}
+            </div>
             <div className="p-4 bg-gray-50 text-sm text-gray-600">
               <p>
                 <span className="font-medium">Legend:</span>{' '}
                 <span className="inline-block w-3 h-3 rounded-full bg-berkeley-burgundy mr-1"></span> Incomplete{' '}
                 <span className="inline-block w-3 h-3 rounded-full bg-green-600 ml-3 mr-1"></span> Completed
+                {userLocation && <span className="ml-3">🔵 Your location {userHeading !== null ? '(with compass direction)' : ''}</span>}
               </p>
             </div>
           </div>
