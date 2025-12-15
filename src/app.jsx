@@ -16,11 +16,19 @@ const BerkeleyPathsTracker = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [debugMessages, setDebugMessages] = useState([]);
   
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markersRef = useRef({});
   const userMarkerRef = useRef(null);
+
+  // Helper to add debug messages
+  const addDebug = (message) => {
+    const timestamp = new Date().toLocaleTimeString();
+    setDebugMessages(prev => [...prev.slice(-4), `${timestamp}: ${message}`]); // Keep last 5 messages
+    console.log(message);
+  };
 
   // Fix for default marker icons in Leaflet
   useEffect(() => {
@@ -73,12 +81,12 @@ const BerkeleyPathsTracker = () => {
 
   // Get user's location and track orientation
   useEffect(() => {
-    console.log('Location effect: Starting geolocation setup');
+    addDebug('Starting geolocation setup');
     if (navigator.geolocation) {
       // Watch position continuously for updates
       const watchId = navigator.geolocation.watchPosition(
         (position) => {
-          console.log('Location obtained:', position.coords.latitude, position.coords.longitude);
+          addDebug(`Location obtained: ${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}`);
           setUserLocation({
             lat: position.coords.latitude,
             lng: position.coords.longitude
@@ -87,7 +95,7 @@ const BerkeleyPathsTracker = () => {
           
           // Some devices provide heading from GPS
           if (position.coords.heading !== null && position.coords.heading !== undefined) {
-            console.log('GPS heading:', position.coords.heading);
+            addDebug(`GPS heading: ${position.coords.heading}`);
             setUserHeading(position.coords.heading);
           }
         },
@@ -108,7 +116,7 @@ const BerkeleyPathsTracker = () => {
               errorMessage += 'An unknown error occurred.';
           }
           
-          console.log('Geolocation error:', errorMessage, error);
+          addDebug(`Geolocation error: ${error.code}`);
           setLocationError(errorMessage);
         },
         {
@@ -178,9 +186,9 @@ const BerkeleyPathsTracker = () => {
 
   // Initialize map
   useEffect(() => {
-    console.log('Map init effect - view:', view, 'mapRef.current:', !!mapRef.current, 'mapInstance:', !!mapInstanceRef.current, 'paths:', paths.length);
+    addDebug(`Map init - view:${view} mapRef:${!!mapRef.current} instance:${!!mapInstanceRef.current} paths:${paths.length}`);
     if (view === 'map' && mapRef.current && !mapInstanceRef.current && paths.length > 0 && typeof L !== 'undefined') {
-      console.log('Creating map instance');
+      addDebug('Creating map instance');
       // Create map centered on Berkeley initially (will update when location comes in)
       const map = L.map(mapRef.current).setView([37.8715, -122.2730], 13);
       
@@ -191,18 +199,18 @@ const BerkeleyPathsTracker = () => {
       }).addTo(map);
 
       mapInstanceRef.current = map;
-      console.log('Map instance created');
+      addDebug('Map created successfully');
 
       // Add path markers
       paths.forEach(path => {
         addPathMarker(map, path);
       });
-      console.log('Path markers added');
+      addDebug(`Added ${paths.length} path lines`);
     }
 
     return () => {
       if (mapInstanceRef.current) {
-        console.log('Cleaning up map');
+        addDebug('Cleaning up map');
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
         markersRef.current = {};
@@ -213,9 +221,9 @@ const BerkeleyPathsTracker = () => {
 
   // Add/update user location marker when location is available
   useEffect(() => {
-    console.log('User location effect triggered:', userLocation, 'Map exists:', !!mapInstanceRef.current);
+    addDebug(`User marker effect - hasLocation:${!!userLocation} hasMap:${!!mapInstanceRef.current}`);
     if (mapInstanceRef.current && userLocation && typeof L !== 'undefined') {
-      console.log('Adding/updating user marker at:', userLocation.lat, userLocation.lng);
+      addDebug(`Adding marker at ${userLocation.lat.toFixed(4)}, ${userLocation.lng.toFixed(4)}`);
       const rotation = userHeading !== null ? userHeading : 0;
       const userIcon = L.divIcon({
         className: 'user-location-marker',
@@ -268,7 +276,7 @@ const BerkeleyPathsTracker = () => {
       
       // If marker doesn't exist, create it and center map on user location
       if (!userMarkerRef.current) {
-        console.log('Creating new user marker and centering map at zoom 17');
+        addDebug('Creating new user marker, centering at zoom 17');
         const marker = L.marker([userLocation.lat, userLocation.lng], { icon: userIcon })
           .addTo(mapInstanceRef.current)
           .bindPopup('Your Location');
@@ -277,9 +285,9 @@ const BerkeleyPathsTracker = () => {
         
         // Center map on user location at zoom 17 when first location is obtained
         mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 17);
-        console.log('Map centered on user location');
+        addDebug('Map centered on user location');
       } else {
-        console.log('Updating existing user marker position');
+        addDebug('Updating existing marker position');
         // Update existing marker position and icon
         userMarkerRef.current.setLatLng([userLocation.lat, userLocation.lng]);
         userMarkerRef.current.setIcon(userIcon);
@@ -830,6 +838,24 @@ const BerkeleyPathsTracker = () => {
                 className="w-full"
                 style={{ height: 'calc(100vh - 250px)', minHeight: '500px' }}
               ></div>
+              
+              {/* Debug Panel */}
+              {debugMessages.length > 0 && (
+                <div className="absolute top-4 left-4 right-4 bg-black bg-opacity-75 text-white text-xs p-3 rounded-lg max-h-32 overflow-auto z-[1000]">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="font-bold">Debug Info:</span>
+                    <button 
+                      onClick={() => setDebugMessages([])}
+                      className="text-white hover:text-gray-300"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                  {debugMessages.map((msg, i) => (
+                    <div key={i} className="mb-1">{msg}</div>
+                  ))}
+                </div>
+              )}
               
               {/* Re-center button */}
               {userLocation && (
