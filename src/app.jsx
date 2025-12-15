@@ -7,9 +7,7 @@ const BerkeleyPathsTracker = () => {
   const [selectedPath, setSelectedPath] = useState(null);
   const [showPathDialog, setShowPathDialog] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
-  const [userHeading, setUserHeading] = useState(null);
   const [locationError, setLocationError] = useState(null);
-  const [needsCompassPermission, setNeedsCompassPermission] = useState(false);
   const [nearbyPaths, setNearbyPaths] = useState([]);
   const [view, setView] = useState('map'); // 'list' or 'map'
   const [filterCompleted, setFilterCompleted] = useState('all'); // 'all', 'completed', 'incomplete'
@@ -72,7 +70,7 @@ const BerkeleyPathsTracker = () => {
     localStorage.setItem('completedPaths', JSON.stringify([...completedPaths]));
   }, [completedPaths]);
 
-  // Get user's location and track orientation
+  // Get user's location
   useEffect(() => {
     if (navigator.geolocation) {
       // Watch position continuously for updates
@@ -83,11 +81,6 @@ const BerkeleyPathsTracker = () => {
             lng: position.coords.longitude
           });
           setLocationError(null); // Clear any previous errors
-          
-          // Some devices provide heading from GPS
-          if (position.coords.heading !== null && position.coords.heading !== undefined) {
-            setUserHeading(position.coords.heading);
-          }
         },
         (error) => {
           let errorMessage = 'Unable to get your location. ';
@@ -111,68 +104,17 @@ const BerkeleyPathsTracker = () => {
         {
           enableHighAccuracy: true,
           maximumAge: 0,
-          timeout: 10000 // Increase timeout to 10 seconds
+          timeout: 10000
         }
       );
 
-      // Also try to get device orientation (compass heading)
-      const handleOrientation = (event) => {
-        if (event.webkitCompassHeading !== undefined) {
-          // iOS
-          setUserHeading(event.webkitCompassHeading);
-          setNeedsCompassPermission(false);
-        } else if (event.alpha !== null) {
-          // Android - alpha is 0-360 degrees
-          // Convert to compass heading (0 = North)
-          const heading = 360 - event.alpha;
-          setUserHeading(heading);
-          setNeedsCompassPermission(false);
-        }
-      };
-
-      // Request permission for iOS 13+
-      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-        // iOS 13+ requires user interaction to request permission
-        setNeedsCompassPermission(true);
-      } else {
-        // Non-iOS devices or older iOS
-        window.addEventListener('deviceorientation', handleOrientation);
-      }
-
       return () => {
         navigator.geolocation.clearWatch(watchId);
-        window.removeEventListener('deviceorientation', handleOrientation);
       };
     } else {
       setLocationError('Geolocation is not supported by your browser.');
     }
   }, []);
-
-  // Function to request compass permission (must be called from user interaction)
-  const requestCompassPermission = () => {
-    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-      DeviceOrientationEvent.requestPermission()
-        .then(permissionState => {
-          if (permissionState === 'granted') {
-            const handleOrientation = (event) => {
-              if (event.webkitCompassHeading !== undefined) {
-                setUserHeading(event.webkitCompassHeading);
-              } else if (event.alpha !== null) {
-                const heading = 360 - event.alpha;
-                setUserHeading(heading);
-              }
-            };
-            window.addEventListener('deviceorientation', handleOrientation);
-            setNeedsCompassPermission(false);
-          } else {
-            console.log('Compass permission denied');
-          }
-        })
-        .catch(err => {
-          console.log('Device orientation permission error:', err);
-        });
-    }
-  };
 
   // Calculate nearby paths when location changes
   useEffect(() => {
@@ -223,33 +165,10 @@ const BerkeleyPathsTracker = () => {
   // Add/update user location marker when location is available
   useEffect(() => {
     if (mapInstanceRef.current && userLocation && typeof L !== 'undefined') {
-      const rotation = userHeading !== null ? userHeading : 0;
       const userIcon = L.divIcon({
         className: 'user-location-marker',
         html: `
-          <div style="width: 100px; height: 100px; position: relative;">
-            ${userHeading !== null ? `
-              <!-- Directional beam using SVG for gradient fade -->
-              <svg style="
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%) rotate(${rotation}deg);
-                width: 100px;
-                height: 100px;
-                overflow: visible;
-                pointer-events: none;
-              " viewBox="0 0 100 100">
-                <defs>
-                  <linearGradient id="beamGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" style="stop-color:rgb(66,133,244);stop-opacity:0.4" />
-                    <stop offset="100%" style="stop-color:rgb(66,133,244);stop-opacity:0" />
-                  </linearGradient>
-                </defs>
-                <!-- Cone path: starts narrow (5px wide) at center, widens to 40px at end -->
-                <path d="M 47.5 50 L 30 0 L 70 0 Z" fill="url(#beamGradient)" />
-              </svg>
-            ` : ''}
+          <div style="width: 40px; height: 40px; position: relative;">
             <!-- Outer accuracy circle -->
             <div style="
               position: absolute;
@@ -277,8 +196,8 @@ const BerkeleyPathsTracker = () => {
             "></div>
           </div>
         `,
-        iconSize: [100, 100],
-        iconAnchor: [50, 50]
+        iconSize: [40, 40],
+        iconAnchor: [20, 20]
       });
       
       // If marker doesn't exist, create it and center map on user location
@@ -292,12 +211,12 @@ const BerkeleyPathsTracker = () => {
         // Center map on user location at zoom 17 when first location is obtained
         mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 17);
       } else {
-        // Update existing marker position and icon
+        // Update existing marker position
         userMarkerRef.current.setLatLng([userLocation.lat, userLocation.lng]);
         userMarkerRef.current.setIcon(userIcon);
       }
     }
-  }, [userLocation, userHeading]);
+  }, [userLocation]);
 
   // Update path lines when completed status changes
   useEffect(() => {
@@ -857,17 +776,6 @@ const BerkeleyPathsTracker = () => {
                   📍 My Location
                 </button>
               )}
-
-              {/* Compass permission button */}
-              {needsCompassPermission && userLocation && (
-                <button
-                  onClick={requestCompassPermission}
-                  className="absolute bottom-20 right-4 bg-berkeley-burgundy text-white px-4 py-2 rounded-lg shadow-lg hover:bg-berkeley-burgundy-dark transition-colors font-medium flex items-center gap-2"
-                  title="Enable compass for direction beam"
-                >
-                  🧭 Enable Compass
-                </button>
-              )}
             </div>
             <div className="p-4 bg-gray-50 text-sm text-gray-600">
               <p>
@@ -875,7 +783,7 @@ const BerkeleyPathsTracker = () => {
                 <span className="inline-block w-3 h-3 rounded-full bg-berkeley-gold mr-1"></span> Incomplete{' '}
                 <span className="inline-block w-3 h-3 rounded-full bg-berkeley-burgundy ml-3 mr-1"></span> Completed
                 {!userLocation && !locationError && <span className="ml-3">📍 Getting your location...</span>}
-                {userLocation && <span className="ml-3">🔵 Your location {userHeading !== null ? '(with direction beam)' : ''}</span>}
+                {userLocation && <span className="ml-3">🔵 Your location</span>}
               </p>
             </div>
           </div>
