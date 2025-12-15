@@ -244,17 +244,26 @@ const BerkeleyPathsTracker = () => {
     };
   }, [view, paths, userLocation]);
 
-  // Update markers when completed status changes
+  // Update path lines when completed status changes
   useEffect(() => {
     if (mapInstanceRef.current && typeof L !== 'undefined') {
       paths.forEach(path => {
         if (markersRef.current[path.id]) {
-          const marker = markersRef.current[path.id];
+          const { line } = markersRef.current[path.id];
           const isCompleted = completedPaths.has(path.id);
           
-          // Update marker color
-          const icon = createPathIcon(isCompleted);
-          marker.setIcon(icon);
+          // Update line color: burgundy for completed, gold for incomplete
+          const color = isCompleted ? '#941B1E' : '#EAA636';
+          line.setStyle({ color: color });
+          
+          // Update popup content
+          line.setPopupContent(`
+            <div style="min-width: 200px;">
+              <h3 style="margin: 0 0 8px 0; font-weight: 600; color: #941B1E;">${path.name}</h3>
+              <p style="margin: 0 0 8px 0; font-size: 14px; color: #666;">${path.location}</p>
+              ${isCompleted ? '<p style="margin: 0; font-size: 12px; color: #941B1E; font-weight: 600;">✓ Completed</p>' : '<p style="margin: 0; font-size: 12px; color: #EAA636; font-weight: 600;">Not completed</p>'}
+            </div>
+          `);
         }
       });
     }
@@ -318,46 +327,54 @@ const BerkeleyPathsTracker = () => {
     }
   }, [userLocation, userHeading]);
 
-  // Helper function to create path marker icon
-  const createPathIcon = (isCompleted) => {
-    const color = isCompleted ? '#10B981' : '#941B1E'; // Green if completed, Berkeley burgundy if not
-    return L.divIcon({
-      className: 'path-marker',
-      html: `<div style="background: ${color}; border: 2px solid white; border-radius: 50%; width: 16px; height: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`,
-      iconSize: [16, 16],
-      iconAnchor: [8, 8]
-    });
-  };
-
-  // Add path marker to map
+  // Add path line to map (no markers, just lines)
   const addPathMarker = (map, path) => {
     const isCompleted = completedPaths.has(path.id);
-    const icon = createPathIcon(isCompleted);
+    
+    // Use Berkeley colors: burgundy (#941B1E) for completed, gold (#EAA636) for incomplete
+    const color = isCompleted ? '#941B1E' : '#EAA636';
 
-    // Create marker for start point
-    const marker = L.marker([path.start[0], path.start[1]], { icon })
-      .addTo(map)
-      .bindPopup(`
-        <div style="min-width: 200px;">
-          <h3 style="margin: 0 0 8px 0; font-weight: 600; color: #941B1E;">${path.name}</h3>
-          <p style="margin: 0 0 8px 0; font-size: 14px; color: #666;">${path.location}</p>
-          ${isCompleted ? '<p style="margin: 0; font-size: 12px; color: #10B981; font-weight: 600;">✓ Completed</p>' : ''}
-        </div>
-      `);
+    // Draw visible line between start and end
+    const line = L.polyline([path.start, path.end], {
+      color: color,
+      weight: 4,
+      opacity: 0.8,
+      className: `path-line-${path.id}`
+    }).addTo(map);
 
-    marker.on('click', () => {
+    // Add popup to the line
+    line.bindPopup(`
+      <div style="min-width: 200px;">
+        <h3 style="margin: 0 0 8px 0; font-weight: 600; color: #941B1E;">${path.name}</h3>
+        <p style="margin: 0 0 8px 0; font-size: 14px; color: #666;">${path.location}</p>
+        ${isCompleted ? '<p style="margin: 0; font-size: 12px; color: #941B1E; font-weight: 600;">✓ Completed</p>' : '<p style="margin: 0; font-size: 12px; color: #EAA636; font-weight: 600;">Not completed</p>'}
+      </div>
+    `);
+
+    // Create invisible clickable area around the line (wider hit area)
+    const invisibleLine = L.polyline([path.start, path.end], {
+      color: 'transparent',
+      weight: 20, // Much wider for easier clicking
+      opacity: 0,
+      className: `path-line-invisible-${path.id}`
+    }).addTo(map);
+
+    // Add click handler to invisible line
+    invisibleLine.on('click', (e) => {
+      L.DomEvent.stopPropagation(e);
       setSelectedPath(path);
       setView('list');
     });
 
-    // Draw line between start and end
-    const line = L.polyline([path.start, path.end], {
-      color: isCompleted ? '#10B981' : '#941B1E',
-      weight: 3,
-      opacity: 0.6
-    }).addTo(map);
+    // Also make the visible line clickable
+    line.on('click', (e) => {
+      L.DomEvent.stopPropagation(e);
+      setSelectedPath(path);
+      setView('list');
+    });
 
-    markersRef.current[path.id] = marker;
+    // Store both lines for updates
+    markersRef.current[path.id] = { line, invisibleLine };
   };
 
   // Calculate distance between two points in miles
@@ -703,9 +720,9 @@ const BerkeleyPathsTracker = () => {
             <div className="p-4 bg-gray-50 text-sm text-gray-600">
               <p>
                 <span className="font-medium">Legend:</span>{' '}
-                <span className="inline-block w-3 h-3 rounded-full bg-berkeley-burgundy mr-1"></span> Incomplete{' '}
-                <span className="inline-block w-3 h-3 rounded-full bg-green-600 ml-3 mr-1"></span> Completed
-                {userLocation && <span className="ml-3">🔵 Your location {userHeading !== null ? '(with compass direction)' : ''}</span>}
+                <span className="inline-block w-3 h-3 rounded-full bg-berkeley-gold mr-1"></span> Incomplete{' '}
+                <span className="inline-block w-3 h-3 rounded-full bg-berkeley-burgundy ml-3 mr-1"></span> Completed
+                {userLocation && <span className="ml-3">🔵 Your location {userHeading !== null ? '(with direction beam)' : ''}</span>}
               </p>
             </div>
           </div>
