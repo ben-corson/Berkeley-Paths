@@ -16,19 +16,11 @@ const BerkeleyPathsTracker = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [debugMessages, setDebugMessages] = useState([]);
   
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markersRef = useRef({});
   const userMarkerRef = useRef(null);
-
-  // Helper to add debug messages
-  const addDebug = (message) => {
-    const timestamp = new Date().toLocaleTimeString();
-    setDebugMessages(prev => [...prev.slice(-4), `${timestamp}: ${message}`]); // Keep last 5 messages
-    console.log(message);
-  };
 
   // Fix for default marker icons in Leaflet
   useEffect(() => {
@@ -81,12 +73,10 @@ const BerkeleyPathsTracker = () => {
 
   // Get user's location and track orientation
   useEffect(() => {
-    addDebug('Starting geolocation setup');
     if (navigator.geolocation) {
       // Watch position continuously for updates
       const watchId = navigator.geolocation.watchPosition(
         (position) => {
-          addDebug(`Location obtained: ${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}`);
           setUserLocation({
             lat: position.coords.latitude,
             lng: position.coords.longitude
@@ -95,7 +85,6 @@ const BerkeleyPathsTracker = () => {
           
           // Some devices provide heading from GPS
           if (position.coords.heading !== null && position.coords.heading !== undefined) {
-            addDebug(`GPS heading: ${position.coords.heading}`);
             setUserHeading(position.coords.heading);
           }
         },
@@ -116,7 +105,6 @@ const BerkeleyPathsTracker = () => {
               errorMessage += 'An unknown error occurred.';
           }
           
-          addDebug(`Geolocation error: ${error.code}`);
           setLocationError(errorMessage);
         },
         {
@@ -130,13 +118,11 @@ const BerkeleyPathsTracker = () => {
       const handleOrientation = (event) => {
         if (event.webkitCompassHeading !== undefined) {
           // iOS
-          console.log('iOS compass heading:', event.webkitCompassHeading);
           setUserHeading(event.webkitCompassHeading);
         } else if (event.alpha !== null) {
           // Android - alpha is 0-360 degrees
           // Convert to compass heading (0 = North)
           const heading = 360 - event.alpha;
-          console.log('Android heading:', heading);
           setUserHeading(heading);
         }
       };
@@ -145,7 +131,6 @@ const BerkeleyPathsTracker = () => {
       if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
         DeviceOrientationEvent.requestPermission()
           .then(permissionState => {
-            console.log('Device orientation permission:', permissionState);
             if (permissionState === 'granted') {
               window.addEventListener('deviceorientation', handleOrientation);
             }
@@ -164,7 +149,6 @@ const BerkeleyPathsTracker = () => {
       };
     } else {
       setLocationError('Geolocation is not supported by your browser.');
-      console.log('Geolocation not supported');
     }
   }, []);
 
@@ -186,9 +170,7 @@ const BerkeleyPathsTracker = () => {
 
   // Initialize map
   useEffect(() => {
-    addDebug(`Map init - view:${view} mapRef:${!!mapRef.current} instance:${!!mapInstanceRef.current} paths:${paths.length}`);
     if (view === 'map' && mapRef.current && !mapInstanceRef.current && paths.length > 0 && typeof L !== 'undefined') {
-      addDebug('Creating map instance');
       // Create map centered on Berkeley initially (will update when location comes in)
       const map = L.map(mapRef.current).setView([37.8715, -122.2730], 13);
       
@@ -199,18 +181,15 @@ const BerkeleyPathsTracker = () => {
       }).addTo(map);
 
       mapInstanceRef.current = map;
-      addDebug('Map created successfully');
 
       // Add path markers
       paths.forEach(path => {
         addPathMarker(map, path);
       });
-      addDebug(`Added ${paths.length} path lines`);
     }
 
     return () => {
       if (mapInstanceRef.current) {
-        addDebug('Cleaning up map');
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
         markersRef.current = {};
@@ -221,16 +200,14 @@ const BerkeleyPathsTracker = () => {
 
   // Add/update user location marker when location is available
   useEffect(() => {
-    addDebug(`User marker effect - hasLocation:${!!userLocation} hasMap:${!!mapInstanceRef.current}`);
     if (mapInstanceRef.current && userLocation && typeof L !== 'undefined') {
-      addDebug(`Adding marker at ${userLocation.lat.toFixed(4)}, ${userLocation.lng.toFixed(4)}`);
       const rotation = userHeading !== null ? userHeading : 0;
       const userIcon = L.divIcon({
         className: 'user-location-marker',
         html: `
-          <div style="width: 60px; height: 60px; position: relative;">
+          <div style="width: 80px; height: 80px; position: relative;">
             ${userHeading !== null ? `
-              <!-- Directional beam (cone of vision) -->
+              <!-- Directional beam (narrower cone like Google Maps) -->
               <div style="
                 position: absolute;
                 top: 50%;
@@ -238,45 +215,45 @@ const BerkeleyPathsTracker = () => {
                 transform: translate(-50%, -50%) rotate(${rotation}deg);
                 width: 0;
                 height: 0;
-                border-left: 30px solid transparent;
-                border-right: 30px solid transparent;
-                border-bottom: 50px solid rgba(59, 130, 246, 0.25);
+                border-left: 20px solid transparent;
+                border-right: 20px solid transparent;
+                border-bottom: 60px solid rgba(66, 133, 244, 0.3);
                 transform-origin: 50% 100%;
               "></div>
             ` : ''}
-            <!-- Center dot with pulse ring -->
+            <!-- Outer accuracy circle -->
             <div style="
               position: absolute;
               top: 50%;
               left: 50%;
               transform: translate(-50%, -50%);
-              background: rgba(59, 130, 246, 0.2);
+              background: rgba(66, 133, 244, 0.15);
+              border: 1px solid rgba(66, 133, 244, 0.3);
               border-radius: 50%;
-              width: 28px;
-              height: 28px;
+              width: 32px;
+              height: 32px;
             "></div>
+            <!-- Center blue dot -->
             <div style="
               position: absolute;
               top: 50%;
               left: 50%;
               transform: translate(-50%, -50%);
-              background: #3B82F6;
-              border: 3px solid white;
+              background: #4285F4;
+              border: 2px solid white;
               border-radius: 50%;
               width: 16px;
               height: 16px;
-              box-shadow: 0 0 0 rgba(59, 130, 246, 0.4);
-              animation: pulse 2s infinite;
+              box-shadow: 0 2px 4px rgba(0,0,0,0.3);
             "></div>
           </div>
         `,
-        iconSize: [60, 60],
-        iconAnchor: [30, 30]
+        iconSize: [80, 80],
+        iconAnchor: [40, 40]
       });
       
       // If marker doesn't exist, create it and center map on user location
       if (!userMarkerRef.current) {
-        addDebug('Creating new user marker, centering at zoom 17');
         const marker = L.marker([userLocation.lat, userLocation.lng], { icon: userIcon })
           .addTo(mapInstanceRef.current)
           .bindPopup('Your Location');
@@ -285,9 +262,7 @@ const BerkeleyPathsTracker = () => {
         
         // Center map on user location at zoom 17 when first location is obtained
         mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 17);
-        addDebug('Map centered on user location');
       } else {
-        addDebug('Updating existing marker position');
         // Update existing marker position and icon
         userMarkerRef.current.setLatLng([userLocation.lat, userLocation.lng]);
         userMarkerRef.current.setIcon(userIcon);
@@ -838,24 +813,6 @@ const BerkeleyPathsTracker = () => {
                 className="w-full"
                 style={{ height: 'calc(100vh - 250px)', minHeight: '500px' }}
               ></div>
-              
-              {/* Debug Panel */}
-              {debugMessages.length > 0 && (
-                <div className="absolute top-4 left-4 right-4 bg-black bg-opacity-75 text-white text-xs p-3 rounded-lg max-h-32 overflow-auto z-[1000]">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="font-bold">Debug Info:</span>
-                    <button 
-                      onClick={() => setDebugMessages([])}
-                      className="text-white hover:text-gray-300"
-                    >
-                      Clear
-                    </button>
-                  </div>
-                  {debugMessages.map((msg, i) => (
-                    <div key={i} className="mb-1">{msg}</div>
-                  ))}
-                </div>
-              )}
               
               {/* Re-center button */}
               {userLocation && (
