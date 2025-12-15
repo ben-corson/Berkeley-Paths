@@ -413,7 +413,7 @@ function App() {
                       {path.distance && (
                         <span className={`text-xs px-2 py-1 rounded-full ${
                           path.distance < 0.5 ? 'text-gray-800' : 'bg-gray-100 text-gray-600'
-                        }`}
+                        }`
                         style={path.distance < 0.5 ? {backgroundColor: '#EAA636'} : {}}>
                           {path.distance.toFixed(1)} mi
                         </span>
