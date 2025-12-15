@@ -227,21 +227,28 @@ const BerkeleyPathsTracker = () => {
       const userIcon = L.divIcon({
         className: 'user-location-marker',
         html: `
-          <div style="width: 80px; height: 80px; position: relative;">
+          <div style="width: 100px; height: 100px; position: relative;">
             ${userHeading !== null ? `
-              <!-- Directional beam (narrower cone like Google Maps) -->
-              <div style="
+              <!-- Directional beam using SVG for gradient fade -->
+              <svg style="
                 position: absolute;
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%) rotate(${rotation}deg);
-                width: 0;
-                height: 0;
-                border-left: 20px solid transparent;
-                border-right: 20px solid transparent;
-                border-bottom: 60px solid rgba(66, 133, 244, 0.3);
-                transform-origin: 50% 100%;
-              "></div>
+                width: 100px;
+                height: 100px;
+                overflow: visible;
+                pointer-events: none;
+              " viewBox="0 0 100 100">
+                <defs>
+                  <linearGradient id="beamGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:rgb(66,133,244);stop-opacity:0.4" />
+                    <stop offset="100%" style="stop-color:rgb(66,133,244);stop-opacity:0" />
+                  </linearGradient>
+                </defs>
+                <!-- Cone path: starts narrow (5px wide) at center, widens to 40px at end -->
+                <path d="M 47.5 50 L 30 0 L 70 0 Z" fill="url(#beamGradient)" />
+              </svg>
             ` : ''}
             <!-- Outer accuracy circle -->
             <div style="
@@ -270,8 +277,8 @@ const BerkeleyPathsTracker = () => {
             "></div>
           </div>
         `,
-        iconSize: [80, 80],
-        iconAnchor: [40, 40]
+        iconSize: [100, 100],
+        iconAnchor: [50, 50]
       });
       
       // If marker doesn't exist, create it and center map on user location
