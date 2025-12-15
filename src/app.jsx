@@ -4,8 +4,8 @@ const BerkeleyPathsTracker = () => {
   // State management
   const [paths, setPaths] = useState([]);
   const [completedPaths, setCompletedPaths] = useState(new Set());
-  const [pathNotes, setPathNotes] = useState({});
   const [selectedPath, setSelectedPath] = useState(null);
+  const [showPathDialog, setShowPathDialog] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
   const [userHeading, setUserHeading] = useState(null);
   const [nearbyPaths, setNearbyPaths] = useState([]);
@@ -55,13 +55,9 @@ const BerkeleyPathsTracker = () => {
   useEffect(() => {
     try {
       const savedCompleted = localStorage.getItem('completedPaths');
-      const savedNotes = localStorage.getItem('pathNotes');
       
       if (savedCompleted) {
         setCompletedPaths(new Set(JSON.parse(savedCompleted)));
-      }
-      if (savedNotes) {
-        setPathNotes(JSON.parse(savedNotes));
       }
     } catch (err) {
       console.error('Error loading saved data:', err);
@@ -72,11 +68,6 @@ const BerkeleyPathsTracker = () => {
   useEffect(() => {
     localStorage.setItem('completedPaths', JSON.stringify([...completedPaths]));
   }, [completedPaths]);
-
-  // Save notes to localStorage
-  useEffect(() => {
-    localStorage.setItem('pathNotes', JSON.stringify(pathNotes));
-  }, [pathNotes]);
 
   // Get user's location and track orientation
   useEffect(() => {
@@ -363,14 +354,14 @@ const BerkeleyPathsTracker = () => {
     invisibleLine.on('click', (e) => {
       L.DomEvent.stopPropagation(e);
       setSelectedPath(path);
-      setView('list');
+      setShowPathDialog(true);
     });
 
     // Also make the visible line clickable
     line.on('click', (e) => {
       L.DomEvent.stopPropagation(e);
       setSelectedPath(path);
-      setView('list');
+      setShowPathDialog(true);
     });
 
     // Store both lines for updates
@@ -401,14 +392,6 @@ const BerkeleyPathsTracker = () => {
       }
       return newSet;
     });
-  };
-
-  // Update path notes
-  const updatePathNotes = (pathId, notes) => {
-    setPathNotes(prev => ({
-      ...prev,
-      [pathId]: notes
-    }));
   };
 
   // Filter paths based on criteria
@@ -443,11 +426,37 @@ const BerkeleyPathsTracker = () => {
   // Show path on map
   const showPathOnMap = (path) => {
     setView('map');
+    setShowPathDialog(false);
     setTimeout(() => {
       if (mapInstanceRef.current) {
-        mapInstanceRef.current.setView([path.start[0], path.start[1]], 16);
+        // Calculate midpoint between start and end
+        const midLat = (path.start[0] + path.end[0]) / 2;
+        const midLng = (path.start[1] + path.end[1]) / 2;
+        
+        // Center on path at zoom level 17
+        mapInstanceRef.current.setView([midLat, midLng], 17);
+        
+        // Highlight the selected path
         if (markersRef.current[path.id]) {
-          markersRef.current[path.id].openPopup();
+          const { line } = markersRef.current[path.id];
+          const isCompleted = completedPaths.has(path.id);
+          const baseColor = isCompleted ? '#941B1E' : '#EAA636';
+          
+          // Make the line thicker and more opaque temporarily
+          line.setStyle({ 
+            weight: 8, 
+            opacity: 1,
+            color: baseColor
+          });
+          
+          // Reset after 2 seconds
+          setTimeout(() => {
+            line.setStyle({ 
+              weight: 4, 
+              opacity: 0.8,
+              color: baseColor
+            });
+          }, 2000);
         }
       }
     }, 100);
@@ -597,7 +606,7 @@ const BerkeleyPathsTracker = () => {
             )}
 
             {/* Selected path detail */}
-            {selectedPath && (
+            {selectedPath && view === 'list' && (
               <div className="mb-6 bg-white rounded-lg shadow-lg p-6">
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">
@@ -633,19 +642,6 @@ const BerkeleyPathsTracker = () => {
                       Show on Map
                     </button>
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Notes
-                    </label>
-                    <textarea
-                      value={pathNotes[selectedPath.id] || ''}
-                      onChange={(e) => updatePathNotes(selectedPath.id, e.target.value)}
-                      placeholder="Add notes about difficulty, highlights, memorable moments..."
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-berkeley-burgundy focus:border-transparent"
-                      rows={4}
-                    />
-                  </div>
                 </div>
               </div>
             )}
@@ -676,12 +672,6 @@ const BerkeleyPathsTracker = () => {
                           )}
                         </div>
                         <p className="text-gray-600 text-sm mt-1">{path.location}</p>
-                        {pathNotes[path.id] && (
-                          <p className="text-gray-500 text-sm mt-2 italic">
-                            📝 {pathNotes[path.id].slice(0, 100)}
-                            {pathNotes[path.id].length > 100 ? '...' : ''}
-                          </p>
-                        )}
                       </div>
                       <div className="text-gray-400 text-sm ml-4">
                         #{path.id}
@@ -728,6 +718,59 @@ const BerkeleyPathsTracker = () => {
           </div>
         )}
       </main>
+
+      {/* Path Dialog for Map View */}
+      {showPathDialog && selectedPath && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-[9999]"
+          onClick={() => setShowPathDialog(false)}
+        >
+          <div 
+            className="bg-white rounded-t-xl sm:rounded-xl shadow-2xl w-full sm:max-w-lg sm:mx-4 max-h-[80vh] overflow-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                    {selectedPath.name}
+                  </h2>
+                  <p className="text-gray-600">{selectedPath.location}</p>
+                </div>
+                <button
+                  onClick={() => setShowPathDialog(false)}
+                  className="text-gray-400 hover:text-gray-600 text-3xl leading-none ml-4"
+                >
+                  ×
+                </button>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    togglePathCompletion(selectedPath.id);
+                  }}
+                  className={`flex-1 px-6 py-3 rounded-lg font-medium transition-colors ${
+                    completedPaths.has(selectedPath.id)
+                      ? 'bg-green-600 text-white hover:bg-green-700'
+                      : 'bg-berkeley-burgundy text-white hover:bg-berkeley-burgundy-dark'
+                  }`}
+                >
+                  {completedPaths.has(selectedPath.id) ? '✓ Completed' : 'Mark as Complete'}
+                </button>
+                <button
+                  onClick={() => showPathOnMap(selectedPath)}
+                  className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+                >
+                  Show on Map
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 mt-12 py-6">
