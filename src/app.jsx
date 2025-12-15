@@ -1,14 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-
-// Fix for default marker icons in Leaflet
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
+const { useState, useEffect, useRef } = React;
 
 const BerkeleyPathsTracker = () => {
   // State management
@@ -27,6 +17,18 @@ const BerkeleyPathsTracker = () => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markersRef = useRef({});
+
+  // Fix for default marker icons in Leaflet
+  useEffect(() => {
+    if (typeof L !== 'undefined') {
+      delete L.Icon.Default.prototype._getIconUrl;
+      L.Icon.Default.mergeOptions({
+        iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+        iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+      });
+    }
+  }, []);
 
   // Load paths data
   useEffect(() => {
@@ -109,7 +111,7 @@ const BerkeleyPathsTracker = () => {
 
   // Initialize map
   useEffect(() => {
-    if (view === 'map' && mapRef.current && !mapInstanceRef.current && paths.length > 0) {
+    if (view === 'map' && mapRef.current && !mapInstanceRef.current && paths.length > 0 && typeof L !== 'undefined') {
       // Create map centered on Berkeley
       const map = L.map(mapRef.current).setView([37.8715, -122.2730], 13);
       
@@ -151,7 +153,7 @@ const BerkeleyPathsTracker = () => {
 
   // Update markers when completed status changes
   useEffect(() => {
-    if (mapInstanceRef.current) {
+    if (mapInstanceRef.current && typeof L !== 'undefined') {
       paths.forEach(path => {
         if (markersRef.current[path.id]) {
           const marker = markersRef.current[path.id];
@@ -564,4 +566,9 @@ const BerkeleyPathsTracker = () => {
   );
 };
 
-export default BerkeleyPathsTracker;
+// Render the app
+const rootElement = document.getElementById('root');
+if (rootElement) {
+  const root = ReactDOM.createRoot(rootElement);
+  root.render(<BerkeleyPathsTracker />);
+}
