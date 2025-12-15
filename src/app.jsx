@@ -9,6 +9,7 @@ const BerkeleyPathsTracker = () => {
   const [userLocation, setUserLocation] = useState(null);
   const [userHeading, setUserHeading] = useState(null);
   const [locationError, setLocationError] = useState(null);
+  const [needsCompassPermission, setNeedsCompassPermission] = useState(false);
   const [nearbyPaths, setNearbyPaths] = useState([]);
   const [view, setView] = useState('map'); // 'list' or 'map'
   const [filterCompleted, setFilterCompleted] = useState('all'); // 'all', 'completed', 'incomplete'
@@ -119,27 +120,22 @@ const BerkeleyPathsTracker = () => {
         if (event.webkitCompassHeading !== undefined) {
           // iOS
           setUserHeading(event.webkitCompassHeading);
+          setNeedsCompassPermission(false);
         } else if (event.alpha !== null) {
           // Android - alpha is 0-360 degrees
           // Convert to compass heading (0 = North)
           const heading = 360 - event.alpha;
           setUserHeading(heading);
+          setNeedsCompassPermission(false);
         }
       };
 
       // Request permission for iOS 13+
       if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-        DeviceOrientationEvent.requestPermission()
-          .then(permissionState => {
-            if (permissionState === 'granted') {
-              window.addEventListener('deviceorientation', handleOrientation);
-            }
-          })
-          .catch(err => {
-            console.log('Device orientation permission denied:', err);
-          });
+        // iOS 13+ requires user interaction to request permission
+        setNeedsCompassPermission(true);
       } else {
-        // Non-iOS devices
+        // Non-iOS devices or older iOS
         window.addEventListener('deviceorientation', handleOrientation);
       }
 
@@ -151,6 +147,32 @@ const BerkeleyPathsTracker = () => {
       setLocationError('Geolocation is not supported by your browser.');
     }
   }, []);
+
+  // Function to request compass permission (must be called from user interaction)
+  const requestCompassPermission = () => {
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+      DeviceOrientationEvent.requestPermission()
+        .then(permissionState => {
+          if (permissionState === 'granted') {
+            const handleOrientation = (event) => {
+              if (event.webkitCompassHeading !== undefined) {
+                setUserHeading(event.webkitCompassHeading);
+              } else if (event.alpha !== null) {
+                const heading = 360 - event.alpha;
+                setUserHeading(heading);
+              }
+            };
+            window.addEventListener('deviceorientation', handleOrientation);
+            setNeedsCompassPermission(false);
+          } else {
+            console.log('Compass permission denied');
+          }
+        })
+        .catch(err => {
+          console.log('Device orientation permission error:', err);
+        });
+    }
+  };
 
   // Calculate nearby paths when location changes
   useEffect(() => {
@@ -826,6 +848,17 @@ const BerkeleyPathsTracker = () => {
                   title="Center on my location"
                 >
                   📍 My Location
+                </button>
+              )}
+
+              {/* Compass permission button */}
+              {needsCompassPermission && userLocation && (
+                <button
+                  onClick={requestCompassPermission}
+                  className="absolute bottom-20 right-4 bg-berkeley-burgundy text-white px-4 py-2 rounded-lg shadow-lg hover:bg-berkeley-burgundy-dark transition-colors font-medium flex items-center gap-2"
+                  title="Enable compass for direction beam"
+                >
+                  🧭 Enable Compass
                 </button>
               )}
             </div>
