@@ -243,64 +243,6 @@ const BerkeleyPathsTracker = () => {
     }
   }, [completedPaths, paths]);
 
-  // Update user location marker when position or heading changes
-  useEffect(() => {
-    if (userMarkerRef.current && userLocation && typeof L !== 'undefined') {
-      const rotation = userHeading !== null ? userHeading : 0;
-      const userIcon = L.divIcon({
-        className: 'user-location-marker',
-        html: `
-          <div style="width: 60px; height: 60px; position: relative;">
-            ${userHeading !== null ? `
-              <!-- Directional beam (cone of vision) -->
-              <div style="
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%) rotate(${rotation}deg);
-                width: 0;
-                height: 0;
-                border-left: 30px solid transparent;
-                border-right: 30px solid transparent;
-                border-bottom: 50px solid rgba(59, 130, 246, 0.25);
-                transform-origin: 50% 100%;
-              "></div>
-            ` : ''}
-            <!-- Center dot with pulse ring -->
-            <div style="
-              position: absolute;
-              top: 50%;
-              left: 50%;
-              transform: translate(-50%, -50%);
-              background: rgba(59, 130, 246, 0.2);
-              border-radius: 50%;
-              width: 28px;
-              height: 28px;
-            "></div>
-            <div style="
-              position: absolute;
-              top: 50%;
-              left: 50%;
-              transform: translate(-50%, -50%);
-              background: #3B82F6;
-              border: 3px solid white;
-              border-radius: 50%;
-              width: 16px;
-              height: 16px;
-              box-shadow: 0 0 0 rgba(59, 130, 246, 0.4);
-            "></div>
-          </div>
-        `,
-        iconSize: [60, 60],
-        iconAnchor: [30, 30]
-      });
-      
-      // Update marker position and icon
-      userMarkerRef.current.setLatLng([userLocation.lat, userLocation.lng]);
-      userMarkerRef.current.setIcon(userIcon);
-    }
-  }, [userLocation, userHeading]);
-
   // Add path line to map (no markers, just lines)
   const addPathMarker = (map, path) => {
     const isCompleted = completedPaths.has(path.id);
