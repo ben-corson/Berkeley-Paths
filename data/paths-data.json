@@ -110,5 +110,9 @@
   { "id": 109, "name": "Public Path #1 Path", "location": "Marchant Court - Coventry Road", "start": [37.901797, -122.283691], "end": [37.901123, -122.283777] },
   { "id": 110, "name": "Eucalyptus Path", "location": "671-685 Alvarado Rd. - 4 Alvarado Place", "start": [37.8588315, -122.2388659], "end": [37.8582910, -122.2404444] },
   { "id": 111, "name": "Short Cut", "location": "73 Alvarado Rd. - Claremont Hotel parking lot", "start": [37.8580834, -122.2408363], "end": [37.8576565, -122.2415904] },
-  { "id": 112, "name": "Evergreen Path", "location": "1 Evergreen Ln. - 30 Alvarado Pl.", "start": [37.8593397, -122.2403710], "end": [37.8588641, -122.2407528] }
+  { "id": 112, "name": "Evergreen Path", "location": "1 Evergreen Ln. - 30 Alvarado Pl.", "start": [37.8593397, -122.2403710], "end": [37.8588641, -122.2407528] },
+  { "id": 113, "name": "Catherine's Walk", "location": "846-850 Hillside Ave. - 839-841 Washington Ave.", "start": [37.890587, -122.304514], "end": [37.889992, -122.304311] },
+  { "id": 114, "name": "Castro Steps", "location": "Castro and Jackson Streets - 927-933 Hillside Ave.", "start": [37.893566, -122.303086], "end": [37.893608, -122.302858] },
+  { "id": 115, "name": "Lower Codornices Path", "location": "1100-1172 San Pablo Ave. - Fielding Field", "start": [37.883566, -122.296930], "end": [37.882261, -122.304321] },
+  { "id": 116, "name": "Manor Way", "location": "1034-1038 Ventura Ave. - 1039-1041 Peralta Ave.", "start": [37.885144, -122.284240], "end": [37.885554, -122.285945] }
 ]
