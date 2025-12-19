@@ -181,8 +181,9 @@ const BerkeleyPathsTracker = () => {
   // Initialize routes map
   useEffect(() => {
     if (view === 'routes' && selectedRoute && mapRef.current && typeof L !== 'undefined') {
-      setTimeout(() => {
-        if (!mapInstanceRef.current) {
+      // Only initialize if map doesn't exist
+      if (!mapInstanceRef.current) {
+        setTimeout(() => {
           const map = L.map(mapRef.current).setView([37.8870, -122.2600], 14);
           
           L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -191,57 +192,66 @@ const BerkeleyPathsTracker = () => {
           }).addTo(map);
 
           mapInstanceRef.current = map;
-        }
 
-        // Remove existing route line
+          // Draw route
+          routeLineRef.current = L.polyline(selectedRoute.route_coordinates, {
+            color: '#8B4789',
+            weight: 5,
+            opacity: 0.85
+          }).addTo(map);
+
+          // Add start marker
+          L.marker(selectedRoute.route_coordinates[0], {
+            icon: L.divIcon({
+              className: 'start-marker',
+              html: '<div style="background: #8B4789; width: 32px; height: 32px; border-radius: 50%; border: 4px solid white; box-shadow: 0 3px 8px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px;">S</div>',
+              iconSize: [32, 32],
+              iconAnchor: [16, 16]
+            })
+          }).addTo(map).bindPopup(`<strong>Start</strong><br>${selectedRoute.start_location}`);
+
+          // Fit map to route
+          map.fitBounds(routeLineRef.current.getBounds(), { padding: [50, 50] });
+
+          // Add user location marker if available
+          if (userLocation) {
+            const userIcon = L.divIcon({
+              className: 'user-location-marker',
+              html: '<div style="background: #3B82F6; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
+              iconSize: [16, 16],
+              iconAnchor: [8, 8]
+            });
+            userMarkerRef.current = L.marker([userLocation.lat, userLocation.lng], { icon: userIcon })
+              .addTo(map)
+              .bindPopup('Your Location');
+          }
+        }, 100);
+      } else {
+        // Map already exists, just update the route
         if (routeLineRef.current) {
           routeLineRef.current.remove();
         }
-
-        // Draw route
+        
         routeLineRef.current = L.polyline(selectedRoute.route_coordinates, {
           color: '#8B4789',
           weight: 5,
           opacity: 0.85
         }).addTo(mapInstanceRef.current);
-
-        // Add start marker
-        L.marker(selectedRoute.route_coordinates[0], {
-          icon: L.divIcon({
-            className: 'start-marker',
-            html: '<div style="background: #8B4789; width: 32px; height: 32px; border-radius: 50%; border: 4px solid white; box-shadow: 0 3px 8px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px;">S</div>',
-            iconSize: [32, 32],
-            iconAnchor: [16, 16]
-          })
-        }).addTo(mapInstanceRef.current).bindPopup(`<strong>Start</strong><br>${selectedRoute.start_location}`);
-
-        // Fit map to route
+        
         mapInstanceRef.current.fitBounds(routeLineRef.current.getBounds(), { padding: [50, 50] });
-
-        // Add user location marker if available
-        if (userLocation && !userMarkerRef.current) {
-          const userIcon = L.divIcon({
-            className: 'user-location-marker',
-            html: '<div style="background: #3B82F6; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
-            iconSize: [16, 16],
-            iconAnchor: [8, 8]
-          });
-          userMarkerRef.current = L.marker([userLocation.lat, userLocation.lng], { icon: userIcon })
-            .addTo(mapInstanceRef.current)
-            .bindPopup('Your Location');
-        }
-      }, 100);
-
-      return () => {
-        if (mapInstanceRef.current && view === 'routes') {
-          mapInstanceRef.current.remove();
-          mapInstanceRef.current = null;
-          routeLineRef.current = null;
-          userMarkerRef.current = null;
-        }
-      };
+      }
     }
-  }, [view, selectedRoute, userLocation]);
+
+    // Cleanup when leaving routes view
+    return () => {
+      if (view !== 'routes' && mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+        routeLineRef.current = null;
+        userMarkerRef.current = null;
+      }
+    };
+  }, [view, selectedRoute]);
 
   // Add/update user location marker
   useEffect(() => {
@@ -499,21 +509,21 @@ const BerkeleyPathsTracker = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-berkeley-burgundy text-white shadow-lg sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold">Berkeley Paths Tracker</h1>
-              <p className="text-berkeley-gold text-sm mt-1">
-                {completedPaths.size} of {paths.length} paths completed ({completionPercentage}%)
+            <div className="flex-1 min-w-0">
+              <h1 className="text-xl font-bold truncate">Berkeley Paths</h1>
+              <p className="text-berkeley-gold text-xs">
+                {completedPaths.size}/{paths.length} ({completionPercentage}%)
               </p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-1 ml-2">
               <button
                 onClick={() => {
                   setView('list');
                   setSelectedRoute(null);
                 }}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
                   view === 'list'
                     ? 'bg-white text-berkeley-burgundy'
                     : 'bg-berkeley-burgundy-dark text-white hover:bg-opacity-80'
@@ -526,7 +536,7 @@ const BerkeleyPathsTracker = () => {
                   setView('map');
                   setSelectedRoute(null);
                 }}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
                   view === 'map'
                     ? 'bg-white text-berkeley-burgundy'
                     : 'bg-berkeley-burgundy-dark text-white hover:bg-opacity-80'
@@ -539,7 +549,7 @@ const BerkeleyPathsTracker = () => {
                   setView('routes');
                   setSelectedRoute(null);
                 }}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
                   view === 'routes'
                     ? 'bg-white text-berkeley-burgundy'
                     : 'bg-berkeley-burgundy-dark text-white hover:bg-opacity-80'
@@ -550,13 +560,15 @@ const BerkeleyPathsTracker = () => {
             </div>
           </div>
 
-          {/* Progress bar */}
-          <div className="mt-4 bg-white bg-opacity-20 rounded-full h-3 overflow-hidden">
-            <div
-              className="bg-berkeley-gold h-full transition-all duration-500"
-              style={{ width: `${completionPercentage}%` }}
-            ></div>
-          </div>
+          {/* Compact progress bar - only show on list view */}
+          {view === 'list' && (
+            <div className="mt-2 bg-white bg-opacity-20 rounded-full h-1.5 overflow-hidden">
+              <div
+                className="bg-berkeley-gold h-full transition-all duration-500"
+                style={{ width: `${completionPercentage}%` }}
+              ></div>
+            </div>
+          )}
         </div>
       </header>
 
@@ -627,7 +639,7 @@ const BerkeleyPathsTracker = () => {
                 )}
               </div>
             ) : (
-              <div className="fixed inset-0 top-[180px] flex flex-col">
+              <div className="fixed inset-0 top-[72px] flex flex-col">
                 {/* Map - takes full screen */}
                 <div className="flex-1 relative">
                   <div
@@ -638,7 +650,7 @@ const BerkeleyPathsTracker = () => {
                   {/* Floating back button */}
                   <button
                     onClick={() => setSelectedRoute(null)}
-                    className="absolute top-4 left-4 bg-white text-gray-800 px-4 py-2 rounded-lg shadow-lg hover:bg-gray-50 transition-colors font-medium flex items-center gap-2 z-10"
+                    className="absolute top-3 left-3 bg-white text-gray-800 px-3 py-1.5 rounded-lg shadow-lg hover:bg-gray-50 transition-colors text-sm font-medium flex items-center gap-1 z-10"
                   >
                     ← Back
                   </button>
@@ -651,8 +663,7 @@ const BerkeleyPathsTracker = () => {
                           mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 16);
                         }
                       }}
-                      className="absolute top-4 right-4 bg-white px-3 py-2 rounded-lg shadow-lg hover:bg-gray-50 transition-colors font-medium z-10"
-                      style={{ color: '#8B4789' }}
+                      className="absolute top-3 right-3 bg-white px-2.5 py-1.5 rounded-lg shadow-lg hover:bg-gray-50 transition-colors text-lg z-10"
                       title="Center on my location"
                     >
                       📍
@@ -660,37 +671,29 @@ const BerkeleyPathsTracker = () => {
                   )}
                 </div>
 
-                {/* Bottom info sheet */}
+                {/* Bottom info sheet - very compact */}
                 <div className="flex-shrink-0 bg-white border-t-2 shadow-2xl" style={{ borderColor: '#8B4789' }}>
-                  <div className="p-4">
-                    {/* Route name and stats */}
-                    <div className="mb-3">
-                      <h2 className="text-lg font-bold mb-1" style={{ color: '#8B4789' }}>
+                  <div className="p-3">
+                    {/* Route name and key stat */}
+                    <div className="flex items-center justify-between mb-2">
+                      <h2 className="text-base font-bold truncate" style={{ color: '#8B4789' }}>
                         {selectedRoute.name}
                       </h2>
-                      <div className="flex gap-3 text-xs text-gray-600 flex-wrap">
-                        <span>📏 {selectedRoute.distance}</span>
-                        <span>🥾 {selectedRoute.difficulty}</span>
-                        <span>⏱️ {selectedRoute.estimated_time}</span>
-                        <span>⛰️ {selectedRoute.elevation_gain}</span>
-                      </div>
+                      <span className="text-xs text-gray-600 ml-2 whitespace-nowrap">
+                        {selectedRoute.distance}
+                      </span>
                     </div>
                     
-                    {/* Description */}
-                    <p className="text-sm text-gray-700 mb-3">{selectedRoute.description}</p>
-                    
-                    {/* Actions */}
-                    <div className="flex gap-2">
-                      <a
-                        href={selectedRoute.pdf_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 text-center px-4 py-3 rounded-lg text-white text-sm font-medium transition-colors"
-                        style={{ backgroundColor: '#8B4789' }}
-                      >
-                        📄 View Turn-by-Turn Directions
-                      </a>
-                    </div>
+                    {/* PDF button - full width */}
+                    <a
+                      href={selectedRoute.pdf_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full text-center px-4 py-2.5 rounded-lg text-white text-sm font-medium transition-colors"
+                      style={{ backgroundColor: '#8B4789' }}
+                    >
+                      📄 View Turn-by-Turn Directions
+                    </a>
                   </div>
                 </div>
               </div>
@@ -893,7 +896,7 @@ const BerkeleyPathsTracker = () => {
 
         {/* Map View */}
         {view === 'map' && (
-          <div className="fixed inset-0 top-[180px] flex flex-col bg-white">
+          <div className="fixed inset-0 top-[72px] flex flex-col bg-white">
             {/* Map - full screen */}
             <div className="flex-1 relative">
               <div
@@ -909,8 +912,7 @@ const BerkeleyPathsTracker = () => {
                       mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 17);
                     }
                   }}
-                  className="absolute bottom-24 right-4 bg-white px-3 py-2 rounded-lg shadow-lg hover:bg-gray-50 transition-colors font-medium z-10"
-                  style={{ color: '#8B4789' }}
+                  className="absolute bottom-16 right-3 bg-white px-2.5 py-1.5 rounded-lg shadow-lg hover:bg-gray-50 transition-colors text-lg z-10"
                   title="Center on my location"
                 >
                   📍
@@ -919,19 +921,19 @@ const BerkeleyPathsTracker = () => {
             </div>
             
             {/* Legend - compact at bottom */}
-            <div className="flex-shrink-0 p-3 bg-gray-50 border-t text-xs text-gray-600">
-              <div className="flex items-center justify-center gap-4 flex-wrap">
+            <div className="flex-shrink-0 p-2 bg-gray-50 border-t text-xs text-gray-600">
+              <div className="flex items-center justify-center gap-3 flex-wrap">
                 <span className="flex items-center gap-1">
-                  <span className="inline-block w-3 h-3 rounded-full bg-berkeley-gold"></span>
+                  <span className="inline-block w-2.5 h-2.5 rounded-full bg-berkeley-gold"></span>
                   Incomplete
                 </span>
                 <span className="flex items-center gap-1">
-                  <span className="inline-block w-3 h-3 rounded-full bg-berkeley-burgundy"></span>
+                  <span className="inline-block w-2.5 h-2.5 rounded-full bg-berkeley-burgundy"></span>
                   Completed
                 </span>
                 {userLocation && (
                   <span className="flex items-center gap-1">
-                    <span className="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
+                    <span className="inline-block w-2.5 h-2.5 rounded-full bg-blue-500"></span>
                     You
                   </span>
                 )}
