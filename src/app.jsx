@@ -3,13 +3,15 @@ const { useState, useEffect, useRef } = React;
 const BerkeleyPathsTracker = () => {
   // State management
   const [paths, setPaths] = useState([]);
+  const [routes, setRoutes] = useState([]);
   const [completedPaths, setCompletedPaths] = useState(new Set());
   const [selectedPath, setSelectedPath] = useState(null);
+  const [selectedRoute, setSelectedRoute] = useState(null);
   const [showPathDialog, setShowPathDialog] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
   const [locationError, setLocationError] = useState(null);
   const [nearbyPaths, setNearbyPaths] = useState([]);
-  const [view, setView] = useState('map'); // 'list' or 'map'
+  const [view, setView] = useState('map'); // 'list', 'map', or 'routes'
   const [filterCompleted, setFilterCompleted] = useState('all'); // 'all', 'completed', 'incomplete'
   const [sortBy, setSortBy] = useState('alphabetical'); // 'alphabetical' or 'distance'
   const [searchQuery, setSearchQuery] = useState('');
@@ -20,6 +22,7 @@ const BerkeleyPathsTracker = () => {
   const mapInstanceRef = useRef(null);
   const markersRef = useRef({});
   const userMarkerRef = useRef(null);
+  const routeLineRef = useRef(null);
 
   // Fix for default marker icons in Leaflet
   useEffect(() => {
@@ -52,6 +55,22 @@ const BerkeleyPathsTracker = () => {
     loadPaths();
   }, []);
 
+  // Load routes data
+  useEffect(() => {
+    const loadRoutes = async () => {
+      try {
+        const response = await fetch('./data/routes-data.json');
+        if (response.ok) {
+          const data = await response.json();
+          setRoutes(data);
+        }
+      } catch (err) {
+        console.error('Routes data not available:', err);
+      }
+    };
+    loadRoutes();
+  }, []);
+
   // Load saved data from localStorage
   useEffect(() => {
     try {
@@ -80,7 +99,7 @@ const BerkeleyPathsTracker = () => {
             lat: position.coords.latitude,
             lng: position.coords.longitude
           });
-          setLocationError(null); // Clear any previous errors
+          setLocationError(null);
         },
         (error) => {
           let errorMessage = 'Unable to get your location. ';
@@ -126,7 +145,7 @@ const BerkeleyPathsTracker = () => {
           path.start[0],
           path.start[1]
         );
-        return distance <= 0.5; // Within 0.5 miles
+        return distance <= 0.5;
       });
       setNearbyPaths(nearby);
     }
@@ -135,10 +154,8 @@ const BerkeleyPathsTracker = () => {
   // Initialize map
   useEffect(() => {
     if (view === 'map' && mapRef.current && !mapInstanceRef.current && paths.length > 0 && typeof L !== 'undefined') {
-      // Create map centered on Berkeley initially (will update when location comes in)
       const map = L.map(mapRef.current).setView([37.8715, -122.2730], 13);
       
-      // Add tile layer
       L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
         maxZoom: 19
@@ -146,14 +163,13 @@ const BerkeleyPathsTracker = () => {
 
       mapInstanceRef.current = map;
 
-      // Add path markers
       paths.forEach(path => {
         addPathMarker(map, path);
       });
     }
 
     return () => {
-      if (mapInstanceRef.current) {
+      if (mapInstanceRef.current && view !== 'routes') {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
         markersRef.current = {};
@@ -162,14 +178,80 @@ const BerkeleyPathsTracker = () => {
     };
   }, [view, paths]);
 
-  // Add/update user location marker when location is available
+  // Initialize routes map
+  useEffect(() => {
+    if (view === 'routes' && selectedRoute && mapRef.current && typeof L !== 'undefined') {
+      setTimeout(() => {
+        if (!mapInstanceRef.current) {
+          const map = L.map(mapRef.current).setView([37.8870, -122.2600], 14);
+          
+          L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap',
+            maxZoom: 19
+          }).addTo(map);
+
+          mapInstanceRef.current = map;
+        }
+
+        // Remove existing route line
+        if (routeLineRef.current) {
+          routeLineRef.current.remove();
+        }
+
+        // Draw route
+        routeLineRef.current = L.polyline(selectedRoute.route_coordinates, {
+          color: '#8B4789',
+          weight: 5,
+          opacity: 0.85
+        }).addTo(mapInstanceRef.current);
+
+        // Add start marker
+        L.marker(selectedRoute.route_coordinates[0], {
+          icon: L.divIcon({
+            className: 'start-marker',
+            html: '<div style="background: #8B4789; width: 32px; height: 32px; border-radius: 50%; border: 4px solid white; box-shadow: 0 3px 8px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px;">S</div>',
+            iconSize: [32, 32],
+            iconAnchor: [16, 16]
+          })
+        }).addTo(mapInstanceRef.current).bindPopup(`<strong>Start</strong><br>${selectedRoute.start_location}`);
+
+        // Fit map to route
+        mapInstanceRef.current.fitBounds(routeLineRef.current.getBounds(), { padding: [50, 50] });
+
+        // Add user location marker if available
+        if (userLocation && !userMarkerRef.current) {
+          const userIcon = L.divIcon({
+            className: 'user-location-marker',
+            html: '<div style="background: #3B82F6; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
+            iconSize: [16, 16],
+            iconAnchor: [8, 8]
+          });
+          userMarkerRef.current = L.marker([userLocation.lat, userLocation.lng], { icon: userIcon })
+            .addTo(mapInstanceRef.current)
+            .bindPopup('Your Location');
+        }
+      }, 100);
+
+      return () => {
+        if (mapInstanceRef.current && view === 'routes') {
+          mapInstanceRef.current.remove();
+          mapInstanceRef.current = null;
+          routeLineRef.current = null;
+          userMarkerRef.current = null;
+        }
+      };
+    }
+  }, [view, selectedRoute, userLocation]);
+
+  // Add/update user location marker
   useEffect(() => {
     if (mapInstanceRef.current && userLocation && typeof L !== 'undefined') {
       const userIcon = L.divIcon({
         className: 'user-location-marker',
-        html: `
+        html: view === 'routes' 
+          ? '<div style="background: #3B82F6; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>'
+          : `
           <div style="width: 40px; height: 40px; position: relative;">
-            <!-- Outer accuracy circle -->
             <div style="
               position: absolute;
               top: 50%;
@@ -181,7 +263,6 @@ const BerkeleyPathsTracker = () => {
               width: 32px;
               height: 32px;
             "></div>
-            <!-- Center blue dot -->
             <div style="
               position: absolute;
               top: 50%;
@@ -196,11 +277,10 @@ const BerkeleyPathsTracker = () => {
             "></div>
           </div>
         `,
-        iconSize: [40, 40],
-        iconAnchor: [20, 20]
+        iconSize: view === 'routes' ? [16, 16] : [40, 40],
+        iconAnchor: view === 'routes' ? [8, 8] : [20, 20]
       });
       
-      // If marker doesn't exist, create it and center map on user location
       if (!userMarkerRef.current) {
         const marker = L.marker([userLocation.lat, userLocation.lng], { icon: userIcon })
           .addTo(mapInstanceRef.current)
@@ -208,29 +288,27 @@ const BerkeleyPathsTracker = () => {
         
         userMarkerRef.current = marker;
         
-        // Center map on user location at zoom 17 when first location is obtained
-        mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 17);
+        if (view !== 'routes') {
+          mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 17);
+        }
       } else {
-        // Update existing marker position
         userMarkerRef.current.setLatLng([userLocation.lat, userLocation.lng]);
         userMarkerRef.current.setIcon(userIcon);
       }
     }
-  }, [userLocation]);
+  }, [userLocation, view]);
 
   // Update path lines when completed status changes
   useEffect(() => {
-    if (mapInstanceRef.current && typeof L !== 'undefined') {
+    if (mapInstanceRef.current && typeof L !== 'undefined' && view === 'map') {
       paths.forEach(path => {
         if (markersRef.current[path.id]) {
           const { line } = markersRef.current[path.id];
           const isCompleted = completedPaths.has(path.id);
           
-          // Update line color: burgundy for completed, gold for incomplete
           const color = isCompleted ? '#941B1E' : '#EAA636';
           line.setStyle({ color: color });
           
-          // Update popup content
           line.setPopupContent(`
             <div style="min-width: 200px;">
               <h3 style="margin: 0 0 8px 0; font-weight: 600; color: #941B1E;">${path.name}</h3>
@@ -241,16 +319,13 @@ const BerkeleyPathsTracker = () => {
         }
       });
     }
-  }, [completedPaths, paths]);
+  }, [completedPaths, paths, view]);
 
-  // Add path line to map (no markers, just lines)
+  // Add path line to map
   const addPathMarker = (map, path) => {
     const isCompleted = completedPaths.has(path.id);
-    
-    // Use Berkeley colors: burgundy (#941B1E) for completed, gold (#EAA636) for incomplete
     const color = isCompleted ? '#941B1E' : '#EAA636';
 
-    // Draw visible line between start and end
     const line = L.polyline([path.start, path.end], {
       color: color,
       weight: 4,
@@ -258,7 +333,6 @@ const BerkeleyPathsTracker = () => {
       className: `path-line-${path.id}`
     }).addTo(map);
 
-    // Add popup to the line
     line.bindPopup(`
       <div style="min-width: 200px;">
         <h3 style="margin: 0 0 8px 0; font-weight: 600; color: #941B1E;">${path.name}</h3>
@@ -267,35 +341,31 @@ const BerkeleyPathsTracker = () => {
       </div>
     `);
 
-    // Create invisible clickable area around the line (wider hit area)
     const invisibleLine = L.polyline([path.start, path.end], {
       color: 'transparent',
-      weight: 20, // Much wider for easier clicking
+      weight: 20,
       opacity: 0,
       className: `path-line-invisible-${path.id}`
     }).addTo(map);
 
-    // Add click handler to invisible line
     invisibleLine.on('click', (e) => {
       L.DomEvent.stopPropagation(e);
       setSelectedPath(path);
       setShowPathDialog(true);
     });
 
-    // Also make the visible line clickable
     line.on('click', (e) => {
       L.DomEvent.stopPropagation(e);
       setSelectedPath(path);
       setShowPathDialog(true);
     });
 
-    // Store both lines for updates
     markersRef.current[path.id] = { line, invisibleLine };
   };
 
   // Calculate distance between two points in miles
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 3959; // Earth's radius in miles
+    const R = 3959;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = 
@@ -319,18 +389,16 @@ const BerkeleyPathsTracker = () => {
     });
   };
 
-  // Filter and sort paths based on criteria
+  // Filter and sort paths
   const getFilteredPaths = () => {
     let filtered = paths;
 
-    // Filter by completion status
     if (filterCompleted === 'completed') {
       filtered = filtered.filter(path => completedPaths.has(path.id));
     } else if (filterCompleted === 'incomplete') {
       filtered = filtered.filter(path => !completedPaths.has(path.id));
     }
 
-    // Filter by search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(path =>
@@ -339,7 +407,6 @@ const BerkeleyPathsTracker = () => {
       );
     }
 
-    // Sort paths
     if (sortBy === 'alphabetical') {
       filtered = [...filtered].sort((a, b) => a.name.localeCompare(b.name));
     } else if (sortBy === 'distance' && userLocation) {
@@ -375,27 +442,22 @@ const BerkeleyPathsTracker = () => {
     setShowPathDialog(false);
     setTimeout(() => {
       if (mapInstanceRef.current) {
-        // Calculate midpoint between start and end
         const midLat = (path.start[0] + path.end[0]) / 2;
         const midLng = (path.start[1] + path.end[1]) / 2;
         
-        // Center on path at zoom level 17
         mapInstanceRef.current.setView([midLat, midLng], 17);
         
-        // Highlight the selected path
         if (markersRef.current[path.id]) {
           const { line } = markersRef.current[path.id];
           const isCompleted = completedPaths.has(path.id);
           const baseColor = isCompleted ? '#941B1E' : '#EAA636';
           
-          // Make the line thicker and more opaque temporarily
           line.setStyle({ 
             weight: 8, 
             opacity: 1,
             color: baseColor
           });
           
-          // Reset after 2 seconds
           setTimeout(() => {
             line.setStyle({ 
               weight: 4, 
@@ -447,7 +509,10 @@ const BerkeleyPathsTracker = () => {
             </div>
             <div className="flex gap-2">
               <button
-                onClick={() => setView('list')}
+                onClick={() => {
+                  setView('list');
+                  setSelectedRoute(null);
+                }}
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   view === 'list'
                     ? 'bg-white text-berkeley-burgundy'
@@ -457,7 +522,10 @@ const BerkeleyPathsTracker = () => {
                 List
               </button>
               <button
-                onClick={() => setView('map')}
+                onClick={() => {
+                  setView('map');
+                  setSelectedRoute(null);
+                }}
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   view === 'map'
                     ? 'bg-white text-berkeley-burgundy'
@@ -465,6 +533,19 @@ const BerkeleyPathsTracker = () => {
                 }`}
               >
                 Map
+              </button>
+              <button
+                onClick={() => {
+                  setView('routes');
+                  setSelectedRoute(null);
+                }}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  view === 'routes'
+                    ? 'bg-white text-berkeley-burgundy'
+                    : 'bg-berkeley-burgundy-dark text-white hover:bg-opacity-80'
+                }`}
+              >
+                Routes
               </button>
             </div>
           </div>
@@ -504,7 +585,108 @@ const BerkeleyPathsTracker = () => {
           </div>
         )}
 
-        {view === 'list' ? (
+        {/* Routes View */}
+        {view === 'routes' && (
+          <>
+            {!selectedRoute ? (
+              <div className="space-y-4">
+                <h2 className="text-2xl font-bold text-berkeley-burgundy mb-4">
+                  Walking Routes
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  Organized walks through Berkeley's paths from the Berkeley Path Wanderers Association
+                </p>
+                
+                {routes.length === 0 ? (
+                  <div className="text-center py-12 text-gray-500">
+                    No routes available. Add routes-data.json to your data folder.
+                  </div>
+                ) : (
+                  routes.map((route) => (
+                    <div
+                      key={route.id}
+                      className="border-2 rounded-lg p-6 hover:shadow-lg transition-all cursor-pointer bg-white"
+                      style={{ borderColor: '#8B4789' }}
+                      onClick={() => setSelectedRoute(route)}
+                    >
+                      <h3 className="text-xl font-bold mb-3" style={{ color: '#8B4789' }}>
+                        {route.name}
+                      </h3>
+                      <div className="grid grid-cols-2 gap-3 text-sm text-gray-700 mb-3">
+                        <div>📏 {route.distance}</div>
+                        <div>🥾 {route.difficulty}</div>
+                        <div>🚶 {route.estimated_time}</div>
+                        <div>⛰️ {route.elevation_gain}</div>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-3">{route.description}</p>
+                      <div className="text-sm font-medium" style={{ color: '#EAA636' }}>
+                        Includes {route.paths_count} paths →
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            ) : (
+              <div className="flex flex-col" style={{ height: 'calc(100vh - 250px)' }}>
+                {/* Route header */}
+                <div className="mb-4 p-4 rounded-lg" style={{ backgroundColor: '#8B4789' }}>
+                  <button
+                    onClick={() => setSelectedRoute(null)}
+                    className="text-white mb-2 flex items-center gap-2 hover:underline"
+                  >
+                    ← Back to Routes
+                  </button>
+                  <h2 className="text-xl font-bold text-white mb-2">{selectedRoute.name}</h2>
+                  <div className="flex gap-4 text-sm text-white opacity-95">
+                    <span>📏 {selectedRoute.distance}</span>
+                    <span>🥾 {selectedRoute.difficulty}</span>
+                    <span>⏱️ {selectedRoute.estimated_time}</span>
+                  </div>
+                </div>
+
+                {/* Map */}
+                <div className="flex-1 rounded-lg overflow-hidden shadow-lg mb-4">
+                  <div
+                    ref={mapRef}
+                    className="w-full h-full"
+                  ></div>
+                </div>
+
+                {/* Info panel */}
+                <div className="p-4 bg-white rounded-lg shadow">
+                  <p className="text-sm text-gray-700 mb-3">{selectedRoute.description}</p>
+                  <div className="flex gap-2 flex-wrap">
+                    <a
+                      href={selectedRoute.pdf_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2 rounded-lg text-white text-sm font-medium transition-colors"
+                      style={{ backgroundColor: '#8B4789' }}
+                    >
+                      📄 View PDF Directions
+                    </a>
+                    {userLocation && (
+                      <button
+                        onClick={() => {
+                          if (mapInstanceRef.current) {
+                            mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 16);
+                          }
+                        }}
+                        className="px-4 py-2 rounded-lg border-2 text-sm font-medium transition-colors"
+                        style={{ borderColor: '#8B4789', color: '#8B4789' }}
+                      >
+                        📍 Show My Location
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* List View */}
+        {view === 'list' && (
           <>
             {/* Search and filters */}
             <div className="mb-6 space-y-4">
@@ -604,7 +786,7 @@ const BerkeleyPathsTracker = () => {
             )}
 
             {/* Selected path detail */}
-            {selectedPath && view === 'list' && (
+            {selectedPath && (
               <div className="mb-6 bg-white rounded-lg shadow-lg p-6">
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">
@@ -694,8 +876,10 @@ const BerkeleyPathsTracker = () => {
               )}
             </div>
           </>
-        ) : (
-          /* Map view */
+        )}
+
+        {/* Map View */}
+        {view === 'map' && (
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <div className="relative">
               <div
