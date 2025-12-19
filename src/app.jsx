@@ -179,9 +179,52 @@ const BerkeleyPathsTracker = () => {
         paths.forEach(path => {
           addPathMarker(map, path);
         });
+
+        // Add user location marker if available
+        if (userLocation) {
+          const userIcon = L.divIcon({
+            className: 'user-location-marker',
+            html: `
+              <div style="width: 40px; height: 40px; position: relative;">
+                <div style="
+                  position: absolute;
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -50%);
+                  background: rgba(66, 133, 244, 0.15);
+                  border: 1px solid rgba(66, 133, 244, 0.3);
+                  border-radius: 50%;
+                  width: 32px;
+                  height: 32px;
+                "></div>
+                <div style="
+                  position: absolute;
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -50%);
+                  background: #4285F4;
+                  border: 2px solid white;
+                  border-radius: 50%;
+                  width: 16px;
+                  height: 16px;
+                  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                "></div>
+              </div>
+            `,
+            iconSize: [40, 40],
+            iconAnchor: [20, 20]
+          });
+          
+          userMarkerRef.current = L.marker([userLocation.lat, userLocation.lng], { icon: userIcon })
+            .addTo(map)
+            .bindPopup('Your Location');
+          
+          // Center on user location
+          map.setView([userLocation.lat, userLocation.lng], 17);
+        }
       }, 100);
     }
-  }, [view, paths]);
+  }, [view, paths, userLocation]);
 
   // Initialize routes map
   useEffect(() => {
@@ -277,7 +320,8 @@ const BerkeleyPathsTracker = () => {
         
         userMarkerRef.current = marker;
         
-        if (view !== 'routes') {
+        // Center map on user location at zoom 17 when first location is obtained (only for map view)
+        if (view === 'map') {
           mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 17);
         }
       } else {
@@ -285,7 +329,7 @@ const BerkeleyPathsTracker = () => {
         userMarkerRef.current.setIcon(userIcon);
       }
     }
-  }, [userLocation, view]);
+  }, [userLocation, view, mapInstanceRef.current]);
 
   // Update path lines when completed status changes
   useEffect(() => {
