@@ -627,7 +627,7 @@ const BerkeleyPathsTracker = () => {
                 )}
               </div>
             ) : (
-              <div className="flex flex-col" style={{ height: 'calc(100vh - 250px)' }}>
+              <div>
                 {/* Route header */}
                 <div className="mb-4 p-4 rounded-lg" style={{ backgroundColor: '#8B4789' }}>
                   <button
@@ -645,10 +645,11 @@ const BerkeleyPathsTracker = () => {
                 </div>
 
                 {/* Map */}
-                <div className="flex-1 rounded-lg overflow-hidden shadow-lg mb-4">
+                <div className="rounded-lg overflow-hidden shadow-lg mb-4">
                   <div
                     ref={mapRef}
-                    className="w-full h-full"
+                    className="w-full"
+                    style={{ height: '60vh', minHeight: '400px' }}
                   ></div>
                 </div>
 
