@@ -151,106 +151,85 @@ const BerkeleyPathsTracker = () => {
     }
   }, [userLocation, paths]);
 
+  // Clean up map when switching views
+  useEffect(() => {
+    // Whenever view changes, clean up the existing map
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.remove();
+      mapInstanceRef.current = null;
+      markersRef.current = {};
+      userMarkerRef.current = null;
+      routeLineRef.current = null;
+    }
+  }, [view]);
+
   // Initialize map
   useEffect(() => {
     if (view === 'map' && mapRef.current && !mapInstanceRef.current && paths.length > 0 && typeof L !== 'undefined') {
-      const map = L.map(mapRef.current).setView([37.8715, -122.2730], 13);
-      
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        maxZoom: 19
-      }).addTo(map);
+      setTimeout(() => {
+        const map = L.map(mapRef.current).setView([37.8715, -122.2730], 13);
+        
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+          maxZoom: 19
+        }).addTo(map);
 
-      mapInstanceRef.current = map;
+        mapInstanceRef.current = map;
 
-      paths.forEach(path => {
-        addPathMarker(map, path);
-      });
+        paths.forEach(path => {
+          addPathMarker(map, path);
+        });
+      }, 100);
     }
-
-    return () => {
-      if (mapInstanceRef.current && view !== 'routes') {
-        mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
-        markersRef.current = {};
-        userMarkerRef.current = null;
-      }
-    };
   }, [view, paths]);
 
   // Initialize routes map
   useEffect(() => {
-    if (view === 'routes' && selectedRoute && mapRef.current && typeof L !== 'undefined') {
-      // Only initialize if map doesn't exist
-      if (!mapInstanceRef.current) {
-        setTimeout(() => {
-          const map = L.map(mapRef.current).setView([37.8870, -122.2600], 14);
-          
-          L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap',
-            maxZoom: 19
-          }).addTo(map);
-
-          mapInstanceRef.current = map;
-
-          // Draw route
-          routeLineRef.current = L.polyline(selectedRoute.route_coordinates, {
-            color: '#8B4789',
-            weight: 5,
-            opacity: 0.85
-          }).addTo(map);
-
-          // Add start marker
-          L.marker(selectedRoute.route_coordinates[0], {
-            icon: L.divIcon({
-              className: 'start-marker',
-              html: '<div style="background: #8B4789; width: 32px; height: 32px; border-radius: 50%; border: 4px solid white; box-shadow: 0 3px 8px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px;">S</div>',
-              iconSize: [32, 32],
-              iconAnchor: [16, 16]
-            })
-          }).addTo(map).bindPopup(`<strong>Start</strong><br>${selectedRoute.start_location}`);
-
-          // Fit map to route
-          map.fitBounds(routeLineRef.current.getBounds(), { padding: [50, 50] });
-
-          // Add user location marker if available
-          if (userLocation) {
-            const userIcon = L.divIcon({
-              className: 'user-location-marker',
-              html: '<div style="background: #3B82F6; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
-              iconSize: [16, 16],
-              iconAnchor: [8, 8]
-            });
-            userMarkerRef.current = L.marker([userLocation.lat, userLocation.lng], { icon: userIcon })
-              .addTo(map)
-              .bindPopup('Your Location');
-          }
-        }, 100);
-      } else {
-        // Map already exists, just update the route
-        if (routeLineRef.current) {
-          routeLineRef.current.remove();
-        }
+    if (view === 'routes' && selectedRoute && mapRef.current && !mapInstanceRef.current && typeof L !== 'undefined') {
+      setTimeout(() => {
+        const map = L.map(mapRef.current).setView([37.8870, -122.2600], 14);
         
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; OpenStreetMap',
+          maxZoom: 19
+        }).addTo(map);
+
+        mapInstanceRef.current = map;
+
+        // Draw route
         routeLineRef.current = L.polyline(selectedRoute.route_coordinates, {
           color: '#8B4789',
           weight: 5,
           opacity: 0.85
-        }).addTo(mapInstanceRef.current);
-        
-        mapInstanceRef.current.fitBounds(routeLineRef.current.getBounds(), { padding: [50, 50] });
-      }
-    }
+        }).addTo(map);
 
-    // Cleanup when leaving routes view
-    return () => {
-      if (view !== 'routes' && mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
-        routeLineRef.current = null;
-        userMarkerRef.current = null;
-      }
-    };
+        // Add start marker
+        L.marker(selectedRoute.route_coordinates[0], {
+          icon: L.divIcon({
+            className: 'start-marker',
+            html: '<div style="background: #8B4789; width: 32px; height: 32px; border-radius: 50%; border: 4px solid white; box-shadow: 0 3px 8px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px;">S</div>',
+            iconSize: [32, 32],
+            iconAnchor: [16, 16]
+          })
+        }).addTo(map).bindPopup(`<strong>Start</strong><br>${selectedRoute.start_location}`);
+
+        // Fit map to route
+        map.fitBounds(routeLineRef.current.getBounds(), { padding: [50, 50] });
+
+        // Add user location marker if available
+        if (userLocation) {
+          const userIcon = L.divIcon({
+            className: 'user-location-marker',
+            html: '<div style="background: #3B82F6; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
+            iconSize: [16, 16],
+            iconAnchor: [8, 8]
+          });
+          userMarkerRef.current = L.marker([userLocation.lat, userLocation.lng], { icon: userIcon })
+            .addTo(map)
+            .bindPopup('Your Location');
+        }
+      }, 100);
+    }
   }, [view, selectedRoute]);
 
   // Add/update user location marker
@@ -509,21 +488,25 @@ const BerkeleyPathsTracker = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-berkeley-burgundy text-white shadow-lg sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex-1 min-w-0">
-              <h1 className="text-xl font-bold truncate">Berkeley Paths</h1>
-              <p className="text-berkeley-gold text-xs">
-                {completedPaths.size}/{paths.length} ({completionPercentage}%)
-              </p>
+        <div className="max-w-7xl mx-auto px-3 py-2">
+          {/* Title - full width on one line */}
+          <h1 className="text-lg font-bold mb-1.5">Berkeley Paths Tracker</h1>
+          
+          {/* Navigation and completion info - second line */}
+          <div className="flex items-center justify-between gap-2">
+            {/* Completion info */}
+            <div className="text-berkeley-gold text-xs whitespace-nowrap">
+              {completedPaths.size}/{paths.length} ({completionPercentage}%)
             </div>
-            <div className="flex gap-1 ml-2">
+            
+            {/* Navigation buttons */}
+            <div className="flex gap-1">
               <button
                 onClick={() => {
                   setView('list');
                   setSelectedRoute(null);
                 }}
-                className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+                className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                   view === 'list'
                     ? 'bg-white text-berkeley-burgundy'
                     : 'bg-berkeley-burgundy-dark text-white hover:bg-opacity-80'
@@ -536,7 +519,7 @@ const BerkeleyPathsTracker = () => {
                   setView('map');
                   setSelectedRoute(null);
                 }}
-                className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+                className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                   view === 'map'
                     ? 'bg-white text-berkeley-burgundy'
                     : 'bg-berkeley-burgundy-dark text-white hover:bg-opacity-80'
@@ -549,7 +532,7 @@ const BerkeleyPathsTracker = () => {
                   setView('routes');
                   setSelectedRoute(null);
                 }}
-                className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+                className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                   view === 'routes'
                     ? 'bg-white text-berkeley-burgundy'
                     : 'bg-berkeley-burgundy-dark text-white hover:bg-opacity-80'
@@ -562,7 +545,7 @@ const BerkeleyPathsTracker = () => {
 
           {/* Compact progress bar - only show on list view */}
           {view === 'list' && (
-            <div className="mt-2 bg-white bg-opacity-20 rounded-full h-1.5 overflow-hidden">
+            <div className="mt-1.5 bg-white bg-opacity-20 rounded-full h-1 overflow-hidden">
               <div
                 className="bg-berkeley-gold h-full transition-all duration-500"
                 style={{ width: `${completionPercentage}%` }}
@@ -639,7 +622,7 @@ const BerkeleyPathsTracker = () => {
                 )}
               </div>
             ) : (
-              <div className="fixed inset-0 top-[72px] flex flex-col">
+              <div className="fixed inset-0 top-[56px] flex flex-col">
                 {/* Map - takes full screen */}
                 <div className="flex-1 relative">
                   <div
@@ -896,7 +879,7 @@ const BerkeleyPathsTracker = () => {
 
         {/* Map View */}
         {view === 'map' && (
-          <div className="fixed inset-0 top-[72px] flex flex-col bg-white">
+          <div className="fixed inset-0 top-[56px] flex flex-col bg-white">
             {/* Map - full screen */}
             <div className="flex-1 relative">
               <div
