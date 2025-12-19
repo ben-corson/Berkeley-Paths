@@ -561,9 +561,9 @@ const BerkeleyPathsTracker = () => {
       </header>
 
       {/* Main content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className={view === 'list' ? 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6' : ''}>
         {/* Location Error Alert */}
-        {locationError && (
+        {locationError && view === 'list' && (
           <div className="mb-6 bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
             <div className="flex">
               <div className="flex-shrink-0">
@@ -589,7 +589,7 @@ const BerkeleyPathsTracker = () => {
         {view === 'routes' && (
           <>
             {!selectedRoute ? (
-              <div className="space-y-4">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-4">
                 <h2 className="text-2xl font-bold text-berkeley-burgundy mb-4">
                   Walking Routes
                 </h2>
@@ -627,58 +627,70 @@ const BerkeleyPathsTracker = () => {
                 )}
               </div>
             ) : (
-              <div>
-                {/* Route header */}
-                <div className="mb-4 p-4 rounded-lg" style={{ backgroundColor: '#8B4789' }}>
-                  <button
-                    onClick={() => setSelectedRoute(null)}
-                    className="text-white mb-2 flex items-center gap-2 hover:underline"
-                  >
-                    ← Back to Routes
-                  </button>
-                  <h2 className="text-xl font-bold text-white mb-2">{selectedRoute.name}</h2>
-                  <div className="flex gap-4 text-sm text-white opacity-95">
-                    <span>📏 {selectedRoute.distance}</span>
-                    <span>🥾 {selectedRoute.difficulty}</span>
-                    <span>⏱️ {selectedRoute.estimated_time}</span>
-                  </div>
-                </div>
-
-                {/* Map */}
-                <div className="rounded-lg overflow-hidden shadow-lg mb-4">
+              <div className="fixed inset-0 top-[180px] flex flex-col">
+                {/* Map - takes full screen */}
+                <div className="flex-1 relative">
                   <div
                     ref={mapRef}
-                    className="w-full"
-                    style={{ height: '60vh', minHeight: '400px' }}
+                    className="absolute inset-0 w-full h-full"
                   ></div>
+                  
+                  {/* Floating back button */}
+                  <button
+                    onClick={() => setSelectedRoute(null)}
+                    className="absolute top-4 left-4 bg-white text-gray-800 px-4 py-2 rounded-lg shadow-lg hover:bg-gray-50 transition-colors font-medium flex items-center gap-2 z-10"
+                  >
+                    ← Back
+                  </button>
+                  
+                  {/* Floating my location button */}
+                  {userLocation && (
+                    <button
+                      onClick={() => {
+                        if (mapInstanceRef.current) {
+                          mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 16);
+                        }
+                      }}
+                      className="absolute top-4 right-4 bg-white px-3 py-2 rounded-lg shadow-lg hover:bg-gray-50 transition-colors font-medium z-10"
+                      style={{ color: '#8B4789' }}
+                      title="Center on my location"
+                    >
+                      📍
+                    </button>
+                  )}
                 </div>
 
-                {/* Info panel */}
-                <div className="p-4 bg-white rounded-lg shadow">
-                  <p className="text-sm text-gray-700 mb-3">{selectedRoute.description}</p>
-                  <div className="flex gap-2 flex-wrap">
-                    <a
-                      href={selectedRoute.pdf_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-4 py-2 rounded-lg text-white text-sm font-medium transition-colors"
-                      style={{ backgroundColor: '#8B4789' }}
-                    >
-                      📄 View PDF Directions
-                    </a>
-                    {userLocation && (
-                      <button
-                        onClick={() => {
-                          if (mapInstanceRef.current) {
-                            mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 16);
-                          }
-                        }}
-                        className="px-4 py-2 rounded-lg border-2 text-sm font-medium transition-colors"
-                        style={{ borderColor: '#8B4789', color: '#8B4789' }}
+                {/* Bottom info sheet */}
+                <div className="flex-shrink-0 bg-white border-t-2 shadow-2xl" style={{ borderColor: '#8B4789' }}>
+                  <div className="p-4">
+                    {/* Route name and stats */}
+                    <div className="mb-3">
+                      <h2 className="text-lg font-bold mb-1" style={{ color: '#8B4789' }}>
+                        {selectedRoute.name}
+                      </h2>
+                      <div className="flex gap-3 text-xs text-gray-600 flex-wrap">
+                        <span>📏 {selectedRoute.distance}</span>
+                        <span>🥾 {selectedRoute.difficulty}</span>
+                        <span>⏱️ {selectedRoute.estimated_time}</span>
+                        <span>⛰️ {selectedRoute.elevation_gain}</span>
+                      </div>
+                    </div>
+                    
+                    {/* Description */}
+                    <p className="text-sm text-gray-700 mb-3">{selectedRoute.description}</p>
+                    
+                    {/* Actions */}
+                    <div className="flex gap-2">
+                      <a
+                        href={selectedRoute.pdf_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 text-center px-4 py-3 rounded-lg text-white text-sm font-medium transition-colors"
+                        style={{ backgroundColor: '#8B4789' }}
                       >
-                        📍 Show My Location
-                      </button>
-                    )}
+                        📄 View Turn-by-Turn Directions
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -881,15 +893,15 @@ const BerkeleyPathsTracker = () => {
 
         {/* Map View */}
         {view === 'map' && (
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <div className="relative">
+          <div className="fixed inset-0 top-[180px] flex flex-col bg-white">
+            {/* Map - full screen */}
+            <div className="flex-1 relative">
               <div
                 ref={mapRef}
-                className="w-full"
-                style={{ height: 'calc(100vh - 250px)', minHeight: '500px' }}
+                className="absolute inset-0 w-full h-full"
               ></div>
               
-              {/* Re-center button */}
+              {/* Re-center button - floating on map */}
               {userLocation && (
                 <button
                   onClick={() => {
@@ -897,21 +909,33 @@ const BerkeleyPathsTracker = () => {
                       mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 17);
                     }
                   }}
-                  className="absolute bottom-4 right-4 bg-white text-berkeley-burgundy px-4 py-2 rounded-lg shadow-lg hover:bg-gray-50 transition-colors font-medium flex items-center gap-2"
+                  className="absolute bottom-24 right-4 bg-white px-3 py-2 rounded-lg shadow-lg hover:bg-gray-50 transition-colors font-medium z-10"
+                  style={{ color: '#8B4789' }}
                   title="Center on my location"
                 >
-                  📍 My Location
+                  📍
                 </button>
               )}
             </div>
-            <div className="p-4 bg-gray-50 text-sm text-gray-600">
-              <p>
-                <span className="font-medium">Legend:</span>{' '}
-                <span className="inline-block w-3 h-3 rounded-full bg-berkeley-gold mr-1"></span> Incomplete{' '}
-                <span className="inline-block w-3 h-3 rounded-full bg-berkeley-burgundy ml-3 mr-1"></span> Completed
-                {!userLocation && !locationError && <span className="ml-3">📍 Getting your location...</span>}
-                {userLocation && <span className="ml-3">🔵 Your location</span>}
-              </p>
+            
+            {/* Legend - compact at bottom */}
+            <div className="flex-shrink-0 p-3 bg-gray-50 border-t text-xs text-gray-600">
+              <div className="flex items-center justify-center gap-4 flex-wrap">
+                <span className="flex items-center gap-1">
+                  <span className="inline-block w-3 h-3 rounded-full bg-berkeley-gold"></span>
+                  Incomplete
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="inline-block w-3 h-3 rounded-full bg-berkeley-burgundy"></span>
+                  Completed
+                </span>
+                {userLocation && (
+                  <span className="flex items-center gap-1">
+                    <span className="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
+                    You
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         )}
