@@ -43,18 +43,16 @@ Then visit `http://localhost:8000` in your browser.
 berkeley-paths-tracker/
 ├── index.html              # Main HTML file (minimal, loads other files)
 ├── data/
-│   └── paths-data.json    # All 105 Berkeley paths data
+│   ├── paths-data.json    # All 105 Berkeley paths data
+│   └── routes-data.json   # Route/walk data
 ├── src/
 │   ├── app.jsx            # React application code
 │   └── styles.css         # CSS styling
 ├── assets/
 │   └── icon.png           # App icon for mobile devices
-├── scripts/
-│   └── build.sh           # Optional: Build script for deployment
 ├── README.md              # This file
 ├── CHANGELOG.md           # Version history
-├── .gitignore            # Git ignore rules
-└── package.json          # Optional: For npm scripts
+└── .gitignore            # Git ignore rules
 ```
 
 ## Updating Path Data

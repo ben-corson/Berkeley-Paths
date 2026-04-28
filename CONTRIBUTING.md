@@ -74,7 +74,7 @@ Before submitting a PR, verify:
 - [ ] Works in Chrome, Firefox, Safari
 - [ ] Mobile responsive (test on actual device or devtools)
 - [ ] No console errors
-- [ ] JSON data validates (run `npm run validate-json`)
+- [ ] JSON data is valid (use a JSON linter or `python -m json.tool data/paths-data.json`)
 - [ ] Geolocation features work correctly
 - [ ] LocalStorage persists data properly
 - [ ] Map interactions work smoothly

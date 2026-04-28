@@ -15,12 +15,9 @@ Your Berkeley Paths Tracker is now organized into a professional repo structure 
 - **README.md** - Complete project documentation
 - **CHANGELOG.md** - Version history
 - **CONTRIBUTING.md** - Contribution guidelines
-- **package.json** - NPM configuration
 
 ### Utilities
 - **.gitignore** - Git ignore rules
-- **scripts/build.sh** - Build script for deployment
-- **data/config.json** - App configuration
 
 ## 🚀 How to Use It
 
@@ -92,7 +89,6 @@ open http://localhost:8000
 ### Update Documentation
 1. Keep `README.md` current
 2. Add entries to `CHANGELOG.md`
-3. Update version in `package.json`
 
 ## 🎨 Key Benefits of This Structure
 
@@ -108,6 +104,7 @@ open http://localhost:8000
 | File | Purpose | Update When |
 |------|---------|-------------|
 | `data/paths-data.json` | Path information | Adding/updating paths |
+| `data/routes-data.json` | Route/walk data | Adding/updating routes |
 | `src/app.jsx` | App logic | Adding features |
 | `src/styles.css` | Styling | Changing appearance |
 | `index.html` | Page structure | Adding dependencies |
@@ -118,7 +115,7 @@ open http://localhost:8000
 
 **Paths not showing?**
 - Check browser console for errors
-- Verify JSON is valid: `npm run validate-json`
+- Verify JSON is valid: `python -m json.tool data/paths-data.json`
 - Check file paths are correct
 
 **Map not loading?**

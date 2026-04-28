@@ -90,22 +90,19 @@ Welcome! This is your complete guide to navigating the documentation for the Ber
 ### Core Application Files
 - `index.html` - Main HTML file
 - `data/paths-data.json` - All 105 paths
-- `data/config.json` - App configuration
+- `data/routes-data.json` - Route/walk data
 - `src/app.jsx` - React application
 - `src/styles.css` - Stylesheet
 - `assets/icon.png` - App icon
 
 ### Configuration Files
-- `package.json` - NPM configuration
 - `.gitignore` - Git ignore rules
-- `scripts/build.sh` - Build script
 
 ## 🔍 Documentation by Audience
 
 ### For First-Time Users
-1. [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md) - Understand what you got
-2. [QUICK_START.md](QUICK_START.md) - Start using it
-3. [README.md](README.md) - Learn all features
+1. [QUICK_START.md](QUICK_START.md) - Start using it
+2. [README.md](README.md) - Learn all features
 
 ### For Developers
 1. [README.md](README.md) - Technical overview
@@ -115,7 +112,6 @@ Welcome! This is your complete guide to navigating the documentation for the Ber
 ### For Deployers
 1. [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md) - Complete checklist
 2. [README.md](README.md) - Deployment options
-3. `scripts/build.sh` - Build script
 
 ### For Maintainers
 1. [CHANGELOG.md](CHANGELOG.md) - Version tracking
@@ -135,15 +131,14 @@ Welcome! This is your complete guide to navigating the documentation for the Ber
 
 ## 💡 Tips for Navigation
 
-1. **Start with PROJECT_SUMMARY.md** to understand what you have
-2. **Use QUICK_START.md** for immediate tasks
-3. **Reference README.md** for detailed information
-4. **Check CONTRIBUTING.md** before making changes
-5. **Follow DEPLOYMENT_CHECKLIST.md** before going live
+1. **Use QUICK_START.md** for immediate tasks
+2. **Reference README.md** for detailed information
+3. **Check CONTRIBUTING.md** before making changes
+4. **Follow DEPLOYMENT_CHECKLIST.md** before going live
 
 ## 🎓 Learning Path
 
-**Beginner**: PROJECT_SUMMARY → QUICK_START → README
+**Beginner**: QUICK_START → README
 **Intermediate**: CONTRIBUTING → Review code files
 **Advanced**: All documentation → Customize → Deploy
 
@@ -163,7 +158,6 @@ Welcome! This is your complete guide to navigating the documentation for the Ber
 
 ## ✨ Documentation Highlights
 
-- **8 comprehensive markdown files**
 - **Step-by-step guides for all tasks**
 - **Code examples included**
 - **Troubleshooting sections**
@@ -177,16 +171,14 @@ Welcome! This is your complete guide to navigating the documentation for the Ber
 ```
 berkeley-paths-tracker/
 ├── 📑 INDEX.md (← You are here!)
-├── 📊 PROJECT_SUMMARY.md
 ├── 🚀 QUICK_START.md
 ├── 📖 README.md
 ├── 🤝 CONTRIBUTING.md
 ├── 📝 CHANGELOG.md
-├── ✅ DEPLOYMENT_CHECKLIST.md
-└── 🗂️ DIRECTORY_STRUCTURE.txt
+└── ✅ DEPLOYMENT_CHECKLIST.md
 ```
 
-Start exploring with [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md) or jump to [QUICK_START.md](QUICK_START.md)!
+Jump to [QUICK_START.md](QUICK_START.md) to get started!
 
 ---
 

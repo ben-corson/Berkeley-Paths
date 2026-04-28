@@ -10,9 +10,6 @@ Your Berkeley Paths Tracker app has been completely restructured into a professi
    - Clean JSON format, easy to edit
    - Each path has: id, name, location, start coords, end coords
 
-✅ **data/config.json**
-   - App configuration settings
-   - Version info, colors, default map settings
 
 ### 💻 Source Code (2)
 ✅ **src/app.jsx**
@@ -56,20 +53,10 @@ Your Berkeley Paths Tracker app has been completely restructured into a professi
    - Common tasks and troubleshooting
    - File purposes explained
 
-### ⚙️ Configuration (3)
-✅ **package.json**
-   - NPM configuration
-   - Useful scripts (start, validate-json, etc.)
-   - Project metadata
-
+### ⚙️ Configuration (1)
 ✅ **.gitignore**
    - Git ignore rules
    - Excludes unnecessary files
-
-✅ **scripts/build.sh**
-   - Build script for deployment
-   - Validates JSON
-   - Creates production build
 
 ## Key Improvements
 
@@ -91,22 +78,19 @@ Your Berkeley Paths Tracker app has been completely restructured into a professi
 
 ```
 berkeley-paths-tracker/
-├── 📄 index.html           # Main HTML (50 lines instead of 695!)
+├── 📄 index.html           # Main HTML (minimal, loads everything)
 ├── 📁 data/
 │   ├── paths-data.json    # All path data (easy updates!)
-│   └── config.json        # App configuration
+│   └── routes-data.json   # Route/walk data
 ├── 📁 src/
 │   ├── app.jsx           # React app code
 │   └── styles.css        # Stylesheet
 ├── 📁 assets/
 │   └── icon.png          # App icon
-├── 📁 scripts/
-│   └── build.sh          # Build script
 ├── 📄 README.md          # Main documentation
 ├── 📄 QUICK_START.md     # Quick reference
 ├── 📄 CHANGELOG.md       # Version history
 ├── 📄 CONTRIBUTING.md    # Contributor guide
-├── 📄 package.json       # NPM config
 └── 📄 .gitignore        # Git ignore rules
 ```
 
@@ -190,12 +174,12 @@ git log src/app.jsx           # See all code changes
 - **Want to understand features?** → Read README.md
 - **Want to contribute?** → Read CONTRIBUTING.md
 - **Tracking changes?** → Update CHANGELOG.md
-- **Need to deploy?** → Run scripts/build.sh
+- **Need to deploy?** → See DEPLOYMENT_CHECKLIST.md
 
-## Total Files Created
+## Total Files
 
-- **13 new files** organized across 4 directories
-- **~2,500 lines** of well-structured code and documentation
+- **Core app files** organized across 3 directories
+- **2 JSON data files** for paths and routes
 - **1 JSON file** with all 105 paths for easy maintenance
 
 ## Success Metrics

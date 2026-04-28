@@ -5,7 +5,7 @@ All notable changes to the Berkeley Paths Tracker will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2025-01-XX
+## [1.0.0] - 2025-01
 
 ### Added
 - Initial release of Berkeley Paths Tracker
@@ -39,7 +39,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Path difficulty ratings
 - Estimated time to complete
 - Path categories/tags
-- Dark mode
 - Offline support with Service Worker
 - Path recommendations based on preferences
 - Statistics dashboard

@@ -7,7 +7,7 @@ Use this checklist when preparing your app for deployment or making updates.
 ### 1. Code Quality
 - [ ] All files are properly formatted
 - [ ] No console errors in browser
-- [ ] JSON validates: `npm run validate-json`
+- [ ] JSON validates: `python -m json.tool data/paths-data.json`
 - [ ] All paths display correctly on map
 - [ ] List view shows all paths
 - [ ] Filter options work (All, Nearby, Completed, Remaining)
@@ -34,7 +34,6 @@ Use this checklist when preparing your app for deployment or making updates.
 ### 4. Documentation
 - [ ] README.md is up to date
 - [ ] CHANGELOG.md has latest version
-- [ ] package.json version is correct
 - [ ] All links work
 - [ ] No broken images
 
@@ -79,12 +78,7 @@ Use this checklist when preparing your app for deployment or making updates.
 
 ### Option B: Netlify Drop
 
-1. **Create Build** (optional)
-   ```bash
-   bash scripts/build.sh
-   ```
-
-2. **Deploy**
+1. **Deploy**
    - Go to netlify.com/drop
    - Drag and drop your folder
    - Get instant live URL
@@ -125,7 +119,6 @@ Use this checklist when preparing your app for deployment or making updates.
 3. **Update Documentation**
    - Add entry to CHANGELOG.md
    - Update README.md if needed
-   - Increment version in package.json
 
 4. **Commit & Push**
    ```bash
@@ -146,8 +139,7 @@ Use this checklist when preparing your app for deployment or making updates.
 1. Edit `data/paths-data.json`
 2. Add new path object(s)
 3. Test locally
-4. Update `totalPaths` in config.json if needed
-5. Commit and push
+4. Commit and push
 
 ### Change Colors
 
