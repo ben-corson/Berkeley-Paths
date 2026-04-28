@@ -17,12 +17,49 @@ const BerkeleyPathsTracker = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+  const [heading, setHeading] = useState(null);
+  const [compassEnabled, setCompassEnabled] = useState(false);
+
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markersRef = useRef({});
   const userMarkerRef = useRef(null);
   const routeLineRef = useRef(null);
+  const headingRef = useRef(null);
+
+  // Enable compass heading via DeviceOrientationEvent
+  const enableCompass = async () => {
+    if (typeof DeviceOrientationEvent === 'undefined') return;
+
+    // iOS 13+ requires explicit permission
+    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+      try {
+        const permission = await DeviceOrientationEvent.requestPermission();
+        if (permission !== 'granted') return;
+      } catch (err) {
+        console.error('Compass permission denied:', err);
+        return;
+      }
+    }
+
+    const handler = (e) => {
+      // webkitCompassHeading is iOS (0=North, clockwise)
+      // alpha is standard (0=North, counter-clockwise) — convert to clockwise
+      let h = null;
+      if (e.webkitCompassHeading != null) {
+        h = e.webkitCompassHeading;
+      } else if (e.alpha != null) {
+        h = (360 - e.alpha) % 360;
+      }
+      if (h !== null) {
+        headingRef.current = h;
+        setHeading(h);
+      }
+    };
+
+    window.addEventListener('deviceorientation', handler, true);
+    setCompassEnabled(true);
+  };
 
   // Fix for default marker icons in Leaflet
   useEffect(() => {
@@ -99,6 +136,11 @@ const BerkeleyPathsTracker = () => {
             lat: position.coords.latitude,
             lng: position.coords.longitude
           });
+          // Use GPS heading as fallback when compass is not active
+          if (!compassEnabled && position.coords.heading != null && !isNaN(position.coords.heading)) {
+            headingRef.current = position.coords.heading;
+            setHeading(position.coords.heading);
+          }
           setLocationError(null);
         },
         (error) => {
@@ -184,41 +226,15 @@ const BerkeleyPathsTracker = () => {
         if (userLocation) {
           const userIcon = L.divIcon({
             className: 'user-location-marker',
-            html: `
-              <div style="width: 40px; height: 40px; position: relative;">
-                <div style="
-                  position: absolute;
-                  top: 50%;
-                  left: 50%;
-                  transform: translate(-50%, -50%);
-                  background: rgba(66, 133, 244, 0.15);
-                  border: 1px solid rgba(66, 133, 244, 0.3);
-                  border-radius: 50%;
-                  width: 32px;
-                  height: 32px;
-                "></div>
-                <div style="
-                  position: absolute;
-                  top: 50%;
-                  left: 50%;
-                  transform: translate(-50%, -50%);
-                  background: #4285F4;
-                  border: 2px solid white;
-                  border-radius: 50%;
-                  width: 16px;
-                  height: 16px;
-                  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-                "></div>
-              </div>
-            `,
-            iconSize: [40, 40],
-            iconAnchor: [20, 20]
+            html: buildUserMarkerHtml(headingRef.current),
+            iconSize: [48, 48],
+            iconAnchor: [24, 24]
           });
-          
+
           userMarkerRef.current = L.marker([userLocation.lat, userLocation.lng], { icon: userIcon })
             .addTo(map)
             .bindPopup('Your Location');
-          
+
           // Center on user location
           map.setView([userLocation.lat, userLocation.lng], 17);
         }
@@ -278,48 +294,23 @@ const BerkeleyPathsTracker = () => {
   // Add/update user location marker
   useEffect(() => {
     if (mapInstanceRef.current && userLocation && typeof L !== 'undefined') {
+      const isRoutes = view === 'routes';
       const userIcon = L.divIcon({
         className: 'user-location-marker',
-        html: view === 'routes' 
+        html: isRoutes
           ? '<div style="background: #3B82F6; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>'
-          : `
-          <div style="width: 40px; height: 40px; position: relative;">
-            <div style="
-              position: absolute;
-              top: 50%;
-              left: 50%;
-              transform: translate(-50%, -50%);
-              background: rgba(66, 133, 244, 0.15);
-              border: 1px solid rgba(66, 133, 244, 0.3);
-              border-radius: 50%;
-              width: 32px;
-              height: 32px;
-            "></div>
-            <div style="
-              position: absolute;
-              top: 50%;
-              left: 50%;
-              transform: translate(-50%, -50%);
-              background: #4285F4;
-              border: 2px solid white;
-              border-radius: 50%;
-              width: 16px;
-              height: 16px;
-              box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            "></div>
-          </div>
-        `,
-        iconSize: view === 'routes' ? [16, 16] : [40, 40],
-        iconAnchor: view === 'routes' ? [8, 8] : [20, 20]
+          : buildUserMarkerHtml(headingRef.current),
+        iconSize: isRoutes ? [16, 16] : [48, 48],
+        iconAnchor: isRoutes ? [8, 8] : [24, 24]
       });
-      
+
       if (!userMarkerRef.current) {
         const marker = L.marker([userLocation.lat, userLocation.lng], { icon: userIcon })
           .addTo(mapInstanceRef.current)
           .bindPopup('Your Location');
-        
+
         userMarkerRef.current = marker;
-        
+
         // Center map on user location at zoom 17 when first location is obtained (only for map view)
         if (view === 'map') {
           mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 17);
@@ -329,7 +320,7 @@ const BerkeleyPathsTracker = () => {
         userMarkerRef.current.setIcon(userIcon);
       }
     }
-  }, [userLocation, view, mapInstanceRef.current]);
+  }, [userLocation, heading, view, mapInstanceRef.current]);
 
   // Update path lines when completed status changes
   useEffect(() => {
@@ -353,6 +344,52 @@ const BerkeleyPathsTracker = () => {
       });
     }
   }, [completedPaths, paths, view]);
+
+  // Build user location marker HTML
+  const buildUserMarkerHtml = (h) => {
+    const hasHeading = h !== null && h !== undefined;
+    return `
+      <div style="width: 48px; height: 48px; position: relative;">
+        ${hasHeading ? `
+        <div style="
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 0;
+          height: 0;
+          border-left: 8px solid transparent;
+          border-right: 8px solid transparent;
+          border-bottom: 20px solid rgba(66, 133, 244, 0.85);
+          transform: translate(-50%, -100%) rotate(${h}deg);
+          transform-origin: 50% 100%;
+          filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+        "></div>` : ''}
+        <div style="
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: rgba(66, 133, 244, 0.15);
+          border: 1px solid rgba(66, 133, 244, 0.3);
+          border-radius: 50%;
+          width: 36px;
+          height: 36px;
+        "></div>
+        <div style="
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: #4285F4;
+          border: 2px solid white;
+          border-radius: 50%;
+          width: 16px;
+          height: 16px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        "></div>
+      </div>
+    `;
+  };
 
   // Add path line to map
   const addPathMarker = (map, path) => {
@@ -943,6 +980,17 @@ const BerkeleyPathsTracker = () => {
                   title="Center on my location"
                 >
                   📍
+                </button>
+              )}
+
+              {/* Compass enable button - only show if not yet enabled */}
+              {!compassEnabled && (
+                <button
+                  onClick={enableCompass}
+                  className="absolute bottom-28 right-3 bg-white px-2.5 py-1.5 rounded-lg shadow-lg hover:bg-gray-50 transition-colors text-lg z-10"
+                  title="Enable compass heading"
+                >
+                  🧭
                 </button>
               )}
             </div>
