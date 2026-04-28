@@ -362,6 +362,10 @@ const BerkeleyPathsTracker = () => {
   // Build user location marker HTML
   const buildUserMarkerHtml = (h) => {
     const hasHeading = h !== null && h !== undefined;
+    // The wedge wrapper is centered on the dot and rotated as a whole unit.
+    // The wedge itself points upward (toward North at 0deg), and the wrapper
+    // rotates to match the heading. This avoids transform ordering issues with
+    // CSS border-triangles.
     return `
       <div style="width: 48px; height: 48px; position: relative;">
         ${hasHeading ? `
@@ -369,15 +373,24 @@ const BerkeleyPathsTracker = () => {
           position: absolute;
           top: 50%;
           left: 50%;
-          width: 0;
-          height: 0;
-          border-left: 8px solid transparent;
-          border-right: 8px solid transparent;
-          border-bottom: 20px solid rgba(66, 133, 244, 0.85);
-          transform: translate(-50%, -100%) rotate(${h}deg);
-          transform-origin: 50% 100%;
-          filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
-        "></div>` : ''}
+          width: 48px;
+          height: 48px;
+          transform: translate(-50%, -50%) rotate(${h}deg);
+          transform-origin: 50% 50%;
+        ">
+          <div style="
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-bottom: 16px solid rgba(66, 133, 244, 0.9);
+            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.25));
+          "></div>
+        </div>` : ''}
         <div style="
           position: absolute;
           top: 50%;
@@ -997,11 +1010,11 @@ const BerkeleyPathsTracker = () => {
                 </button>
               )}
 
-              {/* Compass enable button - only show if not yet enabled */}
+              {/* Compass enable button - always visible until enabled */}
               {!compassEnabled && (
                 <button
                   onClick={enableCompass}
-                  className="absolute bottom-28 right-3 bg-white px-2.5 py-1.5 rounded-lg shadow-lg hover:bg-gray-50 transition-colors text-lg z-10"
+                  className="absolute top-3 left-3 bg-white px-2.5 py-1.5 rounded-lg shadow-lg hover:bg-gray-50 transition-colors text-lg z-10"
                   title="Enable compass heading"
                 >
                   🧭
