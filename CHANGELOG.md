@@ -5,6 +5,13 @@ All notable changes to the Berkeley Paths Tracker will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Compass heading arrow on the location dot in Map view — shows the direction you are facing
+- 🧭 button in the top-right of the map to enable device orientation permission (required on iOS)
+- Re-center 📍 button in the bottom-right of the map to snap the view back to your location
+
 ## [1.0.0] - 2025-01
 
 ### Added
@@ -29,20 +36,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Click any path to view details and add notes
 - Sticky header with progress tracking
 - Touch-optimized for mobile devices
-
-## [Unreleased]
-
-### Planned Features
-- Export/import progress data
-- Share completed paths on social media
-- Photo uploads for each path
-- Path difficulty ratings
-- Estimated time to complete
-- Path categories/tags
-- Offline support with Service Worker
-- Path recommendations based on preferences
-- Statistics dashboard
-- Friend leaderboards
 
 ---
 

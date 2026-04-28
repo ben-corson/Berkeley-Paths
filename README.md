@@ -8,6 +8,7 @@ A progressive web app for tracking your progress through all 105 developed paths
 - ✅ **Progress Tracking** - Mark paths as completed and track your overall completion percentage
 - 📝 **Personal Notes** - Add notes about difficulty, highlights, and memorable moments for each path
 - 🗺️ **Location-Aware** - See your current location and find nearby paths within 0.5 miles
+- 🧭 **Compass Heading** - The location dot shows a directional arrow indicating which way you're facing; tap the 🧭 button to enable (requires device orientation permission on iOS)
 - 🎨 **Berkeley Themed** - Official City of Berkeley burgundy and gold color scheme
 - 📱 **Mobile Optimized** - Add to your iPhone/Android home screen for a native app experience
 - 💾 **Persistent Storage** - All your progress is saved locally in your browser
