@@ -1003,7 +1003,8 @@ const BerkeleyPathsTracker = () => {
                       mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 17);
                     }
                   }}
-                  className="absolute bottom-16 right-3 bg-white px-2.5 py-1.5 rounded-lg shadow-lg hover:bg-gray-50 transition-colors text-lg z-10"
+                  style={{ zIndex: 9999, position: 'absolute', bottom: '64px', right: '12px' }}
+                  className="bg-white px-2.5 py-1.5 rounded-lg shadow-lg hover:bg-gray-50 transition-colors text-lg"
                   title="Center on my location"
                 >
                   📍
