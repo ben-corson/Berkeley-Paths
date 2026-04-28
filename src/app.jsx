@@ -29,21 +29,33 @@ const BerkeleyPathsTracker = () => {
 
   // Enable compass heading via DeviceOrientationEvent
   const enableCompass = async () => {
-    if (typeof DeviceOrientationEvent === 'undefined') return;
+    console.log('[Compass] enableCompass called');
+    console.log('[Compass] DeviceOrientationEvent available:', typeof DeviceOrientationEvent);
+    console.log('[Compass] requestPermission available:', typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission);
+
+    if (typeof DeviceOrientationEvent === 'undefined') {
+      console.log('[Compass] DeviceOrientationEvent not available on this device');
+      return;
+    }
 
     // iOS 13+ requires explicit permission
     if (typeof DeviceOrientationEvent.requestPermission === 'function') {
       try {
+        console.log('[Compass] Requesting permission...');
         const permission = await DeviceOrientationEvent.requestPermission();
+        console.log('[Compass] Permission result:', permission);
         if (permission !== 'granted') return;
       } catch (err) {
-        console.error('Compass permission denied:', err);
+        console.error('[Compass] Permission error:', err);
         return;
       }
+    } else {
+      console.log('[Compass] No requestPermission needed (non-iOS or older iOS)');
     }
 
     const handler = (e) => {
-      // webkitCompassHeading is iOS (0=North, clockwise)
+      console.log('[Compass] Event - alpha:', e.alpha, 'webkitCompassHeading:', e.webkitCompassHeading, 'webkitCompassAccuracy:', e.webkitCompassAccuracy);
+      // webkitCompassHeading is iOS (0=North, clockwise) — use directly
       // alpha is standard (0=North, counter-clockwise) — convert to clockwise
       let h = null;
       if (e.webkitCompassHeading != null) {
@@ -51,6 +63,7 @@ const BerkeleyPathsTracker = () => {
       } else if (e.alpha != null) {
         h = (360 - e.alpha) % 360;
       }
+      console.log('[Compass] Computed heading:', h);
       if (h !== null) {
         headingRef.current = h;
         setHeading(h);
@@ -59,6 +72,7 @@ const BerkeleyPathsTracker = () => {
 
     window.addEventListener('deviceorientation', handler, true);
     setCompassEnabled(true);
+    console.log('[Compass] Listener attached');
   };
 
   // Fix for default marker icons in Leaflet
