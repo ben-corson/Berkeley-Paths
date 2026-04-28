@@ -182,5 +182,5 @@ Jump to [QUICK_START.md](QUICK_START.md) to get started!
 
 ---
 
-**Last Updated:** November 2025
+**Last Updated:** April 2026
 **Version:** 1.0.0

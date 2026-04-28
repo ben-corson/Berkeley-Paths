@@ -83,7 +83,7 @@ Use this checklist when preparing your app for deployment or making updates.
    - Drag and drop your folder
    - Get instant live URL
 
-3. **Custom Domain** (optional)
+2. **Custom Domain** (optional)
    - Go to Domain settings
    - Add custom domain
    - Update DNS records
@@ -191,14 +191,6 @@ Use this checklist when preparing your app for deployment or making updates.
 - [ ] Monitor for any issues
 - [ ] Update social links if applicable
 - [ ] Add site to search engines (optional)
-
-## 📊 Metrics to Track
-
-- Number of paths completed by users
-- Most popular paths
-- Feature usage (map vs list view)
-- Mobile vs desktop usage
-- User feedback and bug reports
 
 ## 🎯 Best Practices
 

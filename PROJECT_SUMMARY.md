@@ -176,19 +176,17 @@ git log src/app.jsx           # See all code changes
 - **Tracking changes?** → Update CHANGELOG.md
 - **Need to deploy?** → See DEPLOYMENT_CHECKLIST.md
 
-## Total Files
+## File Count
 
-- **Core app files** organized across 3 directories
-- **2 JSON data files** for paths and routes
-- **1 JSON file** with all 105 paths for easy maintenance
+- **Core app files** organized across 3 directories (`data/`, `src/`, `assets/`)
+- **2 JSON data files**: `paths-data.json` (105 paths) and `routes-data.json`
 
 ## Success Metrics
 
 ✅ Separated data from code
 ✅ Created modular file structure
 ✅ Added comprehensive documentation
-✅ Included deployment tools
-✅ Made updates 10x easier
+✅ Made updates easier
 ✅ Enabled team collaboration
 ✅ Professional repo structure
 
