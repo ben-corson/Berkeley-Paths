@@ -23,13 +23,22 @@ const BerkeleyPathsTracker = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [heading, setHeading] = useState(null);
+  const [updateAvailable, setUpdateAvailable] = useState(false);
   const [compassEnabled, setCompassEnabled] = useState(false);
 
   const mapRef = useRef(null);
+
   const mapInstanceRef = useRef(null);
   const markersRef = useRef({});
   const userMarkerRef = useRef(null);
   const headingRef = useRef(null);
+
+  // Listen for service worker update signal from index.html
+  useEffect(() => {
+    const handler = () => setUpdateAvailable(true);
+    window.addEventListener('swUpdateAvailable', handler);
+    return () => window.removeEventListener('swUpdateAvailable', handler);
+  }, []);
 
   // Enable compass heading via DeviceOrientationEvent
   const enableCompass = async () => {
@@ -529,6 +538,18 @@ const BerkeleyPathsTracker = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Update banner */}
+      {updateAvailable && (
+        <div className="fixed top-0 left-0 right-0 z-[9999] bg-berkeley-gold text-white text-sm font-medium flex items-center justify-between px-4 py-2.5 shadow-lg">
+          <span>A new version is available</span>
+          <button
+            onClick={() => window.location.reload()}
+            className="ml-4 bg-white text-berkeley-burgundy px-3 py-1 rounded font-semibold text-xs"
+          >
+            Update now
+          </button>
+        </div>
+      )}
       {/* Header */}
       <header className="bg-berkeley-burgundy text-white shadow-lg sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-3 py-2">

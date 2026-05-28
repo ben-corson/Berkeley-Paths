@@ -82,7 +82,7 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js?v=8').then((reg) => {
+          navigator.serviceWorker.register('./sw.js?v=9').then((reg) => {
             // Force update check on every load
             reg.update();
 
@@ -91,8 +91,8 @@
               const newWorker = reg.installing;
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  // New version ready — reload to apply it
-                  window.location.reload();
+                  // New version ready — notify the app to show an update banner
+                  window.dispatchEvent(new Event('swUpdateAvailable'));
                 }
               });
             });
