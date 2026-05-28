@@ -526,7 +526,7 @@ const BerkeleyPathsTracker = () => {
       <header className="bg-berkeley-burgundy text-white shadow-lg sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-3 py-2">
           {/* Title - full width on one line */}
-          <h1 className="text-lg font-bold mb-1.5">Berkeley Paths Tracker</h1>
+          <h1 className="text-lg font-bold mb-1.5">Berkeley Paths Navigator</h1>
           
           {/* Navigation and completion info - second line */}
           <div className="flex items-center justify-between gap-2">
@@ -909,7 +909,7 @@ const BerkeleyPathsTracker = () => {
       <footer className="bg-white border-t border-gray-200 mt-12 py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-600 text-sm">
           <p>
-            The Berkeley Paths Tracker is not affiliated with{' '}
+            Berkeley Paths Navigator is not affiliated with{' '}
             <a
               href="https://www.berkeleypaths.org/"
               target="_blank"
@@ -920,7 +920,7 @@ const BerkeleyPathsTracker = () => {
             </a>, but we encourage you to support their work preserving, restoring, and creating public paths in Berkeley
           </p>
           <p className="mt-2">
-            Berkeley Paths Tracker v1.0.0 | Made with ❤️ for Berkeley path explorers
+            Berkeley Paths Navigator v1.0.0 | Made with ❤️ for Berkeley path explorers
           </p>
         </div>
       </footer>

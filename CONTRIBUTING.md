@@ -1,6 +1,6 @@
-# Contributing to Berkeley Paths Tracker
+# Contributing to Berkeley Paths Navigator
 
-Thank you for considering contributing to Berkeley Paths Tracker! This document provides guidelines and instructions for contributing.
+Thank you for considering contributing to Berkeley Paths Navigator! This document provides guidelines and instructions for contributing.
 
 ## Ways to Contribute
 
@@ -151,4 +151,4 @@ By contributing, you agree that your contributions will be licensed under the MI
 
 ---
 
-Thank you for contributing to Berkeley Paths Tracker! 🎉
+Thank you for contributing to Berkeley Paths Navigator! 🎉

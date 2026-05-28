@@ -1,8 +1,8 @@
-# Berkeley Paths Tracker - Quick Start Guide
+# Berkeley Paths Navigator - Quick Start Guide
 
 ## 🎯 What You Got
 
-Your Berkeley Paths Tracker is now organized into a professional repo structure with:
+Your Berkeley Paths Navigator is now organized into a professional repo structure with:
 
 ### Core Files
 - **index.html** - Minimal HTML that loads everything

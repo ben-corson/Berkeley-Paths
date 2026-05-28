@@ -1,4 +1,4 @@
-# Berkeley Paths Tracker - Deployment Checklist ✅
+# Berkeley Paths Navigator - Deployment Checklist ✅
 
 Use this checklist when preparing your app for deployment or making updates.
 
@@ -50,7 +50,7 @@ Use this checklist when preparing your app for deployment or making updates.
    ```bash
    git init
    git add .
-   git commit -m "Initial commit: Berkeley Paths Tracker"
+   git commit -m "Initial commit: Berkeley Paths Navigator"
    ```
 
 2. **Create GitHub Repository**

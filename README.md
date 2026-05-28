@@ -1,4 +1,4 @@
-# Berkeley Paths Tracker
+# Berkeley Paths Navigator
 
 A progressive web app for tracking your progress through all 105 developed paths in Berkeley, California. Features an interactive map, completion tracking, and personal notes for each path.
 

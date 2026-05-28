@@ -1,8 +1,8 @@
-# Berkeley Paths Tracker - Project Setup Complete! 🎉
+# Berkeley Paths Navigator - Project Setup Complete! 🎉
 
 ## What Was Created
 
-Your Berkeley Paths Tracker app has been completely restructured into a professional, maintainable repository with separated concerns. Here's everything that was created:
+Your Berkeley Paths Navigator app has been completely restructured into a professional, maintainable repository with separated concerns. Here's everything that was created:
 
 ### 📊 Data Files (1)
 ✅ **data/paths-data.json**
@@ -193,7 +193,7 @@ git log src/app.jsx           # See all code changes
 
 ## You're All Set! 🚀
 
-Your Berkeley Paths Tracker is now:
+Your Berkeley Paths Navigator is now:
 - ✅ Well-organized
 - ✅ Easy to update
 - ✅ Ready for collaboration
