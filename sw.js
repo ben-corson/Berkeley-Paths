@@ -1,4 +1,4 @@
-const CACHE_NAME = 'berkeley-paths-v11';
+const CACHE_NAME = 'berkeley-paths-v12';
 
 const STATIC_ASSETS = [
   './',
@@ -15,7 +15,12 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
   );
-  self.skipWaiting();
+  // Don't skipWaiting automatically — wait for user to tap "Update now"
+});
+
+// Allow the page to trigger activation when user approves the update
+self.addEventListener('message', (event) => {
+  if (event.data === 'SKIP_WAITING') self.skipWaiting();
 });
 
 // On activate, delete old caches

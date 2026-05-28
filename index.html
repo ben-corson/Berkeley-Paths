@@ -81,21 +81,27 @@
     <!-- Service Worker -->
     <script>
       if ('serviceWorker' in navigator) {
+        window.swWaitingWorker = null;
+
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js?v=11').then((reg) => {
-            // Force update check on every load
+          navigator.serviceWorker.register('./sw.js?v=12').then((reg) => {
             reg.update();
 
-            // When a new service worker is waiting, activate it immediately
             reg.addEventListener('updatefound', () => {
               const newWorker = reg.installing;
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  // New version ready — notify the app to show an update banner
+                  // Store reference so the app can send SKIP_WAITING
+                  window.swWaitingWorker = newWorker;
                   window.dispatchEvent(new Event('swUpdateAvailable'));
                 }
               });
             });
+          });
+
+          // When the new SW takes control, reload to serve fresh files
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            window.location.reload();
           });
         });
       }

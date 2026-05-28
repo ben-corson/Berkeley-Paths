@@ -543,7 +543,13 @@ const BerkeleyPathsTracker = () => {
         <div className="fixed top-0 left-0 right-0 z-[9999] bg-berkeley-gold text-white text-sm font-medium flex items-center justify-between px-4 py-2.5 shadow-lg">
           <span>A new version is available</span>
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => {
+              if (window.swWaitingWorker) {
+                window.swWaitingWorker.postMessage('SKIP_WAITING');
+              } else {
+                window.location.reload();
+              }
+            }}
             className="ml-4 bg-white text-berkeley-burgundy px-3 py-1 rounded font-semibold text-xs"
           >
             Update now
