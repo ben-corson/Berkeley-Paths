@@ -544,11 +544,14 @@ const BerkeleyPathsTracker = () => {
           <span>A new version is available</span>
           <button
             onClick={() => {
-              if (window.swWaitingWorker) {
-                window.swWaitingWorker.postMessage('SKIP_WAITING');
-              } else {
-                window.location.reload();
-              }
+              // Clear all caches and unregister SW, then reload fresh from network
+              const cleanup = caches.keys().then(keys =>
+                Promise.all(keys.map(k => caches.delete(k)))
+              );
+              const unreg = navigator.serviceWorker.getRegistration().then(reg => {
+                if (reg) return reg.unregister();
+              });
+              Promise.all([cleanup, unreg]).then(() => window.location.reload());
             }}
             className="ml-4 bg-white text-berkeley-burgundy px-3 py-1 rounded font-semibold text-xs"
           >
