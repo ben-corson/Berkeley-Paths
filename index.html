@@ -12,7 +12,7 @@
     <link rel="manifest" href="./manifest.json">
     
     <!-- Theme color for address bar -->
-    <meta name="theme-color" content="#1A56B0">
+    <meta name="theme-color" content="#941B1E">
     
     <!-- Custom App Icons for iOS Home Screen -->
     <link rel="apple-touch-icon" href="./assets/icon.png">
@@ -38,8 +38,8 @@
         theme: {
           extend: {
             colors: {
-              'berkeley-burgundy': '#1A56B0',
-              'berkeley-burgundy-dark': '#1340A0',
+              'berkeley-burgundy': '#941B1E',
+              'berkeley-burgundy-dark': '#6B1214',
               'berkeley-gold': '#EAA636',
             }
           }
@@ -82,7 +82,7 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js?v=10').then((reg) => {
+          navigator.serviceWorker.register('./sw.js?v=11').then((reg) => {
             // Force update check on every load
             reg.update();
 
