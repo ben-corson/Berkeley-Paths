@@ -1,8 +1,8 @@
 :root {
     /* Theme variables — brand colors are defined in index.html Tailwind config.
        Update these to match if you change the brand colors there. */
-    --bg-gradient-start: #941B1E;  /* = berkeley-burgundy */
-    --bg-gradient-end: #6B1214;    /* = berkeley-burgundy-dark */
+    --bg-gradient-start: #1A56B0;  /* = berkeley-burgundy */
+    --bg-gradient-end: #1340A0;    /* = berkeley-burgundy-dark */
     --text-primary: #ffffff;
     --text-secondary: rgba(255, 255, 255, 0.9);
     --card-bg: rgba(255, 255, 255, 0.95);
