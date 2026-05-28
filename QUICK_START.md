@@ -84,7 +84,8 @@ open http://localhost:8000
 ### Modify the UI
 1. Edit `src/app.jsx` for functionality
 2. Edit `src/styles.css` for styling
-3. Changes load automatically on refresh
+3. **Bump the cache version in `sw.js`** (e.g. `berkeley-paths-v1` → `berkeley-paths-v2`)
+4. Commit and push — users get the update automatically
 
 ### Update Documentation
 1. Keep `README.md` current
@@ -106,6 +107,7 @@ open http://localhost:8000
 | `data/paths-data.json` | Path information | Adding/updating paths |
 | `src/app.jsx` | App logic | Adding features |
 | `src/styles.css` | Styling | Changing appearance |
+| `sw.js` | Service worker / caching | Every code release (bump cache version) |
 | `index.html` | Page structure | Adding dependencies |
 | `README.md` | Documentation | Project changes |
 | `CHANGELOG.md` | Version history | Releases |
@@ -125,6 +127,7 @@ open http://localhost:8000
 - Hard refresh: Cmd+Shift+R (Mac) or Ctrl+Shift+R (Windows)
 - Clear browser cache
 - Check file was saved
+- If using the iOS home screen app: make sure you bumped the cache version in `sw.js` and pushed — the service worker will deliver the update on next open
 
 ## 💡 Tips
 

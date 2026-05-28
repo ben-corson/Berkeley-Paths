@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Service worker (`sw.js`) for offline caching and automatic updates
+  - App assets cached on first visit for offline use
+  - iOS home screen users receive code updates automatically without re-adding the app
+  - User progress and data in localStorage is preserved across updates
+  - Bump `CACHE_NAME` in `sw.js` with each release to deliver updates to existing users
 - Compass heading arrow on the location dot in Map view — shows the direction you are facing
 - 🧭 button in the top-right of the map to enable device orientation permission (required on iOS)
 - Re-center 📍 button in the bottom-right of the map to snap the view back to your location
