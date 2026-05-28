@@ -1,5 +1,12 @@
 const { useState, useEffect, useRef } = React;
 
+// Brand colors — keep in sync with Tailwind config in index.html
+const COLORS = {
+  burgundy: '#941B1E',
+  burgundyDark: '#6B1214',
+  gold: '#EAA636',
+};
+
 const BerkeleyPathsTracker = () => {
   // State management
   const [paths, setPaths] = useState([]);
@@ -272,14 +279,14 @@ const BerkeleyPathsTracker = () => {
           const { line } = markersRef.current[path.id];
           const isCompleted = completedPaths.has(path.id);
           
-          const color = isCompleted ? '#941B1E' : '#EAA636';
+          const color = isCompleted ? COLORS.burgundy : COLORS.gold;
           line.setStyle({ color: color });
-          
+
           line.setPopupContent(`
             <div style="min-width: 200px;">
-              <h3 style="margin: 0 0 8px 0; font-weight: 600; color: #941B1E;">${path.name}</h3>
+              <h3 style="margin: 0 0 8px 0; font-weight: 600; color: ${COLORS.burgundy};">${path.name}</h3>
               <p style="margin: 0 0 8px 0; font-size: 14px; color: #666;">${path.location}</p>
-              ${isCompleted ? '<p style="margin: 0; font-size: 12px; color: #941B1E; font-weight: 600;">✓ Completed</p>' : '<p style="margin: 0; font-size: 12px; color: #EAA636; font-weight: 600;">Not completed</p>'}
+              ${isCompleted ? `<p style="margin: 0; font-size: 12px; color: ${COLORS.burgundy}; font-weight: 600;">✓ Completed</p>` : `<p style="margin: 0; font-size: 12px; color: ${COLORS.gold}; font-weight: 600;">Not completed</p>`}
             </div>
           `);
         }
@@ -349,7 +356,7 @@ const BerkeleyPathsTracker = () => {
   // Add path line to map
   const addPathMarker = (map, path) => {
     const isCompleted = completedPaths.has(path.id);
-    const color = isCompleted ? '#941B1E' : '#EAA636';
+    const color = isCompleted ? COLORS.burgundy : COLORS.gold;
 
     const line = L.polyline([path.start, path.end], {
       color: color,
@@ -360,9 +367,9 @@ const BerkeleyPathsTracker = () => {
 
     line.bindPopup(`
       <div style="min-width: 200px;">
-        <h3 style="margin: 0 0 8px 0; font-weight: 600; color: #941B1E;">${path.name}</h3>
+        <h3 style="margin: 0 0 8px 0; font-weight: 600; color: ${COLORS.burgundy};">${path.name}</h3>
         <p style="margin: 0 0 8px 0; font-size: 14px; color: #666;">${path.location}</p>
-        ${isCompleted ? '<p style="margin: 0; font-size: 12px; color: #941B1E; font-weight: 600;">✓ Completed</p>' : '<p style="margin: 0; font-size: 12px; color: #EAA636; font-weight: 600;">Not completed</p>'}
+        ${isCompleted ? `<p style="margin: 0; font-size: 12px; color: ${COLORS.burgundy}; font-weight: 600;">✓ Completed</p>` : `<p style="margin: 0; font-size: 12px; color: ${COLORS.gold}; font-weight: 600;">Not completed</p>`}
       </div>
     `);
 
@@ -475,7 +482,7 @@ const BerkeleyPathsTracker = () => {
         if (markersRef.current[path.id]) {
           const { line } = markersRef.current[path.id];
           const isCompleted = completedPaths.has(path.id);
-          const baseColor = isCompleted ? '#941B1E' : '#EAA636';
+          const baseColor = isCompleted ? COLORS.burgundy : COLORS.gold;
           
           line.setStyle({ 
             weight: 8, 

@@ -1,14 +1,8 @@
 :root {
-    /* City of Berkeley Brand Colors */
-    --berkeley-burgundy: #941B1E;
-    --berkeley-burgundy-dark: #6B1214;
-    --berkeley-gold: #EAA636;
-    --berkeley-tan: #C9984A;
-    --berkeley-light-tan: #D4A574;
-
-    /* Light mode theme variables */
-    --bg-gradient-start: #941B1E;
-    --bg-gradient-end: #6B1214;
+    /* Theme variables — brand colors are defined in index.html Tailwind config.
+       Update these to match if you change the brand colors there. */
+    --bg-gradient-start: #941B1E;  /* = berkeley-burgundy */
+    --bg-gradient-end: #6B1214;    /* = berkeley-burgundy-dark */
     --text-primary: #ffffff;
     --text-secondary: rgba(255, 255, 255, 0.9);
     --card-bg: rgba(255, 255, 255, 0.95);
