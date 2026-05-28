@@ -1,5 +1,7 @@
 # Berkeley Paths Tracker
 
+> **Branch note:** This is the `routes-feature` branch. It contains the in-progress Routes feature, which is not yet ready for production. See `main` for the stable release.
+
 A progressive web app for tracking your progress through all 105 developed paths in Berkeley, California. Features an interactive map, completion tracking, and personal notes for each path.
 
 ## Features
