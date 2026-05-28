@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Berkeley Paths">
-    <title>Berkeley Paths Tracker</title>
+    <title>Berkeley Paths Navigator</title>
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="./manifest.json">
@@ -39,6 +39,7 @@
           extend: {
             colors: {
               'berkeley-burgundy': '#941B1E',
+              'berkeley-burgundy-dark': '#6B1214',
               'berkeley-gold': '#EAA636',
             }
           }
@@ -76,5 +77,34 @@
     
     <!-- App Code -->
     <script type="text/babel" src="./src/app.jsx"></script>
+
+    <!-- Service Worker -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.swWaitingWorker = null;
+
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js?v=12').then((reg) => {
+            reg.update();
+
+            reg.addEventListener('updatefound', () => {
+              const newWorker = reg.installing;
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  // Store reference so the app can send SKIP_WAITING
+                  window.swWaitingWorker = newWorker;
+                  window.dispatchEvent(new Event('swUpdateAvailable'));
+                }
+              });
+            });
+          });
+
+          // When the new SW takes control, reload to serve fresh files
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            window.location.reload();
+          });
+        });
+      }
+    </script>
 </body>
 </html>

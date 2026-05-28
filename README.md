@@ -1,4 +1,4 @@
-# Berkeley Paths Tracker
+# Berkeley Paths Navigator
 
 > **Branch note:** This is the `routes-feature` branch. It contains the in-progress Routes feature, which is not yet ready for production. See `main` for the stable release.
 
@@ -45,9 +45,10 @@ Then visit `http://localhost:8000` in your browser.
 ```
 berkeley-paths-tracker/
 ├── index.html              # Main HTML file (minimal, loads other files)
+├── sw.js                   # Service worker (offline caching & auto-updates)
+├── manifest.json           # PWA manifest (icon, display mode, theme)
 ├── data/
-│   ├── paths-data.json    # All 105 Berkeley paths data
-│   └── routes-data.json   # Route/walk data
+│   └── paths-data.json    # All 105 Berkeley paths data
 ├── src/
 │   ├── app.jsx            # React application code
 │   └── styles.css         # CSS styling
@@ -81,13 +82,27 @@ To add or modify paths, edit `data/paths-data.json`:
 ## Customization
 
 ### Colors
-Edit `src/styles.css` to change the color scheme:
-```css
-:root {
-    --berkeley-burgundy: #941B1E;
-    --berkeley-gold: #EAA636;
+Brand colors are defined in **two places** that must be kept in sync:
+
+**1. `index.html`** — Tailwind config (controls all UI classes like `bg-berkeley-burgundy`):
+```js
+colors: {
+  'berkeley-burgundy': '#941B1E',
+  'berkeley-burgundy-dark': '#6B1214',
+  'berkeley-gold': '#EAA636',
 }
 ```
+
+**2. `src/app.jsx`** — `COLORS` constant at the top of the file (controls map line and popup colors):
+```js
+const COLORS = {
+  burgundy: '#941B1E',
+  burgundyDark: '#6B1214',
+  gold: '#EAA636',
+};
+```
+
+Also update the `--bg-gradient-start` and `--bg-gradient-end` variables in `src/styles.css` if you change the burgundy shades — these control the header gradient.
 
 ### Map Style
 Edit the tile layer URL in `src/app.jsx` (line ~245):
@@ -109,6 +124,22 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
 ### Netlify/Vercel
 
 Simply drag and drop the entire folder to Netlify or connect your GitHub repo to Vercel.
+
+## Pushing Updates to Users
+
+The app uses a service worker (`sw.js`) to cache files on users' devices. This means:
+- The app works offline after the first visit
+- Users on iOS home screen get updates automatically — they don't need to re-add the app
+- User progress (completed paths, notes) is never lost during an update
+
+**Every time you push a code change, bump the cache version in `sw.js`:**
+
+```js
+// Change this each release:
+const CACHE_NAME = 'berkeley-paths-v1'; // → v2, v3, etc.
+```
+
+This tells users' devices to fetch the new version. If you forget to bump it, some users may continue running the old version from cache.
 
 ## Data Sources
 

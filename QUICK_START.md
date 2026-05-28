@@ -1,8 +1,8 @@
-# Berkeley Paths Tracker - Quick Start Guide
+# Berkeley Paths Navigator - Quick Start Guide
 
 ## 🎯 What You Got
 
-Your Berkeley Paths Tracker is now organized into a professional repo structure with:
+Your Berkeley Paths Navigator is now organized into a professional repo structure with:
 
 ### Core Files
 - **index.html** - Minimal HTML that loads everything
@@ -34,13 +34,21 @@ Just edit `data/paths-data.json`:
 ```
 
 ### Changing Colors
-Edit `src/styles.css`:
-```css
-:root {
-    --berkeley-burgundy: #941B1E;
-    --berkeley-gold: #EAA636;
-}
+Colors must be updated in two places:
+
+1. **`index.html`** — Tailwind config (controls the UI):
+```js
+'berkeley-burgundy': '#941B1E',
+'berkeley-burgundy-dark': '#6B1214',
+'berkeley-gold': '#EAA636',
 ```
+
+2. **`src/app.jsx`** — `COLORS` constant at the top (controls map colors):
+```js
+const COLORS = { burgundy: '#941B1E', burgundyDark: '#6B1214', gold: '#EAA636' };
+```
+
+Also update `--bg-gradient-start` / `--bg-gradient-end` in `src/styles.css` if changing the burgundy shades.
 
 ### Testing Locally
 ```bash
@@ -84,7 +92,8 @@ open http://localhost:8000
 ### Modify the UI
 1. Edit `src/app.jsx` for functionality
 2. Edit `src/styles.css` for styling
-3. Changes load automatically on refresh
+3. **Bump the cache version in `sw.js`** (e.g. `berkeley-paths-v1` → `berkeley-paths-v2`)
+4. Commit and push — users get the update automatically
 
 ### Update Documentation
 1. Keep `README.md` current
@@ -104,9 +113,9 @@ open http://localhost:8000
 | File | Purpose | Update When |
 |------|---------|-------------|
 | `data/paths-data.json` | Path information | Adding/updating paths |
-| `data/routes-data.json` | Route/walk data | Adding/updating routes |
 | `src/app.jsx` | App logic | Adding features |
 | `src/styles.css` | Styling | Changing appearance |
+| `sw.js` | Service worker / caching | Every code release (bump cache version) |
 | `index.html` | Page structure | Adding dependencies |
 | `README.md` | Documentation | Project changes |
 | `CHANGELOG.md` | Version history | Releases |
@@ -126,6 +135,7 @@ open http://localhost:8000
 - Hard refresh: Cmd+Shift+R (Mac) or Ctrl+Shift+R (Windows)
 - Clear browser cache
 - Check file was saved
+- If using the iOS home screen app: make sure you bumped the cache version in `sw.js` and pushed — the service worker will deliver the update on next open
 
 ## 💡 Tips
 
