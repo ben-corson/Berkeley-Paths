@@ -44,8 +44,7 @@ Then visit `http://localhost:8000` in your browser.
 berkeley-paths-tracker/
 ├── index.html              # Main HTML file (minimal, loads other files)
 ├── data/
-│   ├── paths-data.json    # All 105 Berkeley paths data
-│   └── routes-data.json   # Route/walk data
+│   └── paths-data.json    # All 105 Berkeley paths data
 ├── src/
 │   ├── app.jsx            # React application code
 │   └── styles.css         # CSS styling

@@ -104,7 +104,6 @@ open http://localhost:8000
 | File | Purpose | Update When |
 |------|---------|-------------|
 | `data/paths-data.json` | Path information | Adding/updating paths |
-| `data/routes-data.json` | Route/walk data | Adding/updating routes |
 | `src/app.jsx` | App logic | Adding features |
 | `src/styles.css` | Styling | Changing appearance |
 | `index.html` | Page structure | Adding dependencies |

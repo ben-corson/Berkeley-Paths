@@ -80,8 +80,7 @@ Your Berkeley Paths Tracker app has been completely restructured into a professi
 berkeley-paths-tracker/
 ├── 📄 index.html           # Main HTML (minimal, loads everything)
 ├── 📁 data/
-│   ├── paths-data.json    # All path data (easy updates!)
-│   └── routes-data.json   # Route/walk data
+│   └── paths-data.json    # All path data (easy updates!)
 ├── 📁 src/
 │   ├── app.jsx           # React app code
 │   └── styles.css        # Stylesheet
@@ -179,7 +178,7 @@ git log src/app.jsx           # See all code changes
 ## File Count
 
 - **Core app files** organized across 3 directories (`data/`, `src/`, `assets/`)
-- **2 JSON data files**: `paths-data.json` (105 paths) and `routes-data.json`
+- **1 JSON data file**: `paths-data.json` (105 paths)
 
 ## Success Metrics
 

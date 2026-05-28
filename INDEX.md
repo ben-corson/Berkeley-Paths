@@ -90,7 +90,6 @@ Welcome! This is your complete guide to navigating the documentation for the Ber
 ### Core Application Files
 - `index.html` - Main HTML file
 - `data/paths-data.json` - All 105 paths
-- `data/routes-data.json` - Route/walk data
 - `src/app.jsx` - React application
 - `src/styles.css` - Stylesheet
 - `assets/icon.png` - App icon
