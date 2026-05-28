@@ -3,15 +3,13 @@ const { useState, useEffect, useRef } = React;
 const BerkeleyPathsTracker = () => {
   // State management
   const [paths, setPaths] = useState([]);
-  const [routes, setRoutes] = useState([]);
   const [completedPaths, setCompletedPaths] = useState(new Set());
   const [selectedPath, setSelectedPath] = useState(null);
-  const [selectedRoute, setSelectedRoute] = useState(null);
   const [showPathDialog, setShowPathDialog] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
   const [locationError, setLocationError] = useState(null);
   const [nearbyPaths, setNearbyPaths] = useState([]);
-  const [view, setView] = useState('map'); // 'list', 'map', or 'routes'
+  const [view, setView] = useState('map'); // 'list' or 'map'
   const [filterCompleted, setFilterCompleted] = useState('all'); // 'all', 'completed', 'incomplete'
   const [sortBy, setSortBy] = useState('alphabetical'); // 'alphabetical' or 'distance'
   const [searchQuery, setSearchQuery] = useState('');
@@ -24,7 +22,6 @@ const BerkeleyPathsTracker = () => {
   const mapInstanceRef = useRef(null);
   const markersRef = useRef({});
   const userMarkerRef = useRef(null);
-  const routeLineRef = useRef(null);
   const headingRef = useRef(null);
 
   // Enable compass heading via DeviceOrientationEvent
@@ -104,22 +101,6 @@ const BerkeleyPathsTracker = () => {
       }
     };
     loadPaths();
-  }, []);
-
-  // Load routes data
-  useEffect(() => {
-    const loadRoutes = async () => {
-      try {
-        const response = await fetch('./data/routes-data.json');
-        if (response.ok) {
-          const data = await response.json();
-          setRoutes(data);
-        }
-      } catch (err) {
-        console.error('Routes data not available:', err);
-      }
-    };
-    loadRoutes();
   }, []);
 
   // Load saved data from localStorage
@@ -215,7 +196,6 @@ const BerkeleyPathsTracker = () => {
       mapInstanceRef.current = null;
       markersRef.current = {};
       userMarkerRef.current = null;
-      routeLineRef.current = null;
     }
   }, [view]);
 
@@ -256,66 +236,14 @@ const BerkeleyPathsTracker = () => {
     }
   }, [view, paths, userLocation]);
 
-  // Initialize routes map
-  useEffect(() => {
-    if (view === 'routes' && selectedRoute && mapRef.current && !mapInstanceRef.current && typeof L !== 'undefined') {
-      setTimeout(() => {
-        const map = L.map(mapRef.current).setView([37.8870, -122.2600], 14);
-        
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-          attribution: '&copy; OpenStreetMap',
-          maxZoom: 19
-        }).addTo(map);
-
-        mapInstanceRef.current = map;
-
-        // Draw route
-        routeLineRef.current = L.polyline(selectedRoute.route_coordinates, {
-          color: '#8B4789',
-          weight: 5,
-          opacity: 0.85
-        }).addTo(map);
-
-        // Add start marker
-        L.marker(selectedRoute.route_coordinates[0], {
-          icon: L.divIcon({
-            className: 'start-marker',
-            html: '<div style="background: #8B4789; width: 32px; height: 32px; border-radius: 50%; border: 4px solid white; box-shadow: 0 3px 8px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px;">S</div>',
-            iconSize: [32, 32],
-            iconAnchor: [16, 16]
-          })
-        }).addTo(map).bindPopup(`<strong>Start</strong><br>${selectedRoute.start_location}`);
-
-        // Fit map to route
-        map.fitBounds(routeLineRef.current.getBounds(), { padding: [50, 50] });
-
-        // Add user location marker if available
-        if (userLocation) {
-          const userIcon = L.divIcon({
-            className: 'user-location-marker',
-            html: '<div style="background: #3B82F6; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
-            iconSize: [16, 16],
-            iconAnchor: [8, 8]
-          });
-          userMarkerRef.current = L.marker([userLocation.lat, userLocation.lng], { icon: userIcon })
-            .addTo(map)
-            .bindPopup('Your Location');
-        }
-      }, 100);
-    }
-  }, [view, selectedRoute]);
-
   // Add/update user location marker
   useEffect(() => {
     if (mapInstanceRef.current && userLocation && typeof L !== 'undefined') {
-      const isRoutes = view === 'routes';
       const userIcon = L.divIcon({
         className: 'user-location-marker',
-        html: isRoutes
-          ? '<div style="background: #3B82F6; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>'
-          : buildUserMarkerHtml(headingRef.current),
-        iconSize: isRoutes ? [16, 16] : [48, 48],
-        iconAnchor: isRoutes ? [8, 8] : [24, 24]
+        html: buildUserMarkerHtml(headingRef.current),
+        iconSize: [48, 48],
+        iconAnchor: [24, 24]
       });
 
       if (!userMarkerRef.current) {
@@ -610,10 +538,7 @@ const BerkeleyPathsTracker = () => {
             {/* Navigation buttons */}
             <div className="flex gap-1">
               <button
-                onClick={() => {
-                  setView('list');
-                  setSelectedRoute(null);
-                }}
+                onClick={() => setView('list')}
                 className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                   view === 'list'
                     ? 'bg-white text-berkeley-burgundy'
@@ -623,10 +548,7 @@ const BerkeleyPathsTracker = () => {
                 List
               </button>
               <button
-                onClick={() => {
-                  setView('map');
-                  setSelectedRoute(null);
-                }}
+                onClick={() => setView('map')}
                 className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                   view === 'map'
                     ? 'bg-white text-berkeley-burgundy'
@@ -634,19 +556,6 @@ const BerkeleyPathsTracker = () => {
                 }`}
               >
                 Map
-              </button>
-              <button
-                onClick={() => {
-                  setView('routes');
-                  setSelectedRoute(null);
-                }}
-                className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
-                  view === 'routes'
-                    ? 'bg-white text-berkeley-burgundy'
-                    : 'bg-berkeley-burgundy-dark text-white hover:bg-opacity-80'
-                }`}
-              >
-                Routes
               </button>
             </div>
           </div>
@@ -686,110 +595,6 @@ const BerkeleyPathsTracker = () => {
               </div>
             </div>
           </div>
-        )}
-
-        {/* Routes View */}
-        {view === 'routes' && (
-          <>
-            {!selectedRoute ? (
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-4">
-                <h2 className="text-2xl font-bold text-berkeley-burgundy mb-4">
-                  Walking Routes
-                </h2>
-                <p className="text-gray-600 mb-6">
-                  Organized walks through Berkeley's paths from the Berkeley Path Wanderers Association
-                </p>
-                
-                {routes.length === 0 ? (
-                  <div className="text-center py-12 text-gray-500">
-                    No routes available. Add routes-data.json to your data folder.
-                  </div>
-                ) : (
-                  routes.map((route) => (
-                    <div
-                      key={route.id}
-                      className="border-2 rounded-lg p-6 hover:shadow-lg transition-all cursor-pointer bg-white"
-                      style={{ borderColor: '#8B4789' }}
-                      onClick={() => setSelectedRoute(route)}
-                    >
-                      <h3 className="text-xl font-bold mb-3" style={{ color: '#8B4789' }}>
-                        {route.name}
-                      </h3>
-                      <div className="grid grid-cols-2 gap-3 text-sm text-gray-700 mb-3">
-                        <div>📏 {route.distance}</div>
-                        <div>🥾 {route.difficulty}</div>
-                        <div>🚶 {route.estimated_time}</div>
-                        <div>⛰️ {route.elevation_gain}</div>
-                      </div>
-                      <p className="text-sm text-gray-600 mb-3">{route.description}</p>
-                      <div className="text-sm font-medium" style={{ color: '#EAA636' }}>
-                        Includes {route.paths_count} paths →
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            ) : (
-              <div className="fixed inset-0 top-[56px] flex flex-col">
-                {/* Map - takes full screen */}
-                <div className="flex-1 relative">
-                  <div
-                    ref={mapRef}
-                    className="absolute inset-0 w-full h-full"
-                  ></div>
-                  
-                  {/* Floating back button */}
-                  <button
-                    onClick={() => setSelectedRoute(null)}
-                    className="absolute top-3 left-3 bg-white text-gray-800 px-3 py-1.5 rounded-lg shadow-lg hover:bg-gray-50 transition-colors text-sm font-medium flex items-center gap-1 z-10"
-                  >
-                    ← Back
-                  </button>
-                  
-                  {/* Floating my location button */}
-                  {userLocation && (
-                    <button
-                      onClick={() => {
-                        if (mapInstanceRef.current) {
-                          mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 16);
-                        }
-                      }}
-                      className="absolute top-3 right-3 bg-white px-2.5 py-1.5 rounded-lg shadow-lg hover:bg-gray-50 transition-colors text-lg z-10"
-                      title="Center on my location"
-                    >
-                      📍
-                    </button>
-                  )}
-                </div>
-
-                {/* Bottom info sheet - very compact */}
-                <div className="flex-shrink-0 bg-white border-t-2 shadow-2xl" style={{ borderColor: '#8B4789' }}>
-                  <div className="p-3">
-                    {/* Route name and key stat */}
-                    <div className="flex items-center justify-between mb-2">
-                      <h2 className="text-base font-bold truncate" style={{ color: '#8B4789' }}>
-                        {selectedRoute.name}
-                      </h2>
-                      <span className="text-xs text-gray-600 ml-2 whitespace-nowrap">
-                        {selectedRoute.distance}
-                      </span>
-                    </div>
-                    
-                    {/* PDF button - full width */}
-                    <a
-                      href={selectedRoute.pdf_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block w-full text-center px-4 py-2.5 rounded-lg text-white text-sm font-medium transition-colors"
-                      style={{ backgroundColor: '#8B4789' }}
-                    >
-                      📄 View Turn-by-Turn Directions
-                    </a>
-                  </div>
-                </div>
-              </div>
-            )}
-          </>
         )}
 
         {/* List View */}
