@@ -34,13 +34,21 @@ Just edit `data/paths-data.json`:
 ```
 
 ### Changing Colors
-Edit `src/styles.css`:
-```css
-:root {
-    --berkeley-burgundy: #941B1E;
-    --berkeley-gold: #EAA636;
-}
+Colors must be updated in two places:
+
+1. **`index.html`** — Tailwind config (controls the UI):
+```js
+'berkeley-burgundy': '#941B1E',
+'berkeley-burgundy-dark': '#6B1214',
+'berkeley-gold': '#EAA636',
 ```
+
+2. **`src/app.jsx`** — `COLORS` constant at the top (controls map colors):
+```js
+const COLORS = { burgundy: '#941B1E', burgundyDark: '#6B1214', gold: '#EAA636' };
+```
+
+Also update `--bg-gradient-start` / `--bg-gradient-end` in `src/styles.css` if changing the burgundy shades.
 
 ### Testing Locally
 ```bash
