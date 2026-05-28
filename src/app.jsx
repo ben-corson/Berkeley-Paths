@@ -1104,14 +1104,14 @@ const BerkeleyPathsTracker = () => {
       <footer className="bg-white border-t border-gray-200 mt-12 py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-600 text-sm">
           <p>
-            Please support the work of{' '}
+            The Berkeley Paths Tracker is not affiliated with{' '}
             <a
               href="https://www.berkeleypaths.org/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-berkeley-burgundy hover:underline"
             >
-              berkeleypaths.org
+              the Berkeley Path Wanderers Association, but we encourage you to support their work preserving, restoring, and creating public paths in Berkeley
             </a>
           </p>
           <p className="mt-2">
