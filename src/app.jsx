@@ -2,8 +2,8 @@ const { useState, useEffect, useRef } = React;
 
 // Brand colors — keep in sync with Tailwind config in index.html
 const COLORS = {
-  burgundy: '#941B1E',
-  burgundyDark: '#6B1214',
+  burgundy: '#1A56B0',
+  burgundyDark: '#1340A0',
   gold: '#EAA636',
 };
 
