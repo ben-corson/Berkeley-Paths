@@ -909,15 +909,15 @@ const BerkeleyPathsTracker = () => {
       <footer className="bg-white border-t border-gray-200 mt-12 py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-600 text-sm">
           <p>
-            Data sourced from{' '}
+            The Berkeley Paths Tracker is not affiliated with{' '}
             <a
-              href="https://www.berkeleypath.org/"
+              href="https://www.berkeleypaths.org/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-berkeley-burgundy hover:underline"
             >
-              berkeleypath.org
-            </a>
+              the Berkeley Path Wanderers Association
+            </a>, but we encourage you to support their work preserving, restoring, and creating public paths in Berkeley
           </p>
           <p className="mt-2">
             Berkeley Paths Tracker v1.0.0 | Made with ❤️ for Berkeley path explorers
