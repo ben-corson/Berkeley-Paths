@@ -1111,8 +1111,8 @@ const BerkeleyPathsTracker = () => {
               rel="noopener noreferrer"
               className="text-berkeley-burgundy hover:underline"
             >
-              the Berkeley Path Wanderers Association, but we encourage you to support their work preserving, restoring, and creating public paths in Berkeley
-            </a>
+              the Berkeley Path Wanderers Association
+            </a>, but we encourage you to support their work preserving, restoring, and creating public paths in Berkeley
           </p>
           <p className="mt-2">
             Berkeley Paths Tracker v1.0.0 | Made with ❤️ for Berkeley path explorers
