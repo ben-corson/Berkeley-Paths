@@ -1104,14 +1104,14 @@ const BerkeleyPathsTracker = () => {
       <footer className="bg-white border-t border-gray-200 mt-12 py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-600 text-sm">
           <p>
-            Data sourced from{' '}
+            Please support the work of{' '}
             <a
-              href="https://www.berkeleypath.org/"
+              href="https://www.berkeleypaths.org/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-berkeley-burgundy hover:underline"
             >
-              berkeleypath.org
+              berkeleypaths.org
             </a>
           </p>
           <p className="mt-2">
