@@ -735,46 +735,6 @@ const BerkeleyPathsTracker = () => {
               </div>
             )}
 
-            {/* Selected path detail */}
-            {selectedPath && (
-              <div className="mb-6 bg-white rounded-lg shadow-lg p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex-1">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                      {selectedPath.name}
-                    </h2>
-                    <p className="text-gray-600">{selectedPath.location}</p>
-                  </div>
-                  <button
-                    onClick={() => setSelectedPath(null)}
-                    className="text-gray-400 hover:text-gray-600 text-2xl"
-                  >
-                    ×
-                  </button>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => togglePathCompletion(selectedPath.id)}
-                      className={`flex-1 px-6 py-3 rounded-lg font-medium transition-colors ${
-                        completedPaths.has(selectedPath.id)
-                          ? 'bg-green-600 text-white hover:bg-green-700'
-                          : 'bg-berkeley-burgundy text-white hover:bg-berkeley-burgundy-dark'
-                      }`}
-                    >
-                      {completedPaths.has(selectedPath.id) ? '✓ Completed' : 'Mark as Complete'}
-                    </button>
-                    <button
-                      onClick={() => showPathOnMap(selectedPath)}
-                      className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors"
-                    >
-                      Show on Map
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* Paths list */}
             <div className="space-y-3">
@@ -889,6 +849,44 @@ const BerkeleyPathsTracker = () => {
           </div>
         )}
       </main>
+
+      {/* Sticky bottom sheet for List View selected path */}
+      {selectedPath && view === 'list' && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-berkeley-burgundy shadow-2xl z-50 px-4 py-3">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex-1 min-w-0">
+                <h2 className="text-base font-bold text-gray-900 truncate">{selectedPath.name}</h2>
+                <p className="text-xs text-gray-500 truncate">{selectedPath.location}</p>
+              </div>
+              <button
+                onClick={() => setSelectedPath(null)}
+                className="text-gray-400 hover:text-gray-600 text-2xl ml-3 flex-shrink-0"
+              >
+                ×
+              </button>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => togglePathCompletion(selectedPath.id)}
+                className={`flex-1 px-4 py-2.5 rounded-lg font-medium text-sm transition-colors ${
+                  completedPaths.has(selectedPath.id)
+                    ? 'bg-green-600 text-white hover:bg-green-700'
+                    : 'bg-berkeley-burgundy text-white hover:bg-berkeley-burgundy-dark'
+                }`}
+              >
+                {completedPaths.has(selectedPath.id) ? '✓ Completed' : 'Mark as Complete'}
+              </button>
+              <button
+                onClick={() => showPathOnMap(selectedPath)}
+                className="px-4 py-2.5 bg-gray-200 text-gray-700 rounded-lg font-medium text-sm hover:bg-gray-300 transition-colors"
+              >
+                Show on Map
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Path Dialog for Map View */}
       {showPathDialog && selectedPath && (
