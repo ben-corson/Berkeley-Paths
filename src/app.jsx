@@ -32,6 +32,7 @@ const BerkeleyPathsTracker = () => {
   const markersRef = useRef({});
   const userMarkerRef = useRef(null);
   const headingRef = useRef(null);
+  const pendingMapFocusRef = useRef(null); // path to center on when map opens
 
   // Listen for service worker update signal from index.html
   useEffect(() => {
@@ -244,8 +245,30 @@ const BerkeleyPathsTracker = () => {
           userMarkerRef.current = L.marker([userLocation.lat, userLocation.lng], { icon: userIcon })
             .addTo(map)
             .bindPopup('Your Location');
+        }
 
-          // Center on user location
+        // Center on a specific path if requested, otherwise center on user location
+        if (pendingMapFocusRef.current) {
+          const focusPath = pendingMapFocusRef.current;
+          pendingMapFocusRef.current = null;
+          const coords = focusPath.coordinates || [focusPath.start, focusPath.end];
+          const lats = coords.map(c => c[0]);
+          const lngs = coords.map(c => c[1]);
+          const midLat = (Math.min(...lats) + Math.max(...lats)) / 2;
+          const midLng = (Math.min(...lngs) + Math.max(...lngs)) / 2;
+          map.setView([midLat, midLng], 17);
+
+          // Briefly highlight the path
+          setTimeout(() => {
+            if (markersRef.current[focusPath.id]) {
+              const { line } = markersRef.current[focusPath.id];
+              const isCompleted = completedPaths.has(focusPath.id);
+              const baseColor = isCompleted ? COLORS.burgundy : COLORS.gold;
+              line.setStyle({ weight: 8, opacity: 1, color: baseColor });
+              setTimeout(() => line.setStyle({ weight: 4, opacity: 0.8, color: baseColor }), 2000);
+            }
+          }, 50);
+        } else if (userLocation) {
           map.setView([userLocation.lat, userLocation.lng], 17);
         }
       }, 100);
@@ -480,36 +503,9 @@ const BerkeleyPathsTracker = () => {
 
   // Show path on map
   const showPathOnMap = (path) => {
+    pendingMapFocusRef.current = path;
     setView('map');
     setShowPathDialog(false);
-    setTimeout(() => {
-      if (mapInstanceRef.current) {
-        const midLat = (path.start[0] + path.end[0]) / 2;
-        const midLng = (path.start[1] + path.end[1]) / 2;
-        
-        mapInstanceRef.current.setView([midLat, midLng], 17);
-        
-        if (markersRef.current[path.id]) {
-          const { line } = markersRef.current[path.id];
-          const isCompleted = completedPaths.has(path.id);
-          const baseColor = isCompleted ? COLORS.burgundy : COLORS.gold;
-          
-          line.setStyle({ 
-            weight: 8, 
-            opacity: 1,
-            color: baseColor
-          });
-          
-          setTimeout(() => {
-            line.setStyle({ 
-              weight: 4, 
-              opacity: 0.8,
-              color: baseColor
-            });
-          }, 2000);
-        }
-      }
-    }, 100);
   };
 
   if (loading) {
