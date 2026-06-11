@@ -14,7 +14,7 @@
   { "id": 13, "name": "Billie Jean Walk", "location": "911-917 Euclid Ave. - 918-924 Hilldale Ave.", "start": [37.894731, -122.263853], "end": [37.895099, -122.262791] },
   { "id": 14, "name": "Black Path", "location": "Solano Ave. and Contra Costa Ave. - 928 Mendocino Ave.", "start": [37.890895, -122.275549], "end": [37.890895, -122.274219] },
   { "id": 15, "name": "Boynton Walk", "location": "463-469 Arlington Ave. - 450-452 Boynton Ave.", "start": [37.902048, -122.276377], "end": [37.902183, -122.275657] },
-  { "id": 16, "name": "Bret Harte Path", "location": "1099-1101 Keeler Ave. - 1082-1084 Sterling Ave.", "start": [37.890699, -122.25831], "end": [37.891311, -122.258021] },
+  { "id": 16, "name": "Bret Harte Path", "location": "1099-1101 Keeler Ave. - 1082-1084 Sterling Ave.", "start": [37.890699, -122.25831], "end": [37.891311, -122.258021], "coordinates": [[37.890699, -122.25831],[37.890957, -122.258006],[37.891311, -122.258021]] },
   { "id": 17, "name": "Bret Harte Way", "location": "1099-1101 Euclid Ave. - 1098-1104 Keith Ave.", "start": [37.889572, -122.262454], "end": [37.889879, -122.261714] },
   { "id": 18, "name": "Cedar Path", "location": "Cedar St. & La Loma Ave. - 2710 Cedar St.", "start": [37.879919, -122.257232], "end": [37.879888, -122.257711] },
   { "id": 19, "name": "Chester Lane", "location": "117-131 Southampton Ave. - 682-690 San Luis Rd.", "start": [37.896804, -122.273983], "end": [37.897575, -122.273007] },
