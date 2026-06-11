@@ -437,8 +437,9 @@ const BerkeleyPathsTracker = () => {
   const addPathMarker = (map, path) => {
     const isCompleted = completedPaths.has(path.id);
     const color = isCompleted ? COLORS.burgundy : COLORS.gold;
+    const coords = path.coordinates || [path.start, path.end];
 
-    const line = L.polyline([path.start, path.end], {
+    const line = L.polyline(coords, {
       color: color,
       weight: 4,
       opacity: 0.8,
@@ -453,7 +454,7 @@ const BerkeleyPathsTracker = () => {
       </div>
     `);
 
-    const invisibleLine = L.polyline([path.start, path.end], {
+    const invisibleLine = L.polyline(coords, {
       color: 'transparent',
       weight: 20,
       opacity: 0,
