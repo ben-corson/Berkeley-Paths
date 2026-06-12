@@ -7,7 +7,7 @@
   { "id": 6, "name": "Arden Path", "location": "95-100 Arden Rd. - Panoramic Way", "start": [37.869931, -122.246967], "end": [37.870021, -122.247635] },
   { "id": 7, "name": "Arden Steps", "location": "Opposite 37 Mosswood Rd. - 95-100 Arden Rd.", "start": [37.870021, -122.247628], "end": [37.870344, -122.247609] },
   { "id": 8, "name": "Atlas Path", "location": "1311-1321 Grizzly Peak Blvd. - 150-156 Hill Rd.", "start": [37.886845, -122.251025], "end": [37.886998, -122.24996], "coordinates": [[37.886845, -122.251025], [37.886844, -122.250891], [37.886761, -122.250757], [37.886998, -122.24996]] },
-  { "id": 9, "name": "Avalon Walk", "location": "2827-2828 Palm Ct. - 2901-2904 Avalon Ave.", "start": [37.860214, -122.249814], "end": [37.859876, -122.249248] },
+  { "id": 9, "name": "Avalon Walk", "location": "2827-2828 Palm Ct. - 2901-2904 Avalon Ave.", "start": [37.860214, -122.249814], "end": [37.859876, -122.249248], "coordinates": [[37.860214, -122.249814], [37.860211, -122.249579], [37.859876, -122.249248]] },
   { "id": 10, "name": "Bancroft Steps", "location": "Bancroft Way & Warring St. - Bancroft Way & Prospect St.", "start": [37.869413, -122.250188], "end": [37.869328, -122.250927] },
   { "id": 11, "name": "Berryman Path", "location": "Berryman St. & Shattuck Ave. - south of 1256 Spruce St.", "start": [37.884251, -122.267661], "end": [37.883913, -122.269754] },
   { "id": 12, "name": "Betty Olds Path", "location": "Twain Ave. & Sterling Ave. - 85-91 Whitaker Ave.", "start": [37.890814, -122.256082], "end": [37.890665, -122.256739], "coordinates": [[37.890814, -122.256082],[37.890800, -122.256431],[37.890665, -122.256739]] },
