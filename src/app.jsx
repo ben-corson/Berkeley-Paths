@@ -641,7 +641,7 @@ const BerkeleyPathsTracker = () => {
                 placeholder="Search paths by name or location..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-berkeley-burgundy focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-berkeley-burgundy focus:border-transparent text-gray-900 placeholder-gray-400"
               />
               
               <div className="flex gap-2 flex-wrap">
