@@ -34,6 +34,9 @@ const BerkeleyPathsTracker = () => {
   const headingRef = useRef(null);
   const pendingMapFocusRef = useRef(null); // path to center on when map opens
 
+  const inspectMode = new URLSearchParams(window.location.search).has('inspect');
+  const [inspectIndex, setInspectIndex] = useState(0);
+
   // Listen for service worker update signal from index.html
   useEffect(() => {
     const handler = () => setUpdateAvailable(true);
@@ -270,6 +273,12 @@ const BerkeleyPathsTracker = () => {
               setTimeout(() => line.setStyle({ weight: 4, opacity: 0.8, color: baseColor }), 2000);
             }
           }, 50);
+        } else if (inspectMode && paths.length > 0) {
+          const p = paths[inspectIndex];
+          const coords = p.coordinates || [p.start, p.end];
+          const lats = coords.map(c => c[0]);
+          const lngs = coords.map(c => c[1]);
+          map.setView([(Math.min(...lats) + Math.max(...lats)) / 2, (Math.min(...lngs) + Math.max(...lngs)) / 2], 17);
         } else if (userLocation) {
           map.setView([userLocation.lat, userLocation.lng], 17);
         }
@@ -455,6 +464,30 @@ const BerkeleyPathsTracker = () => {
       return newSet;
     });
   };
+
+  const focusMapOnPath = (path) => {
+    const map = mapInstanceRef.current;
+    if (!map || !path) return;
+    const coords = path.coordinates || [path.start, path.end];
+    const lats = coords.map(c => c[0]);
+    const lngs = coords.map(c => c[1]);
+    const midLat = (Math.min(...lats) + Math.max(...lats)) / 2;
+    const midLng = (Math.min(...lngs) + Math.max(...lngs)) / 2;
+    map.setView([midLat, midLng], 17);
+    if (markersRef.current[path.id]) {
+      const { line } = markersRef.current[path.id];
+      const baseColor = completedPaths.has(path.id) ? COLORS.burgundy : COLORS.gold;
+      line.setStyle({ weight: 8, opacity: 1, color: baseColor });
+      setTimeout(() => line.setStyle({ weight: 4, opacity: 0.8, color: baseColor }), 1500);
+    }
+  };
+
+  // Inspect mode: focus map whenever inspectIndex changes
+  useEffect(() => {
+    if (inspectMode && paths.length > 0 && mapInstanceRef.current) {
+      focusMapOnPath(paths[inspectIndex]);
+    }
+  }, [inspectIndex, inspectMode, paths, mapInstanceRef.current]);
 
   // Filter and sort paths
   const getFilteredPaths = () => {
@@ -810,6 +843,26 @@ const BerkeleyPathsTracker = () => {
                 >
                   📍
                 </button>
+              )}
+
+              {/* Inspect mode overlay */}
+              {inspectMode && paths.length > 0 && (
+                <div style={{ zIndex: 9999, position: 'absolute', bottom: '16px', left: '50%', transform: 'translateX(-50%)' }}
+                  className="bg-white rounded-xl shadow-xl px-4 py-3 flex items-center gap-3 border border-gray-200"
+                >
+                  <button
+                    onClick={() => setInspectIndex(i => (i - 1 + paths.length) % paths.length)}
+                    className="text-xl px-2 py-1 rounded hover:bg-gray-100 transition-colors"
+                  >‹</button>
+                  <div className="text-center min-w-[160px]">
+                    <div className="font-semibold text-gray-900 text-sm">{paths[inspectIndex].name}</div>
+                    <div className="text-gray-400 text-xs mt-0.5">{inspectIndex + 1} / {paths.length}</div>
+                  </div>
+                  <button
+                    onClick={() => setInspectIndex(i => (i + 1) % paths.length)}
+                    className="text-xl px-2 py-1 rounded hover:bg-gray-100 transition-colors"
+                  >›</button>
+                </div>
               )}
 
               {/* Compass enable button - always visible until enabled */}
