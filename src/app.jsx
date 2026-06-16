@@ -192,16 +192,12 @@ const BerkeleyPathsTracker = () => {
   // Calculate nearby paths when location changes
   useEffect(() => {
     if (userLocation && paths.length > 0) {
-      const nearby = paths.filter(path => {
-        const distance = calculateDistance(
-          userLocation.lat,
-          userLocation.lng,
-          path.start[0],
-          path.start[1]
-        );
-        return distance <= 0.5;
+      const sorted = [...paths].sort((a, b) => {
+        const da = calculateDistance(userLocation.lat, userLocation.lng, a.start[0], a.start[1]);
+        const db = calculateDistance(userLocation.lat, userLocation.lng, b.start[0], b.start[1]);
+        return da - db;
       });
-      setNearbyPaths(nearby);
+      setNearbyPaths(sorted.slice(0, 3));
     }
   }, [userLocation, paths]);
 
@@ -711,13 +707,13 @@ const BerkeleyPathsTracker = () => {
             {nearbyPaths.length > 0 && (
               <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h2 className="text-lg font-semibold text-blue-900 mb-2">
-                  📍 Nearby Paths ({nearbyPaths.length})
+                  📍 Nearby Paths
                 </h2>
                 <p className="text-sm text-blue-700 mb-3">
-                  Paths within 0.5 miles of your location
+                  Closest paths to your current location
                 </p>
                 <div className="space-y-2">
-                  {nearbyPaths.slice(0, 3).map(path => (
+                  {nearbyPaths.map(path => (
                     <button
                       key={path.id}
                       onClick={() => setSelectedPath(path)}
