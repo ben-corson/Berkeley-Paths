@@ -189,17 +189,23 @@ const BerkeleyPathsTracker = () => {
     }
   }, []);
 
-  // Calculate nearby paths when location changes
+  // Calculate nearby paths when location or filter changes
   useEffect(() => {
     if (userLocation && paths.length > 0) {
-      const sorted = [...paths].sort((a, b) => {
+      let candidates = paths;
+      if (filterCompleted === 'completed') {
+        candidates = paths.filter(p => completedPaths.has(p.id));
+      } else if (filterCompleted === 'incomplete') {
+        candidates = paths.filter(p => !completedPaths.has(p.id));
+      }
+      const sorted = [...candidates].sort((a, b) => {
         const da = calculateDistance(userLocation.lat, userLocation.lng, a.start[0], a.start[1]);
         const db = calculateDistance(userLocation.lat, userLocation.lng, b.start[0], b.start[1]);
         return da - db;
       });
       setNearbyPaths(sorted.slice(0, 3));
     }
-  }, [userLocation, paths]);
+  }, [userLocation, paths, filterCompleted, completedPaths]);
 
   // Clean up map when switching views
   useEffect(() => {
@@ -719,7 +725,10 @@ const BerkeleyPathsTracker = () => {
                       onClick={() => setSelectedPath(path)}
                       className="block w-full text-left px-3 py-2 bg-white rounded hover:bg-blue-50 transition-colors"
                     >
-                      <div className="font-medium text-blue-900">{path.name}</div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-blue-900">{path.name}</span>
+                        {completedPaths.has(path.id) && <span className="text-green-600">✓</span>}
+                      </div>
                       <div className="text-sm text-gray-600">{path.location}</div>
                     </button>
                   ))}
