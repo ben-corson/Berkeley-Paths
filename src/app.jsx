@@ -772,9 +772,6 @@ const BerkeleyPathsTracker = () => {
                           </p>
                         )}
                       </div>
-                      <div className="text-gray-400 text-sm ml-4">
-                        #{path.id}
-                      </div>
                     </div>
                   </div>
                   );
