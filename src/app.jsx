@@ -256,7 +256,7 @@ const BerkeleyPathsTracker = () => {
         if (pendingMapFocusRef.current) {
           const focusPath = pendingMapFocusRef.current;
           pendingMapFocusRef.current = null;
-          const coords = focusPath.coordinates || [focusPath.start, focusPath.end];
+          const coords = focusPath.segments ? focusPath.segments.flat() : (focusPath.coordinates || [focusPath.start, focusPath.end]);
           const lats = coords.map(c => c[0]);
           const lngs = coords.map(c => c[1]);
           const midLat = (Math.min(...lats) + Math.max(...lats)) / 2;
@@ -275,7 +275,7 @@ const BerkeleyPathsTracker = () => {
           }, 50);
         } else if (inspectMode && paths.length > 0) {
           const p = paths[inspectIndex];
-          const coords = p.coordinates || [p.start, p.end];
+          const coords = p.segments ? p.segments.flat() : (p.coordinates || [p.start, p.end]);
           const lats = coords.map(c => c[0]);
           const lngs = coords.map(c => c[1]);
           map.setView([(Math.min(...lats) + Math.max(...lats)) / 2, (Math.min(...lngs) + Math.max(...lngs)) / 2], 17);
@@ -400,14 +400,11 @@ const BerkeleyPathsTracker = () => {
   const addPathMarker = (map, path) => {
     const isCompleted = completedPaths.has(path.id);
     const color = isCompleted ? COLORS.burgundy : COLORS.gold;
-    const coords = path.coordinates || [path.start, path.end];
+    const segments = path.segments || [path.coordinates || [path.start, path.end]];
 
-    const line = L.polyline(coords, {
-      color: color,
-      weight: 4,
-      opacity: 0.8,
-      className: `path-line-${path.id}`
-    }).addTo(map);
+    const line = L.featureGroup();
+    segments.forEach(coords => L.polyline(coords, { color, weight: 4, opacity: 0.8 }).addTo(line));
+    line.addTo(map);
 
     line.bindPopup(`
       <div style="min-width: 200px;">
@@ -417,12 +414,9 @@ const BerkeleyPathsTracker = () => {
       </div>
     `);
 
-    const invisibleLine = L.polyline(coords, {
-      color: 'transparent',
-      weight: 20,
-      opacity: 0,
-      className: `path-line-invisible-${path.id}`
-    }).addTo(map);
+    const invisibleLine = L.featureGroup();
+    segments.forEach(coords => L.polyline(coords, { color: 'transparent', weight: 20, opacity: 0 }).addTo(invisibleLine));
+    invisibleLine.addTo(map);
 
     invisibleLine.on('click', (e) => {
       L.DomEvent.stopPropagation(e);
@@ -468,7 +462,7 @@ const BerkeleyPathsTracker = () => {
   const focusMapOnPath = (path) => {
     const map = mapInstanceRef.current;
     if (!map || !path) return;
-    const coords = path.coordinates || [path.start, path.end];
+    const coords = path.segments ? path.segments.flat() : (path.coordinates || [path.start, path.end]);
     const lats = coords.map(c => c[0]);
     const lngs = coords.map(c => c[1]);
     const midLat = (Math.min(...lats) + Math.max(...lats)) / 2;
