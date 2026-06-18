@@ -100,6 +100,34 @@ When adding or updating paths in `data/paths-data.json`:
 - Keep consistent formatting
 - Test after adding new paths
 
+## Editing Path Coordinates with geojson.io
+
+The recommended workflow for visually editing or correcting path coordinates:
+
+1. Get the current coordinates for a path from `data/paths-data.json`
+2. Convert them to GeoJSON format (note: GeoJSON uses `[longitude, latitude]` order, the **opposite** of our data):
+   ```json
+   {
+     "type": "FeatureCollection",
+     "features": [{
+       "type": "Feature",
+       "properties": { "name": "Path Name" },
+       "geometry": {
+         "type": "LineString",
+         "coordinates": [
+           [-122.2544006, 37.8855136],
+           [-122.2537965, 37.8857334]
+         ]
+       }
+     }]
+   }
+   ```
+3. Go to **geojson.io** and paste the GeoJSON into the left panel — the path will appear on the map
+4. Drag existing points or click to add new ones until the line matches the real path
+5. Copy the updated GeoJSON from the left panel
+6. Convert coordinates back to `[latitude, longitude]` order and update `data/paths-data.json`
+7. Bump the SW cache version in `sw.js`
+
 ## Commit Message Format
 
 Use clear, descriptive commit messages:
