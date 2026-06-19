@@ -43,6 +43,14 @@ const BerkeleyPathsTracker = () => {
     return !localStorage.getItem('installPromptDismissed');
   });
   const [deferredInstallPrompt, setDeferredInstallPrompt] = useState(null);
+  const [milestone, setMilestone] = useState(null);
+
+  const MILESTONES = [
+    { pct: 25, emoji: '🌟', title: 'Quarter of the way there!', message: "You've completed 25% of Berkeley's paths. Keep exploring!" },
+    { pct: 50, emoji: '🏅', title: 'Halfway there!', message: "50% done — you're a true Berkeley path explorer." },
+    { pct: 75, emoji: '🔥', title: 'Three quarters done!', message: "75% complete. The finish line is in sight!" },
+    { pct: 100, emoji: '🏆', title: 'All paths completed!', message: "You've walked every developed path in Berkeley. Incredible!" },
+  ];
 
   // Listen for service worker update signal from index.html
   useEffect(() => {
@@ -470,6 +478,19 @@ const BerkeleyPathsTracker = () => {
         newSet.delete(pathId);
       } else {
         newSet.add(pathId);
+        const pct = Math.round((newSet.size / paths.length) * 100);
+        const hit = MILESTONES.find(m => {
+          if (pct < m.pct) return false;
+          const prevPct = Math.round(((newSet.size - 1) / paths.length) * 100);
+          return prevPct < m.pct;
+        });
+        if (hit) {
+          const seenKey = `milestone_${hit.pct}`;
+          if (!localStorage.getItem(seenKey)) {
+            localStorage.setItem(seenKey, 'true');
+            setTimeout(() => setMilestone(hit), 300);
+          }
+        }
       }
       return newSet;
     });
@@ -629,6 +650,23 @@ const BerkeleyPathsTracker = () => {
               className="block w-full text-center text-gray-400 text-sm py-1"
             >
               Not now
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Milestone modal */}
+      {milestone && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4" style={{background: 'rgba(0,0,0,0.5)'}}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center">
+            <div style={{fontSize: '4rem', lineHeight: 1, marginBottom: '12px'}}>{milestone.emoji}</div>
+            <h2 className="text-xl font-bold text-berkeley-burgundy mb-2">{milestone.title}</h2>
+            <p className="text-sm text-gray-600 mb-6 leading-relaxed">{milestone.message}</p>
+            <button
+              onClick={() => setMilestone(null)}
+              className="bg-berkeley-burgundy text-white font-semibold py-2.5 px-8 rounded-xl text-sm"
+            >
+              Keep going!
             </button>
           </div>
         </div>
