@@ -37,16 +37,27 @@ const BerkeleyPathsTracker = () => {
   const inspectMode = new URLSearchParams(window.location.search).has('inspect');
   const [inspectIndex, setInspectIndex] = useState(0);
   const isInstalled = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+  const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
   const [showInstallPrompt, setShowInstallPrompt] = useState(() => {
     if (isInstalled) return false;
     return !localStorage.getItem('installPromptDismissed');
   });
+  const [deferredInstallPrompt, setDeferredInstallPrompt] = useState(null);
 
   // Listen for service worker update signal from index.html
   useEffect(() => {
     const handler = () => setUpdateAvailable(true);
     window.addEventListener('swUpdateAvailable', handler);
     return () => window.removeEventListener('swUpdateAvailable', handler);
+  }, []);
+
+  useEffect(() => {
+    const handler = (e) => {
+      e.preventDefault();
+      setDeferredInstallPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
   // Enable compass heading via DeviceOrientationEvent
@@ -580,12 +591,36 @@ const BerkeleyPathsTracker = () => {
               <li className="flex gap-2"><span>📶</span><span><strong>Works offline</strong> — no cell service needed on the trail</span></li>
               <li className="flex gap-2"><span>⚡</span><span><strong>Opens instantly</strong> from your home screen</span></li>
             </ul>
-            <a
-              href="install.html"
-              className="block w-full text-center bg-berkeley-burgundy text-white font-semibold py-2.5 rounded-xl mb-3 text-sm"
-            >
-              Show me how
-            </a>
+            {isIOS ? (
+              <a
+                href="install.html"
+                className="block w-full text-center bg-berkeley-burgundy text-white font-semibold py-2.5 rounded-xl mb-3 text-sm"
+              >
+                Show me how
+              </a>
+            ) : deferredInstallPrompt ? (
+              <button
+                onClick={async () => {
+                  deferredInstallPrompt.prompt();
+                  const { outcome } = await deferredInstallPrompt.userChoice;
+                  if (outcome === 'accepted') {
+                    localStorage.setItem('installPromptDismissed', 'true');
+                    setShowInstallPrompt(false);
+                  }
+                  setDeferredInstallPrompt(null);
+                }}
+                className="block w-full text-center bg-berkeley-burgundy text-white font-semibold py-2.5 rounded-xl mb-3 text-sm"
+              >
+                Install app
+              </button>
+            ) : (
+              <a
+                href="install.html"
+                className="block w-full text-center bg-berkeley-burgundy text-white font-semibold py-2.5 rounded-xl mb-3 text-sm"
+              >
+                Show me how
+              </a>
+            )}
             <button
               onClick={() => {
                 localStorage.setItem('installPromptDismissed', 'true');
