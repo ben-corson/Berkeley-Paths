@@ -666,7 +666,7 @@ const BerkeleyPathsTracker = () => {
               onClick={() => setMilestone(null)}
               className="bg-berkeley-burgundy text-white font-semibold py-2.5 px-16 rounded-xl text-sm"
             >
-              Keep going!
+              {milestone.pct === 100 ? 'Amazing!' : 'Keep going!'}
             </button>
           </div>
         </div>
