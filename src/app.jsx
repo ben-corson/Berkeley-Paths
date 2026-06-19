@@ -36,6 +36,11 @@ const BerkeleyPathsTracker = () => {
 
   const inspectMode = new URLSearchParams(window.location.search).has('inspect');
   const [inspectIndex, setInspectIndex] = useState(0);
+  const isInstalled = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+  const [showInstallPrompt, setShowInstallPrompt] = useState(() => {
+    if (isInstalled) return false;
+    return !localStorage.getItem('installPromptDismissed');
+  });
 
   // Listen for service worker update signal from index.html
   useEffect(() => {
@@ -564,6 +569,36 @@ const BerkeleyPathsTracker = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Install prompt modal */}
+      {showInstallPrompt && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4" style={{background: 'rgba(0,0,0,0.5)'}}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6">
+            <h2 className="text-lg font-bold text-berkeley-burgundy mb-2">Install Berkeley Paths Navigator</h2>
+            <p className="text-sm text-gray-600 mb-4 leading-relaxed">Add this app to your home screen for the best experience:</p>
+            <ul className="text-sm text-gray-700 space-y-2 mb-6">
+              <li className="flex gap-2"><span>📍</span><span><strong>Your progress is saved</strong> on your device — no account needed</span></li>
+              <li className="flex gap-2"><span>📶</span><span><strong>Works offline</strong> — no cell service needed on the trail</span></li>
+              <li className="flex gap-2"><span>⚡</span><span><strong>Opens instantly</strong> from your home screen</span></li>
+            </ul>
+            <a
+              href="install.html"
+              className="block w-full text-center bg-berkeley-burgundy text-white font-semibold py-2.5 rounded-xl mb-3 text-sm"
+            >
+              Show me how
+            </a>
+            <button
+              onClick={() => {
+                localStorage.setItem('installPromptDismissed', 'true');
+                setShowInstallPrompt(false);
+              }}
+              className="block w-full text-center text-gray-400 text-sm py-1"
+            >
+              Not now
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Update banner */}
       {updateAvailable && (
         <div className="fixed top-0 left-0 right-0 z-[9999] bg-berkeley-gold text-white text-sm font-medium flex items-center justify-between px-4 py-2.5 shadow-lg">

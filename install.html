@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Install Berkeley Paths Navigator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&family=Alike&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f9f6f1;
+      color: #2d2d2d;
+      padding: 24px 16px 48px;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    header h1 {
+      font-family: 'Alike', serif;
+      color: #941B1E;
+      font-size: 1.8rem;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      color: #666;
+      font-size: 0.95rem;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 24px;
+      color: #941B1E;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    .back-link:hover { text-decoration: underline; }
+
+    .platform {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      margin-bottom: 28px;
+      overflow: hidden;
+    }
+
+    .platform-header {
+      background: #941B1E;
+      color: white;
+      padding: 14px 20px;
+      font-weight: 600;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .platform-header svg {
+      flex-shrink: 0;
+    }
+
+    .steps {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .step {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .step-number {
+      background: #EAA636;
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .step-content {
+      flex: 1;
+    }
+
+    .step-content p {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .step-content strong {
+      color: #941B1E;
+    }
+
+    /* Phone mockup */
+    .mockup {
+      width: 100%;
+      max-width: 280px;
+      display: block;
+    }
+
+    .tip {
+      background: #fef9f0;
+      border-left: 3px solid #EAA636;
+      padding: 10px 14px;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.85rem;
+      color: #555;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <a class="back-link" href="./">← Back to Berkeley Paths Navigator</a>
+
+  <header>
+    <h1>Install Berkeley Paths Navigator</h1>
+    <p>Add the app to your home screen for the best experience.</p>
+  </header>
+
+  <!-- Why install -->
+  <div style="background: white; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 20px 24px; margin-bottom: 28px;">
+    <h2 style="font-size: 1rem; font-weight: 600; color: #941B1E; margin-bottom: 14px;">Why install the app?</h2>
+    <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px;">
+      <li style="display: flex; gap: 10px; align-items: flex-start; font-size: 0.95rem; line-height: 1.4;">
+        <span style="font-size: 1.1rem;">📍</span>
+        <span><strong>Your progress is saved on your device</strong> — no account or sign-in needed. Check off paths as you walk them and your history stays put.</span>
+      </li>
+      <li style="display: flex; gap: 10px; align-items: flex-start; font-size: 0.95rem; line-height: 1.4;">
+        <span style="font-size: 1.1rem;">📶</span>
+        <span><strong>Works offline</strong> — the app and map load even without cell service, so you can navigate on the trail without a signal.</span>
+      </li>
+      <li style="display: flex; gap: 10px; align-items: flex-start; font-size: 0.95rem; line-height: 1.4;">
+        <span style="font-size: 1.1rem;">⚡</span>
+        <span><strong>Opens instantly</strong> from your home screen, just like a native app — no browser, no searching.</span>
+      </li>
+      <li style="display: flex; gap: 10px; align-items: flex-start; font-size: 0.95rem; line-height: 1.4;">
+        <span style="font-size: 1.1rem;">🚫</span>
+        <span><strong>No app store required</strong> — install it directly from your browser in seconds.</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- iOS / Safari -->
+  <div class="platform">
+    <div class="platform-header">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+      iPhone / iPad (Safari)
+    </div>
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <p>Open <strong>Safari</strong> and navigate to the app. (The install option only appears in Safari — it won't work from Chrome or Firefox on iPhone.)</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <p>Tap the <strong>Share button</strong> at the bottom of the screen — it looks like this:</p>
+          <!-- Just the share button icon, no phone chrome -->
+          <svg class="mockup" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="max-width:80px;">
+            <rect width="80" height="80" rx="16" fill="#f0f0f0"/>
+            <g transform="translate(40,40)">
+              <rect x="-12" y="-6" width="24" height="18" rx="3" fill="none" stroke="#555" stroke-width="2.5"/>
+              <line x1="0" y1="-6" x2="0" y2="-20" stroke="#555" stroke-width="2.5"/>
+              <polyline points="-6,-15 0,-22 6,-15" fill="none" stroke="#555" stroke-width="2.5"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <p>Scroll down in the share sheet and tap <strong>Add to Home Screen</strong>.</p>
+          <!-- Just the share sheet menu items, no phone chrome -->
+          <svg class="mockup" viewBox="0 0 260 130" xmlns="http://www.w3.org/2000/svg">
+            <rect width="260" height="130" rx="12" fill="white" stroke="#e0e0e0" stroke-width="1"/>
+            <!-- row 1 -->
+            <rect x="12" y="10" width="236" height="34" rx="6" fill="#f8f8f8"/>
+            <rect x="22" y="18" width="18" height="18" rx="4" fill="#ddd"/>
+            <text x="48" y="31" font-size="13" fill="#777" font-family="sans-serif">Copy Link</text>
+            <!-- row 2 -->
+            <rect x="12" y="50" width="236" height="34" rx="6" fill="#f8f8f8"/>
+            <rect x="22" y="58" width="18" height="18" rx="4" fill="#ddd"/>
+            <text x="48" y="71" font-size="13" fill="#777" font-family="sans-serif">Open in Safari</text>
+            <!-- row 3 highlighted -->
+            <rect x="12" y="90" width="236" height="34" rx="6" fill="#fff3e0" stroke="#EAA636" stroke-width="1.5"/>
+            <rect x="22" y="98" width="18" height="18" rx="4" fill="#EAA636" opacity="0.5"/>
+            <text x="48" y="111" font-size="13" fill="#941B1E" font-weight="600" font-family="sans-serif">Add to Home Screen</text>
+            <text x="238" y="113" text-anchor="end" font-size="20" fill="#EAA636" font-family="sans-serif">✓</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <p>Tap <strong>Add</strong> in the top-right corner. The app icon will appear on your home screen.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Android / Chrome -->
+  <div class="platform">
+    <div class="platform-header">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24C14.9 8.13 13.48 7.75 12 7.75s-2.9.38-4.48 1.16L5.65 5.67c-.19-.29-.54-.38-.83-.22-.3.16-.42.54-.26.85L6.4 9.48C3.3 11.25 1.28 14.44 1 18h22c-.28-3.56-2.3-6.75-5.4-8.52zM7 15.25c-.69 0-1.25-.56-1.25-1.25S6.31 12.75 7 12.75s1.25.56 1.25 1.25S7.69 15.25 7 15.25zm10 0c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z"/></svg>
+      Android (Chrome)
+    </div>
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <p>Open <strong>Chrome</strong> and navigate to the app.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <p>Tap the <strong>three-dot menu</strong> in the top-right corner of Chrome — it looks like this:</p>
+          <svg class="mockup" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="max-width:80px;">
+            <rect width="80" height="80" rx="16" fill="#f0f0f0"/>
+            <circle cx="40" cy="24" r="5" fill="#555"/>
+            <circle cx="40" cy="40" r="5" fill="#555"/>
+            <circle cx="40" cy="56" r="5" fill="#555"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <p>Tap <strong>Add to Home screen</strong> from the menu.</p>
+          <svg class="mockup" viewBox="0 0 260 130" xmlns="http://www.w3.org/2000/svg">
+            <rect width="260" height="130" rx="12" fill="white" stroke="#e0e0e0" stroke-width="1"/>
+            <!-- row 1 -->
+            <rect x="12" y="10" width="236" height="34" rx="6" fill="#f8f8f8"/>
+            <text x="24" y="31" font-size="13" fill="#777" font-family="sans-serif">New tab</text>
+            <!-- row 2 -->
+            <rect x="12" y="50" width="236" height="34" rx="6" fill="#f8f8f8"/>
+            <text x="24" y="71" font-size="13" fill="#777" font-family="sans-serif">Bookmarks</text>
+            <!-- row 3 highlighted -->
+            <rect x="12" y="90" width="236" height="34" rx="6" fill="#fff3e0" stroke="#EAA636" stroke-width="1.5"/>
+            <text x="24" y="111" font-size="13" fill="#941B1E" font-weight="600" font-family="sans-serif">Add to Home screen</text>
+            <text x="238" y="113" text-anchor="end" font-size="20" fill="#EAA636" font-family="sans-serif">✓</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <p>Tap <strong>Add</strong> in the dialog that appears. The app icon will be added to your home screen.</p>
+          <div class="tip">💡 On some Android devices you may see a banner at the bottom of Chrome saying "Add to Home screen" — you can tap that instead of using the menu.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Samsung -->
+  <div class="platform">
+    <div class="platform-header">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
+      Android (Samsung Internet)
+    </div>
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <p>Open <strong>Samsung Internet</strong> and navigate to the app.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <p>Tap the <strong>menu icon</strong> (three horizontal lines) at the bottom of the screen.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <p>Tap <strong>Add page to</strong> → <strong>Home screen</strong>.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <p>Tap <strong>Add</strong> to confirm.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>
