@@ -6,7 +6,7 @@ Your Berkeley Paths Navigator app has been completely restructured into a profes
 
 ### 📊 Data Files (1)
 ✅ **data/paths-data.json**
-   - All 105 Berkeley paths extracted from your HTML
+   - All 121 Berkeley paths extracted from your HTML
    - Clean JSON format, easy to edit
    - Each path has: id, name, location, start coords, end coords
 
@@ -178,7 +178,7 @@ git log src/app.jsx           # See all code changes
 ## File Count
 
 - **Core app files** organized across 3 directories (`data/`, `src/`, `assets/`)
-- **1 JSON data file**: `paths-data.json` (105 paths)
+- **1 JSON data file**: `paths-data.json` (121 paths)
 
 ## Success Metrics
 

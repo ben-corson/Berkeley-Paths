@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `install.html` — dedicated page with platform-specific PWA install instructions (iOS/Safari, Android/Chrome, Samsung Internet)
+- One-tap install prompt for Android/Chrome users via `beforeinstallprompt` API; falls back to instructions page for iOS
+- First-visit install prompt modal (shown once, dismissed to localStorage)
+- 5 new paths: Arlington Path (#117), Beloit Path (#118), Willamette Path (#119), Lenox Path (#120), Westminster Path (#121)
+- geojson.io coordinate editing workflow documented in CONTRIBUTING.md
+
+### Changed
+- Renamed "Public Path #2" → Stratford Path
+- Renamed "Public Path #1 Path" → Marchant Path
+- Renamed "Short Cut" → The Short Cut
+- Corrected coordinates for: Easter Way, El Mirador Path, Eunice Steps, Glendale Path, Halkin Walk, Indian Rock Path, La Vereda Steps, Miller Path East, Oak Street Path, Orchard Lane, Rose Walk, Ruth Armstrong Path, Yosemite Steps, Acacia Steps, Acacia Walk, Shasta Path, Coventry Path
+
+### Added (previous)
 - Service worker (`sw.js`) for offline caching and automatic updates
   - App assets cached on first visit for offline use
   - iOS home screen users receive code updates automatically without re-adding the app

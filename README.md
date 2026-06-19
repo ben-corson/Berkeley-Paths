@@ -1,10 +1,10 @@
 # Berkeley Paths Navigator
 
-A progressive web app for tracking your progress through all 105 developed paths in Berkeley, California. Features an interactive map, completion tracking, and personal notes for each path.
+A progressive web app for tracking your progress through all 121 developed paths in Berkeley, California. Features an interactive map, completion tracking, and personal notes for each path.
 
 ## Features
 
-- 📍 **Interactive Map** - View all 105 Berkeley paths on an interactive map with visual indicators
+- 📍 **Interactive Map** - View all 121 Berkeley paths on an interactive map with visual indicators
 - ✅ **Progress Tracking** - Mark paths as completed and track your overall completion percentage
 - 📝 **Personal Notes** - Add notes about difficulty, highlights, and memorable moments for each path
 - 🗺️ **Location-Aware** - See your current location and find nearby paths within 0.5 miles
@@ -43,10 +43,11 @@ Then visit `http://localhost:8000` in your browser.
 ```
 berkeley-paths-tracker/
 ├── index.html              # Main HTML file (minimal, loads other files)
+├── install.html            # PWA install instructions page
 ├── sw.js                   # Service worker (offline caching & auto-updates)
 ├── manifest.json           # PWA manifest (icon, display mode, theme)
 ├── data/
-│   └── paths-data.json    # All 105 Berkeley paths data
+│   └── paths-data.json    # All 121 Berkeley paths data
 ├── src/
 │   ├── app.jsx            # React application code
 │   └── styles.css         # CSS styling
