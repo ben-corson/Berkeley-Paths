@@ -1,4 +1,4 @@
-const CACHE_NAME = 'berkeley-paths-v91';
+const CACHE_NAME = 'berkeley-paths-v92';
 
 const STATIC_ASSETS = [
   './',
@@ -6,6 +6,7 @@ const STATIC_ASSETS = [
   './manifest.json',
   './src/app.jsx',
   './src/styles.css',
+  './src/tailwind.css',
   './assets/icon.png',
   './data/paths-data.json',
 ];
