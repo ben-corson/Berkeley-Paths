@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "name": "Route 1: Hills Loop",
+    "name": "Route 1: Rose and Spruce",
     "distance": "5 miles",
     "paths_count": 17,
     "start_location": "Rose St & Spruce St",
@@ -2667,7 +2667,7 @@
   },
   {
     "id": 2,
-    "name": "Route 2: North Berkeley Hills",
+    "name": "Route 2: Great Stoneface Park",
     "distance": "4.5 miles",
     "paths_count": 15,
     "start_location": "Rose St & Euclid Ave",
@@ -5421,7 +5421,7 @@
   },
   {
     "id": 3,
-    "name": "Route 3: Downtown & West Berkeley",
+    "name": "Route 3: Acton and Virginia",
     "distance": "7.1 miles",
     "paths_count": 8,
     "start_location": "Acton St & Virginia St",
@@ -6043,7 +6043,7 @@
   },
   {
     "id": 4,
-    "name": "Route 4: Berkeley Hills",
+    "name": "Route 4: Cordonices Park",
     "distance": "5 miles",
     "paths_count": 18,
     "start_location": "Stadium Rim Way",
@@ -7905,7 +7905,7 @@
   },
   {
     "id": 5,
-    "name": "Route 5: Elmwood & Claremont",
+    "name": "Route 5: Domingo Peet's",
     "distance": "4 miles",
     "paths_count": 12,
     "start_location": "College Ave & Ashby Ave",
