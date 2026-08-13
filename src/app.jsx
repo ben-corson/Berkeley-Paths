@@ -932,6 +932,17 @@ const BerkeleyPathsTracker = () => {
                       📍
                     </button>
                   )}
+
+                  {/* Compass button */}
+                  {!compassEnabled && (
+                    <button
+                      onClick={enableCompass}
+                      className="absolute top-14 right-3 bg-white px-2.5 py-1.5 rounded-lg shadow-lg hover:bg-gray-50 transition-colors text-lg z-10"
+                      title="Enable compass heading"
+                    >
+                      🧭
+                    </button>
+                  )}
                 </div>
 
                 {/* Bottom info sheet - very compact */}
