@@ -381,7 +381,10 @@ const BerkeleyPathsTracker = () => {
 
   // Add/update user location marker
   useEffect(() => {
-    if (mapInstanceRef.current && userLocation && typeof L !== 'undefined') {
+    if (!userLocation || typeof L === 'undefined') return;
+
+    const addOrUpdateMarker = () => {
+      if (!mapInstanceRef.current) return;
       const isRoutes = view === 'routes';
       const userIcon = L.divIcon({
         className: 'user-location-marker',
@@ -396,10 +399,7 @@ const BerkeleyPathsTracker = () => {
         const marker = L.marker([userLocation.lat, userLocation.lng], { icon: userIcon })
           .addTo(mapInstanceRef.current)
           .bindPopup('Your Location');
-
         userMarkerRef.current = marker;
-
-        // Center map on user location at zoom 17 when first location is obtained (only for map view)
         if (view === 'map') {
           mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 17);
         }
@@ -407,8 +407,16 @@ const BerkeleyPathsTracker = () => {
         userMarkerRef.current.setLatLng([userLocation.lat, userLocation.lng]);
         userMarkerRef.current.setIcon(userIcon);
       }
+    };
+
+    // When a route is selected, the map initializes after a 100ms timeout — wait for it
+    if (view === 'routes' && selectedRoute) {
+      const t = setTimeout(addOrUpdateMarker, 150);
+      return () => clearTimeout(t);
+    } else {
+      addOrUpdateMarker();
     }
-  }, [userLocation, heading, view, mapInstanceRef.current]);
+  }, [userLocation, heading, view, selectedRoute]);
 
   // Update path lines when completed status changes
   useEffect(() => {
