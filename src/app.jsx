@@ -1,5 +1,7 @@
 const { useState, useEffect, useRef } = React;
 
+const ROUTES_ENABLED = true;
+
 // Brand colors — keep in sync with Tailwind config in index.html
 const COLORS = {
   burgundy: '#941B1E',
@@ -671,19 +673,21 @@ const BerkeleyPathsTracker = () => {
               >
                 Map
               </button>
-              <button
-                onClick={() => {
-                  setView('routes');
-                  setSelectedRoute(null);
-                }}
-                className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
-                  view === 'routes'
-                    ? 'bg-white text-berkeley-burgundy'
-                    : 'bg-berkeley-burgundy-dark text-white hover:bg-opacity-80'
-                }`}
-              >
-                Routes
-              </button>
+              {ROUTES_ENABLED && (
+                <button
+                  onClick={() => {
+                    setView('routes');
+                    setSelectedRoute(null);
+                  }}
+                  className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
+                    view === 'routes'
+                      ? 'bg-white text-berkeley-burgundy'
+                      : 'bg-berkeley-burgundy-dark text-white hover:bg-opacity-80'
+                  }`}
+                >
+                  Routes
+                </button>
+              )}
             </div>
           </div>
 
@@ -725,7 +729,7 @@ const BerkeleyPathsTracker = () => {
         )}
 
         {/* Routes View */}
-        {view === 'routes' && (
+        {ROUTES_ENABLED && view === 'routes' && (
           <>
             {!selectedRoute ? (
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-4">
