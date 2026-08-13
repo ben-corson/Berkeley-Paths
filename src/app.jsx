@@ -254,9 +254,8 @@ const BerkeleyPathsTracker = () => {
     }
   }, [userLocation, paths, filterCompleted, completedPaths]);
 
-  // Clean up map when switching views
+  // Clean up map when switching views or deselecting a route
   useEffect(() => {
-    // Whenever view changes, clean up the existing map
     if (mapInstanceRef.current) {
       mapInstanceRef.current.remove();
       mapInstanceRef.current = null;
@@ -264,7 +263,7 @@ const BerkeleyPathsTracker = () => {
       userMarkerRef.current = null;
       routeLineRef.current = null;
     }
-  }, [view]);
+  }, [view, selectedRoute]);
 
   // Initialize map
   useEffect(() => {
@@ -948,16 +947,7 @@ const BerkeleyPathsTracker = () => {
                       </span>
                     </div>
                     
-                    {/* PDF button - full width */}
-                    <a
-                      href={selectedRoute.pdf_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block w-full text-center px-4 py-2.5 rounded-lg text-white text-sm font-medium transition-colors"
-                      style={{ backgroundColor: '#8B4789' }}
-                    >
-                      📄 View Turn-by-Turn Directions
-                    </a>
+
                   </div>
                 </div>
               </div>

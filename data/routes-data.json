@@ -2668,7 +2668,7 @@
   {
     "id": 2,
     "name": "Route 2: Great Stoneface Park",
-    "distance": "4.5 miles",
+    "distance": "6.2 miles",
     "paths_count": 15,
     "start_location": "Rose St & Euclid Ave",
     "description": "Hilly walk through North Berkeley north of Marin Avenue, including John Hinkel Park and Indian Rock Park",
@@ -7906,7 +7906,7 @@
   {
     "id": 5,
     "name": "Route 5: Domingo Peet's",
-    "distance": "4 miles",
+    "distance": "7.0 miles",
     "paths_count": 12,
     "start_location": "College Ave & Ashby Ave",
     "description": "Explore the Elmwood and Claremont neighborhoods with charming paths",
@@ -9292,7 +9292,7 @@
   {
     "id": 6,
     "name": "Route 6: Live Oak Park",
-    "distance": "",
+    "distance": "6.5 miles",
     "paths_count": 0,
     "start_location": "Live Oak Park",
     "description": "",
