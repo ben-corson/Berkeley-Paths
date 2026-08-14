@@ -431,7 +431,7 @@ const BerkeleyPathsTracker = () => {
 
   // Update path lines when completed status changes
   useEffect(() => {
-    if (mapInstanceRef.current && typeof L !== 'undefined' && view === 'map') {
+    if (mapInstanceRef.current && typeof L !== 'undefined' && (view === 'map' || view === 'routes')) {
       paths.forEach(path => {
         if (markersRef.current[path.id]) {
           const { line } = markersRef.current[path.id];
