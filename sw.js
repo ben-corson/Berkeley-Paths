@@ -1,4 +1,4 @@
-const CACHE_NAME = 'berkeley-paths-v125';
+const CACHE_NAME = 'berkeley-paths-v126';
 
 const STATIC_ASSETS = [
   './',
@@ -9,7 +9,6 @@ const STATIC_ASSETS = [
   './src/tailwind.css',
   './assets/icon.png',
   './data/paths-data.json',
-  './version.json',
 ];
 
 // On install, cache all static assets and activate immediately
@@ -43,6 +42,11 @@ self.addEventListener('fetch', (event) => {
   const isDataRequest = url.pathname.startsWith('/data/');
 
   if (!isSameOrigin && !isDataRequest) {
+    return;
+  }
+
+  // Always fetch version.json from network — never cache it
+  if (url.pathname.endsWith('/version.json')) {
     return;
   }
 

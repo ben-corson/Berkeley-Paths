@@ -1,7 +1,7 @@
 const { useState, useEffect, useRef } = React;
 
 const ROUTES_ENABLED = true;
-const VERSION = 'v125';
+const VERSION = 'v126';
 
 // Brand colors — keep in sync with Tailwind config in index.html
 const COLORS = {
@@ -65,13 +65,16 @@ const BerkeleyPathsTracker = () => {
     return () => window.removeEventListener('swUpdateAvailable', handler);
   }, []);
 
-  // Version check — fetch version.json bypassing cache on load and foreground
+  // Version check — fetch version.json from network on load and foreground
   useEffect(() => {
+    let reloading = false;
     const checkVersion = async () => {
+      if (reloading) return;
       try {
         const res = await fetch('./version.json', { cache: 'no-store' });
         const data = await res.json();
         if (data.version !== VERSION) {
+          reloading = true;
           await caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))));
           window.location.reload();
         }
