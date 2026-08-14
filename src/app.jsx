@@ -1,7 +1,7 @@
 const { useState, useEffect, useRef } = React;
 
 const ROUTES_ENABLED = true;
-const VERSION = 'v123';
+const VERSION = 'v124';
 
 // Brand colors — keep in sync with Tailwind config in index.html
 const COLORS = {
@@ -380,13 +380,13 @@ const BerkeleyPathsTracker = () => {
         // Fit map to route
         map.fitBounds(routeLineRef.current.getBounds(), { padding: [50, 50] });
 
-        // Add user location marker if available
+        // Add user location marker if available (marker update effect handles updates)
         if (userLocation) {
           const userIcon = L.divIcon({
             className: 'user-location-marker',
-            html: '<div style="background: #3B82F6; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
-            iconSize: [16, 16],
-            iconAnchor: [8, 8]
+            html: buildUserMarkerHtml(headingRef.current),
+            iconSize: [48, 48],
+            iconAnchor: [24, 24]
           });
           userMarkerRef.current = L.marker([userLocation.lat, userLocation.lng], { icon: userIcon })
             .addTo(map)
@@ -402,14 +402,11 @@ const BerkeleyPathsTracker = () => {
 
     const addOrUpdateMarker = () => {
       if (!mapInstanceRef.current) return;
-      const isRoutes = view === 'routes';
       const userIcon = L.divIcon({
         className: 'user-location-marker',
-        html: isRoutes
-          ? '<div style="background: #3B82F6; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>'
-          : buildUserMarkerHtml(headingRef.current),
-        iconSize: isRoutes ? [16, 16] : [48, 48],
-        iconAnchor: isRoutes ? [8, 8] : [24, 24]
+        html: buildUserMarkerHtml(headingRef.current),
+        iconSize: [48, 48],
+        iconAnchor: [24, 24]
       });
 
       if (!userMarkerRef.current) {
