@@ -1,7 +1,7 @@
 const { useState, useEffect, useRef } = React;
 
 const ROUTES_ENABLED = true;
-const VERSION = 'v122';
+const VERSION = 'v123';
 
 // Brand colors — keep in sync with Tailwind config in index.html
 const COLORS = {
@@ -30,6 +30,7 @@ const BerkeleyPathsTracker = () => {
   const [heading, setHeading] = useState(null);
   const [compassEnabled, setCompassEnabled] = useState(false);
   const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [followMe, setFollowMe] = useState(false);
 
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
@@ -264,6 +265,7 @@ const BerkeleyPathsTracker = () => {
       userMarkerRef.current = null;
       routeLineRef.current = null;
     }
+    setFollowMe(false);
   }, [view, selectedRoute]);
 
   // Initialize map
@@ -344,6 +346,9 @@ const BerkeleyPathsTracker = () => {
 
         mapInstanceRef.current = map;
 
+        // Disable follow-me when user manually pans
+        map.on('dragstart', () => setFollowMe(false));
+
         // Draw solid purple route line first (underneath everything)
         routeLineRef.current = L.polyline(selectedRoute.route_coordinates, {
           color: '#8B4789',
@@ -419,6 +424,11 @@ const BerkeleyPathsTracker = () => {
         userMarkerRef.current.setLatLng([userLocation.lat, userLocation.lng]);
         userMarkerRef.current.setIcon(userIcon);
       }
+
+      // Follow me mode: keep map centered on user
+      if (followMe && mapInstanceRef.current) {
+        mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 17);
+      }
     };
 
     // When a route is selected, the map initializes after a 100ms timeout — wait for it
@@ -428,7 +438,7 @@ const BerkeleyPathsTracker = () => {
     } else {
       addOrUpdateMarker();
     }
-  }, [userLocation, heading, view, selectedRoute]);
+  }, [userLocation, heading, view, selectedRoute, followMe]);
 
   // Update path lines when completed status changes
   useEffect(() => {
@@ -938,31 +948,30 @@ const BerkeleyPathsTracker = () => {
                     ← Back
                   </button>
                   
-                  {/* Floating my location button */}
-                  {userLocation && (
-                    <button
-                      onClick={() => {
-                        if (mapInstanceRef.current) {
-                          mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 16);
-                        }
-                      }}
-                      className="absolute top-3 right-3 bg-white px-2.5 py-1.5 rounded-lg shadow-lg hover:bg-gray-50 transition-colors text-lg z-10"
-                      title="Center on my location"
-                    >
-                      📍
-                    </button>
-                  )}
+                  {/* Follow-me / location button */}
+                  <button
+                    onClick={() => {
+                      if (!userLocation || !mapInstanceRef.current) return;
+                      const next = !followMe;
+                      setFollowMe(next);
+                      if (next) mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 17);
+                    }}
+                    style={{ zIndex: 9999, position: 'absolute', top: '12px', right: '12px' }}
+                    className={`px-2.5 py-1.5 rounded-lg shadow-lg transition-colors text-lg ${followMe ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-50'}`}
+                    title={followMe ? 'Following your location' : 'Center on my location'}
+                  >
+                    📍
+                  </button>
 
                   {/* Compass button */}
-                  {!compassEnabled && (
-                    <button
-                      onClick={enableCompass}
-                      className="absolute top-14 right-3 bg-white px-2.5 py-1.5 rounded-lg shadow-lg hover:bg-gray-50 transition-colors text-lg z-10"
-                      title="Enable compass heading"
-                    >
-                      🧭
-                    </button>
-                  )}
+                  <button
+                    onClick={enableCompass}
+                    style={{ zIndex: 9999, position: 'absolute', top: '56px', right: '12px' }}
+                    className={`px-2.5 py-1.5 rounded-lg shadow-lg transition-colors text-lg ${compassEnabled ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-50'}`}
+                    title={compassEnabled ? 'Compass enabled' : 'Enable compass heading'}
+                  >
+                    🧭
+                  </button>
                 </div>
 
                 {/* Bottom info sheet - very compact */}
