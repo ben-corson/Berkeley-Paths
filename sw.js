@@ -1,4 +1,4 @@
-const CACHE_NAME = 'berkeley-paths-v120';
+const CACHE_NAME = 'berkeley-paths-v121';
 
 const STATIC_ASSETS = [
   './',
@@ -11,12 +11,12 @@ const STATIC_ASSETS = [
   './data/paths-data.json',
 ];
 
-// On install, cache all static assets
+// On install, cache all static assets and activate immediately
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
   );
-  // Don't skipWaiting automatically — wait for user to tap "Update now"
+  self.skipWaiting();
 });
 
 // Allow the page to trigger activation when user approves the update
