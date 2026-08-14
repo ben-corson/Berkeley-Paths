@@ -343,15 +343,16 @@ const BerkeleyPathsTracker = () => {
 
         mapInstanceRef.current = map;
 
-        // Draw paths (underneath route line so route stays visible on top)
-        paths.forEach(path => addPathMarker(map, path));
-
-        // Draw route line on top
+        // Draw route highlight first (underneath paths), non-interactive so clicks pass through
         routeLineRef.current = L.polyline(selectedRoute.route_coordinates, {
           color: '#8B4789',
-          weight: 7,
-          opacity: 0.7
+          weight: 18,
+          opacity: 0.2,
+          interactive: false
         }).addTo(map);
+
+        // Draw paths on top so they're visible and clickable
+        paths.forEach(path => addPathMarker(map, path));
 
         // Add start marker
         L.marker(selectedRoute.route_coordinates[0], {
