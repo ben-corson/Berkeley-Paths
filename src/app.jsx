@@ -356,7 +356,7 @@ const BerkeleyPathsTracker = () => {
         paths.forEach(path => {
           const segments = path.segments || [path.coordinates || [path.start, path.end]];
           segments.forEach(coords => {
-            L.polyline(coords, { color: 'white', weight: 9, opacity: 1, interactive: false }).addTo(map);
+            L.polyline(coords, { color: 'white', weight: 9, opacity: 1, interactive: false, lineCap: 'butt', lineJoin: 'miter' }).addTo(map);
           });
           addPathMarker(map, path);
         });
