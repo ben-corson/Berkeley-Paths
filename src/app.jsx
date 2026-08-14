@@ -1,6 +1,7 @@
 const { useState, useEffect, useRef } = React;
 
 const ROUTES_ENABLED = true;
+const VERSION = 'v122';
 
 // Brand colors — keep in sync with Tailwind config in index.html
 const COLORS = {
@@ -1326,7 +1327,7 @@ const BerkeleyPathsTracker = () => {
             </a>
           </p>
           <p className="mt-2">
-            Berkeley Paths Navigator v1.0.0 | Made with ❤️ for Berkeley path explorers
+            Berkeley Paths Navigator {VERSION} | Made with ❤️ for Berkeley path explorers
           </p>
         </div>
       </footer>
