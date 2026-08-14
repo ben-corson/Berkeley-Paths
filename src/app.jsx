@@ -346,7 +346,7 @@ const BerkeleyPathsTracker = () => {
         // Draw solid purple route line first (underneath everything)
         routeLineRef.current = L.polyline(selectedRoute.route_coordinates, {
           color: '#8B4789',
-          weight: 5,
+          weight: 3,
           opacity: 0.85,
           interactive: false
         }).addTo(map);
@@ -356,7 +356,7 @@ const BerkeleyPathsTracker = () => {
         paths.forEach(path => {
           const segments = path.segments || [path.coordinates || [path.start, path.end]];
           segments.forEach(coords => {
-            L.polyline(coords, { color: 'white', weight: 6, opacity: 1, interactive: false, lineCap: 'butt', lineJoin: 'miter' }).addTo(map);
+            L.polyline(coords, { color: 'white', weight: 4, opacity: 1, interactive: false, lineCap: 'butt', lineJoin: 'miter' }).addTo(map);
           });
           addPathMarker(map, path);
         });
