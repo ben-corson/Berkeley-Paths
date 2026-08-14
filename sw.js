@@ -1,4 +1,4 @@
-const CACHE_NAME = 'berkeley-paths-v111';
+const CACHE_NAME = 'berkeley-paths-v112';
 
 const STATIC_ASSETS = [
   './',
