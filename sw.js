@@ -1,4 +1,4 @@
-const CACHE_NAME = 'berkeley-paths-v124';
+const CACHE_NAME = 'berkeley-paths-v125';
 
 const STATIC_ASSETS = [
   './',
@@ -9,6 +9,7 @@ const STATIC_ASSETS = [
   './src/tailwind.css',
   './assets/icon.png',
   './data/paths-data.json',
+  './version.json',
 ];
 
 // On install, cache all static assets and activate immediately
