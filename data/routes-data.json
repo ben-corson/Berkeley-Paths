@@ -3,11 +3,11 @@
     "id": 1,
     "name": "Route 1: Rose and Spruce",
     "distance": "5 miles",
-    "paths_count": 17,
+    "paths_count": 15,
     "start_location": "Rose St & Spruce St",
     "description": "Counter-clockwise loop through Rose, La Loma, and Tamalpais areas",
     "difficulty": "Moderate to Difficult",
-    "elevation_gain": "~1250 feet",
+    "elevation_gain": "~1325 feet",
     "estimated_time": "2-3 hours",
     "pdf_url": "https://static1.squarespace.com/static/58dd602de6f2e1bf5927e8b6/t/644f02be81f44450147e8698/1682899667108/Walk+1+Itinerary.pdf",
     "route_coordinates": [
