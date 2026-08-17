@@ -1,7 +1,7 @@
 const { useState, useEffect, useRef } = React;
 
 const ROUTES_ENABLED = true;
-const VERSION = 'v126';
+const VERSION = 'v128';
 
 // Brand colors — keep in sync with Tailwind config in index.html
 const COLORS = {
@@ -9,6 +9,49 @@ const COLORS = {
   burgundyDark: '#6B1214',
   gold: '#EAA636',
 };
+
+function lonToTileX(lon, zoom) {
+  return Math.floor((lon + 180) / 360 * Math.pow(2, zoom));
+}
+function latToTileY(lat, zoom) {
+  const r = lat * Math.PI / 180;
+  return Math.floor((1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2 * Math.pow(2, zoom));
+}
+
+async function preCacheTiles(coords) {
+  if (!('caches' in window)) return;
+  const lats = coords.map(c => c[0]);
+  const lons = coords.map(c => c[1]);
+  const minLat = Math.min(...lats), maxLat = Math.max(...lats);
+  const minLon = Math.min(...lons), maxLon = Math.max(...lons);
+
+  const urls = [];
+  const subdomains = ['a', 'b', 'c'];
+  for (let z = 14; z <= 17; z++) {
+    const x0 = lonToTileX(minLon, z), x1 = lonToTileX(maxLon, z);
+    const y0 = latToTileY(maxLat, z), y1 = latToTileY(minLat, z); // y is inverted
+    for (let x = x0; x <= x1; x++) {
+      for (let y = y0; y <= y1; y++) {
+        const s = subdomains[(x + y) % 3];
+        urls.push(`https://${s}.tile.openstreetmap.org/${z}/${x}/${y}.png`);
+      }
+    }
+  }
+
+  const cache = await caches.open('berkeley-paths-tiles');
+  // Fetch in small batches to avoid hammering OSM servers
+  for (let i = 0; i < urls.length; i += 8) {
+    const batch = urls.slice(i, i + 8);
+    await Promise.allSettled(
+      batch.map(url =>
+        cache.match(url).then(hit => {
+          if (hit) return; // already cached
+          return fetch(url, { mode: 'cors' }).then(r => { if (r.ok) cache.put(url, r); }).catch(() => {});
+        })
+      )
+    );
+  }
+}
 
 const BerkeleyPathsTracker = () => {
   // State management
@@ -418,6 +461,9 @@ const BerkeleyPathsTracker = () => {
             .bindPopup('Your Location');
         }
       }, 100);
+
+      // Pre-cache tiles for this route in the background
+      preCacheTiles(selectedRoute.route_coordinates);
     }
   }, [view, selectedRoute]);
 

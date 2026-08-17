@@ -1,4 +1,5 @@
-const CACHE_NAME = 'berkeley-paths-v126';
+const CACHE_NAME = 'berkeley-paths-v128';
+const TILE_CACHE_NAME = 'berkeley-paths-tiles'; // persistent across app updates
 
 const STATIC_ASSETS = [
   './',
@@ -24,11 +25,15 @@ self.addEventListener('message', (event) => {
   if (event.data === 'SKIP_WAITING') self.skipWaiting();
 });
 
-// On activate, delete old caches
+// On activate, delete old app caches but keep tile cache
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
+      Promise.all(
+        keys
+          .filter((k) => k !== CACHE_NAME && k !== TILE_CACHE_NAME)
+          .map((k) => caches.delete(k))
+      )
     )
   );
   self.clients.claim();
@@ -36,11 +41,28 @@ self.addEventListener('activate', (event) => {
 
 // Serve from cache, fall back to network
 self.addEventListener('fetch', (event) => {
-  // Only handle same-origin and data requests; let CDN requests go to network
   const url = new URL(event.request.url);
   const isSameOrigin = url.origin === self.location.origin;
   const isDataRequest = url.pathname.startsWith('/data/');
+  const isTile = url.hostname.endsWith('tile.openstreetmap.org');
 
+  // Serve OSM tiles from tile cache (cache-first, persistent)
+  if (isTile) {
+    event.respondWith(
+      caches.open(TILE_CACHE_NAME).then((cache) =>
+        cache.match(event.request).then((cached) => {
+          if (cached) return cached;
+          return fetch(event.request).then((response) => {
+            if (response.ok) cache.put(event.request, response.clone());
+            return response;
+          });
+        })
+      )
+    );
+    return;
+  }
+
+  // Only handle same-origin and data requests; let other CDN requests go to network
   if (!isSameOrigin && !isDataRequest) {
     return;
   }
