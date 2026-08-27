@@ -9303,10 +9303,11 @@
     "distance": "6.5 miles",
     "paths_count": 0,
     "start_location": "Live Oak Park",
-    "description": "",
-    "difficulty": "",
-    "elevation_gain": "~1400 feet",
-    "estimated_time": "",
+    "paths_count": 25,
+    "description": "Up into the Berkeley Hills and then back down again.",
+    "difficulty": "Difficult",
+    "elevation_gain": "~1600 feet",
+    "estimated_time": "2.5-3.5 hours",
     "pdf_url": "https://static1.squarespace.com/static/58dd602de6f2e1bf5927e8b6/t/64cd680a19d7df73820f22fe/1691183119618/Walk+6+Itinerary.pdf",
     "route_coordinates": [
       [
