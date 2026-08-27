@@ -1,7 +1,7 @@
 const { useState, useEffect, useRef } = React;
 
 const ROUTES_ENABLED = true;
-const VERSION = 'v130';
+const VERSION = 'v131';
 
 // Brand colors — keep in sync with Tailwind config in index.html
 const COLORS = {
@@ -342,7 +342,7 @@ const BerkeleyPathsTracker = () => {
         
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
           attribution: '&copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
-          maxZoom: 16
+          maxZoom: 19, maxNativeZoom: 16
         }).addTo(map);
 
         mapInstanceRef.current = map;
@@ -405,9 +405,9 @@ const BerkeleyPathsTracker = () => {
       setTimeout(() => {
         const map = L.map(mapRef.current).setView([37.8870, -122.2600], 14);
         
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-          attribution: '&copy; OpenStreetMap',
-          maxZoom: 19
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+          attribution: '&copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+          maxZoom: 19, maxNativeZoom: 16
         }).addTo(map);
 
         mapInstanceRef.current = map;

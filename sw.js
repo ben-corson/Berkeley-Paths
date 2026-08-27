@@ -1,4 +1,4 @@
-const CACHE_NAME = 'berkeley-paths-v130';
+const CACHE_NAME = 'berkeley-paths-v131';
 const TILE_CACHE_NAME = 'berkeley-paths-tiles'; // persistent across app updates
 
 const STATIC_ASSETS = [
