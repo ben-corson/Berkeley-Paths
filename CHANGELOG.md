@@ -2,70 +2,62 @@
 
 All notable changes to the Berkeley Paths Navigator will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
 ## [Unreleased]
 
+## [2.0.0] - 2026
+
 ### Added
-- `install.html` — dedicated page with platform-specific PWA install instructions (iOS/Safari, Android/Chrome, Samsung Internet)
-- One-tap install prompt for Android/Chrome users via `beforeinstallprompt` API; falls back to instructions page for iOS
-- First-visit install prompt modal (shown once, dismissed to localStorage)
-- 5 new paths: Arlington Path (#117), Beloit Path (#118), Willamette Path (#119), Lenox Path (#120), Westminster Path (#121)
-- geojson.io coordinate editing workflow documented in CONTRIBUTING.md
+- **Routes view** — 6 curated walking routes with metadata (distance, elevation gain, difficulty, estimated time, path count)
+- Route map shows the full route as a purple polyline with path segments highlighted in gold/burgundy
+- White casing technique: route line is visually hidden where paths run, so path colors show through cleanly
+- Click any path segment on the route map to mark it complete
+- Follow-me mode (📍 button): centers route map on your location at zoom 17 while walking
+- Compass button (🧭) on route map shows directional heading arrow on your location dot
+- Route coordinates calculated from real GPS traces; elevation gain from USGS EPQS API
+- **Tile pre-caching**: when you open a route, map tiles for that area (zoom 14–17) are fetched in the background so the map works offline while walking
+- Tile cache is persistent across app updates (separate from the app asset cache)
+- `version.json` out-of-band update check: app detects new versions as soon as it becomes visible and reloads automatically — reliable on iOS home screen apps
+- `scripts/calc_elevation.py` utility for calculating elevation gain from route coordinates via USGS API
 
 ### Changed
-- Renamed "Public Path #2" → Stratford Path
-- Renamed "Public Path #1 Path" → Marchant Path
-- Renamed "Short Cut" → The Short Cut
-- Corrected coordinates for: Easter Way, El Mirador Path, Eunice Steps, Glendale Path, Halkin Walk, Indian Rock Path, La Vereda Steps, Miller Path East, Oak Street Path, Orchard Lane, Rose Walk, Ruth Armstrong Path, Yosemite Steps, Acacia Steps, Acacia Walk, Shasta Path, Coventry Path
+- Map tiles switched from Carto (deprecated free tier) → OSM → Esri → OSM Humanitarian → **Stadia Maps Alidade Smooth** (clean gray, zoom 20, free tier)
+- Service worker now uses `skipWaiting` for immediate activation on update
+- App title corrected to "Berkeley Paths Navigator" (was "Tracker" in some places)
+- Removed "View Turn-by-Turn Directions" button from route detail view
 
-### Added (previous)
-- Service worker (`sw.js`) for offline caching and automatic updates
-  - App assets cached on first visit for offline use
-  - iOS home screen users receive code updates automatically without re-adding the app
-  - User progress and data in localStorage is preserved across updates
-  - Bump `CACHE_NAME` in `sw.js` with each release to deliver updates to existing users
-- Compass heading arrow on the location dot in Map view — shows the direction you are facing
-- 🧭 button in the top-right of the map to enable device orientation permission (required on iOS)
-- Re-center 📍 button in the bottom-right of the map to snap the view back to your location
+### Fixed
+- Route map not re-rendering when switching between routes (cleanup effect now watches `selectedRoute`)
+- Path colors not updating after marking complete in Routes view
+- Compass and pin buttons hidden behind Leaflet map layers (switched from Tailwind `z-10` to inline `style={{ zIndex: 9999 }}`)
+- Directional arrow missing on route map (was showing plain blue dot)
+- Infinite reload loop caused by `version.json` being served from SW cache
+- White gap at path/non-path junctions (fixed with `lineCap: 'butt'` on white casing)
+
+## [1.1.0] - 2025
+
+### Added
+- `install.html` — dedicated PWA install instructions page (iOS/Safari, Android/Chrome)
+- First-visit install prompt modal
+- 5 new paths: Arlington (#117), Beloit (#118), Willamette (#119), Lenox (#120), Westminster (#121)
+- Service worker for offline caching and automatic updates
+- Compass heading arrow on location dot
+- 🧭 button to enable device orientation permission on iOS
+- 📍 re-center button on the map
+
+### Changed
+- Renamed several paths to match official names (Stratford, Marchant, The Short Cut)
+- Corrected coordinates for ~15 paths
 
 ## [1.0.0] - 2025-01
 
 ### Added
-- Initial release of Berkeley Paths Navigator
-- Interactive map displaying all 105 Berkeley paths
+- Initial release
+- Interactive map with all 105 Berkeley paths
 - Path completion tracking with progress bar
-- Personal notes for each path
-- Geolocation support to show nearby paths
+- Personal notes per path
+- Geolocation and nearby path detection
 - List and map view modes
-- Filter by completed, remaining, nearby, or all paths
-- Sort paths alphabetically or by distance
-- Berkeley-themed UI with official city colors
-- Mobile-responsive design
-- iOS home screen app support
-- LocalStorage persistence for user data
-- Google Maps integration for directions
-
-### Features
-- 105 developed Berkeley paths included
-- Real-time distance calculation from user location
-- Color-coded path visualization (completed, nearby, remaining)
-- Click any path to view details and add notes
-- Sticky header with progress tracking
-- Touch-optimized for mobile devices
-
----
-
-## Version Format
-
-- **MAJOR** version for incompatible API changes
-- **MINOR** version for new functionality in a backwards compatible manner
-- **PATCH** version for backwards compatible bug fixes
-
-## Contributing
-
-When making changes:
-1. Update this CHANGELOG.md with your changes
-2. Follow the format: Added, Changed, Deprecated, Removed, Fixed, Security
-3. Include the date when releasing a version
+- Filter and sort (alphabetical, distance, completion status)
+- Berkeley-themed UI (burgundy and gold)
+- Mobile-responsive design, iOS home screen support
+- LocalStorage persistence

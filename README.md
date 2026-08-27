@@ -1,184 +1,104 @@
 # Berkeley Paths Navigator
 
-A progressive web app for tracking your progress through all 121 developed paths in Berkeley, California. Features an interactive map, completion tracking, and personal notes for each path.
+A progressive web app for tracking your progress through all 121 developed paths in Berkeley, California. Features an interactive map, guided routes, completion tracking, and offline support.
 
 ## Features
 
-- 📍 **Interactive Map** - View all 121 Berkeley paths on an interactive map with visual indicators
-- ✅ **Progress Tracking** - Mark paths as completed and track your overall completion percentage
-- 📝 **Personal Notes** - Add notes about difficulty, highlights, and memorable moments for each path
-- 🗺️ **Location-Aware** - See your current location and find nearby paths within 0.5 miles
-- 🧭 **Compass Heading** - The location dot shows a directional arrow indicating which way you're facing; tap the 🧭 button to enable (requires device orientation permission on iOS)
-- 🎨 **Berkeley Themed** - Official City of Berkeley burgundy and gold color scheme
-- 📱 **Mobile Optimized** - Add to your iPhone/Android home screen for a native app experience
-- 💾 **Persistent Storage** - All your progress is saved locally in your browser
+- 📍 **Interactive Map** — View all 121 Berkeley paths with color-coded completion status
+- ✅ **Progress Tracking** — Mark paths as completed and track your overall percentage
+- 🗺️ **Guided Routes** — 6 curated walking routes with turn-by-turn path guidance
+- 📝 **Personal Notes** — Add notes about difficulty, highlights, and memorable moments
+- 🧭 **Compass & Location** — Directional arrow shows which way you're facing; follow-me mode centers the map on your location at walking zoom
+- 📱 **Home Screen App** — Add to your iPhone home screen for a native app experience with automatic updates
+- 💾 **Offline Support** — Works without a connection after first load; route map tiles pre-cached when you open a route
 
 ## Getting Started
 
-### Quick Start
-
-1. Open `index.html` in a web browser
-2. Allow location access for the best experience
-3. Start exploring Berkeley's paths!
-
 ### Local Development
 
-No build process required! Just open `index.html` directly in your browser or use a simple HTTP server:
+No build process required. Open `index.html` in a browser, or run a local server:
 
 ```bash
-# Using Python 3
 python -m http.server 8000
-
-# Using Node.js http-server
-npx http-server
-
-# Using PHP
-php -S localhost:8000
 ```
 
-Then visit `http://localhost:8000` in your browser.
+Then visit `http://localhost:8000`.
 
 ## Project Structure
 
 ```
-berkeley-paths-tracker/
-├── index.html              # Main HTML file (minimal, loads other files)
-├── install.html            # PWA install instructions page
-├── sw.js                   # Service worker (offline caching & auto-updates)
-├── manifest.json           # PWA manifest (icon, display mode, theme)
+berkeley-paths/
+├── index.html              # Main HTML (loads React, Leaflet, registers SW)
+├── sw.js                   # Service worker (offline caching, tile caching)
+├── version.json            # Current version string (never SW-cached)
+├── manifest.json           # PWA manifest
 ├── data/
-│   └── paths-data.json    # All 121 Berkeley paths data
+│   ├── paths-data.json     # All 121 Berkeley paths
+│   └── routes-data.json    # 6 curated walking routes with coordinates
 ├── src/
-│   ├── app.jsx            # React application code
-│   └── styles.css         # CSS styling
+│   ├── app.jsx             # React application
+│   └── styles.css          # Custom CSS
 ├── assets/
-│   └── icon.png           # App icon for mobile devices
-├── README.md              # This file
-├── CHANGELOG.md           # Version history
-└── .gitignore            # Git ignore rules
+│   └── icon.png            # App icon
+└── scripts/
+    └── calc_elevation.py   # Utility: calculate elevation gain from USGS API
 ```
 
-## Updating Path Data
+## Pushing Updates to Users
 
-To add or modify paths, edit `data/paths-data.json`:
+Three files must be bumped together on every push:
 
-```json
-{
-  "id": 106,
-  "name": "New Path Name",
-  "location": "Start Address - End Address",
-  "start": [37.8792, -122.2595],
-  "end": [37.8802, -122.2605]
-}
-```
+| File | What to change |
+|------|----------------|
+| `sw.js` | `CACHE_NAME = 'berkeley-paths-vN'` |
+| `src/app.jsx` | `const VERSION = 'vN'` |
+| `version.json` | `{"version":"vN"}` |
 
-- `id`: Unique identifier (integer)
-- `name`: Path name (string)
-- `location`: Descriptive location (string)
-- `start`: [latitude, longitude] coordinates
-- `end`: [latitude, longitude] coordinates
+The app fetches `version.json` from the network (bypassing the service worker) each time it becomes visible. If the version doesn't match the running app, it clears all caches and reloads. This is the primary update mechanism for iOS home screen apps.
 
-## Customization
+## Map Tiles
 
-### Colors
-Brand colors are defined in **two places** that must be kept in sync:
+The app uses **Stadia Maps Alidade Smooth** tiles — a clean, muted gray style with no API rate limits in normal usage.
 
-**1. `index.html`** — Tailwind config (controls all UI classes like `bg-berkeley-burgundy`):
-```js
-colors: {
-  'berkeley-burgundy': '#941B1E',
-  'berkeley-burgundy-dark': '#6B1214',
-  'berkeley-gold': '#EAA636',
-}
-```
+The tile style can be changed by updating the `tileLayer` URL in `src/app.jsx`. The same URL must be updated in two places (main map and route map) and in the `preCacheTiles()` function and SW fetch handler.
 
-**2. `src/app.jsx`** — `COLORS` constant at the top of the file (controls map line and popup colors):
-```js
-const COLORS = {
-  burgundy: '#941B1E',
-  burgundyDark: '#6B1214',
-  gold: '#EAA636',
-};
-```
+The service worker caches tiles in a separate persistent cache (`berkeley-paths-tiles`) that survives app updates. When you open a route, tiles for that route's bounding box (zoom 14–17) are pre-fetched in the background so the map works offline while walking.
 
-Also update the `--bg-gradient-start` and `--bg-gradient-end` variables in `src/styles.css` if you change the burgundy shades — these control the header gradient.
+## Routes
 
-### Map Style
-Edit the tile layer URL in `src/app.jsx` (line ~245):
-```javascript
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    // Change this URL to use a different map style
-})
+Routes are defined in `data/routes-data.json`. Each route has:
+- Metadata: name, distance, elevation gain, difficulty, estimated time
+- `route_coordinates`: array of `[lat, lon]` pairs tracing the full loop
+- `paths`: the path segments that make up the route (referenced from `paths-data.json`)
+
+To edit route coordinates, export to GeoJSON (converting `[lat, lon]` → `[lon, lat]`), edit in [geojson.io](https://geojson.io), then convert back.
+
+## Elevation Data
+
+Use `scripts/calc_elevation.py` to calculate elevation gain from route coordinates via the USGS National Map Elevation Point Query Service:
+
+```bash
+python scripts/calc_elevation.py          # fetch and display
+python scripts/calc_elevation.py --update # write results to routes-data.json
+python scripts/calc_elevation.py --cached # use cached results only
 ```
 
 ## Deployment
 
-### GitHub Pages
-
-1. Push your code to GitHub
-2. Go to Settings > Pages
-3. Select your branch and `/root` folder
-4. Your app will be live at `https://yourusername.github.io/berkeley-paths-tracker/`
-
-### Netlify/Vercel
-
-Simply drag and drop the entire folder to Netlify or connect your GitHub repo to Vercel.
-
-## Pushing Updates to Users
-
-The app uses a service worker (`sw.js`) to cache files on users' devices. This means:
-- The app works offline after the first visit
-- Users on iOS home screen get updates automatically — they don't need to re-add the app
-- User progress (completed paths, notes) is never lost during an update
-
-**Every time you push a code change, bump the cache version in `sw.js`:**
-
-```js
-// Change this each release:
-const CACHE_NAME = 'berkeley-paths-v1'; // → v2, v3, etc.
-```
-
-This tells users' devices to fetch the new version. If you forget to bump it, some users may continue running the old version from cache.
-
-## Data Sources
-
-Path data is sourced from the official [Berkeley Paths website](https://www.berkeleypath.org/), which maintains information about all developed paths in Berkeley.
-
-## Browser Compatibility
-
-- ✅ Chrome/Edge (Recommended)
-- ✅ Firefox
-- ✅ Safari (iOS 12+)
-- ✅ Mobile browsers
+The app is hosted on GitHub Pages. Push to `main` and it deploys automatically.
 
 ## Technical Stack
 
-- **React 18** - UI framework
-- **Leaflet** - Interactive maps
-- **Tailwind CSS** - Utility-first styling
-- **LocalStorage** - Data persistence
-- **Geolocation API** - Location tracking
+- **React 18** — UI (loaded via CDN, no build step)
+- **Leaflet 1.9** — Interactive maps
+- **Tailwind CSS** — Pre-built utility styles
+- **Stadia Maps** — Map tiles (Alidade Smooth style)
+- **Service Worker** — Offline caching and background tile pre-fetch
+- **LocalStorage** — User progress and notes persistence
+- **USGS EPQS API** — Elevation data for route metadata
 
-## Contributing
+## Data Sources
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## License
-
-This project is open source and available under the [MIT License](LICENSE).
-
-## Acknowledgments
-
-- City of Berkeley for maintaining the paths
-- Berkeley Path Wanderers Association
-- OpenStreetMap contributors
-
-## Version
-
-Current version: 1.0.0
-
-See [CHANGELOG.md](CHANGELOG.md) for version history.
+- Path data: [Berkeley Path Wanderers Association](https://www.berkeleypath.org/)
+- Elevation: [USGS National Map](https://apps.nationalmap.gov/epqs/)
+- Map tiles: [Stadia Maps](https://stadiamaps.com/) / [OpenStreetMap](https://www.openstreetmap.org/)
