@@ -1,4 +1,4 @@
-const CACHE_NAME = 'berkeley-paths-v129';
+const CACHE_NAME = 'berkeley-paths-v130';
 const TILE_CACHE_NAME = 'berkeley-paths-tiles'; // persistent across app updates
 
 const STATIC_ASSETS = [
@@ -44,7 +44,7 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   const isSameOrigin = url.origin === self.location.origin;
   const isDataRequest = url.pathname.startsWith('/data/');
-  const isTile = url.hostname.endsWith('tile.openstreetmap.org');
+  const isTile = url.hostname === 'server.arcgisonline.com';
 
   // Serve OSM tiles from tile cache (cache-first, persistent)
   if (isTile) {
