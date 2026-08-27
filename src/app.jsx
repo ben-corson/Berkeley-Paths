@@ -1,7 +1,7 @@
 const { useState, useEffect, useRef } = React;
 
 const ROUTES_ENABLED = true;
-const VERSION = 'v128';
+const VERSION = 'v129';
 
 // Brand colors — keep in sync with Tailwind config in index.html
 const COLORS = {
@@ -342,8 +342,8 @@ const BerkeleyPathsTracker = () => {
       setTimeout(() => {
         const map = L.map(mapRef.current).setView([37.8715, -122.2730], 13);
         
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
           maxZoom: 19
         }).addTo(map);
 
