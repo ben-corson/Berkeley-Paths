@@ -1,4 +1,4 @@
-const CACHE_NAME = 'berkeley-paths-v132';
+const CACHE_NAME = 'berkeley-paths-v133';
 const TILE_CACHE_NAME = 'berkeley-paths-tiles'; // persistent across app updates
 
 const STATIC_ASSETS = [
@@ -44,7 +44,7 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   const isSameOrigin = url.origin === self.location.origin;
   const isDataRequest = url.pathname.startsWith('/data/');
-  const isTile = url.hostname === 'tile.openstreetmap.fr';
+  const isTile = url.hostname === 'tiles.stadiamaps.com';
 
   // Serve OSM tiles from tile cache (cache-first, persistent)
   if (isTile) {

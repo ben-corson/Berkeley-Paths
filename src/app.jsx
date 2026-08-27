@@ -1,7 +1,7 @@
 const { useState, useEffect, useRef } = React;
 
 const ROUTES_ENABLED = true;
-const VERSION = 'v132';
+const VERSION = 'v133';
 
 // Brand colors — keep in sync with Tailwind config in index.html
 const COLORS = {
@@ -31,8 +31,7 @@ async function preCacheTiles(coords) {
     const y0 = latToTileY(maxLat, z), y1 = latToTileY(minLat, z); // y is inverted
     for (let x = x0; x <= x1; x++) {
       for (let y = y0; y <= y1; y++) {
-        const s = ['a','b','c'][(x + y) % 3];
-        urls.push(`https://${s}.tile.openstreetmap.fr/hot/${z}/${x}/${y}.png`);
+        urls.push(`https://tiles.stadiamaps.com/tiles/alidade_smooth/${z}/${x}/${y}.png?api_key=6dec55c5-d7bc-4209-b16a-14121ba4718a`);
       }
     }
   }
@@ -341,9 +340,9 @@ const BerkeleyPathsTracker = () => {
       setTimeout(() => {
         const map = L.map(mapRef.current).setView([37.8715, -122.2730], 13);
         
-        L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-          maxZoom: 19
+        L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png?api_key=6dec55c5-d7bc-4209-b16a-14121ba4718a', {
+          attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+          maxZoom: 20
         }).addTo(map);
 
         mapInstanceRef.current = map;
@@ -406,9 +405,9 @@ const BerkeleyPathsTracker = () => {
       setTimeout(() => {
         const map = L.map(mapRef.current).setView([37.8870, -122.2600], 14);
         
-        L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-          maxZoom: 19
+        L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png?api_key=6dec55c5-d7bc-4209-b16a-14121ba4718a', {
+          attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+          maxZoom: 20
         }).addTo(map);
 
         mapInstanceRef.current = map;
