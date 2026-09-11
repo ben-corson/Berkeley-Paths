@@ -60,7 +60,27 @@ The app fetches `version.json` from the network (bypassing the service worker) e
 
 The app uses **Stadia Maps Alidade Smooth** tiles — a clean, muted gray style with no API rate limits in normal usage.
 
-The tile style can be changed by updating the `tileLayer` URL in `src/app.jsx`. The same URL must be updated in two places (main map and route map) and in the `preCacheTiles()` function and SW fetch handler.
+### Stadia Maps configuration
+
+The Stadia API key is embedded in the tile URL in `src/app.jsx`. Stadia authenticates web apps by **allowed domain** rather than by key secret — the key alone isn't enough; the request must come from an authorised domain.
+
+The current authorised domain is `ben-corson.github.io`, configured at [client.stadiamaps.com](https://client.stadiamaps.com).
+
+**If you move the app to a new domain:**
+1. Log in to [client.stadiamaps.com](https://client.stadiamaps.com)
+2. Go to your property → Authentication Configuration
+3. Click **+ Add Domain** and enter the new domain (e.g. `myapp.com`)
+4. Click **Save Domain**
+
+Tile requests from unlisted domains will be blocked. `localhost` and `127.0.0.1` always work without being listed (for local development).
+
+The free tier allows 200,000 tile requests/month, which is ample for a small walking app.
+
+### Changing tile style
+
+Update the `tileLayer` URL in `src/app.jsx` — it appears in two places (main map and route map). Also update the matching URL in `preCacheTiles()` and the SW fetch handler hostname check in `sw.js`.
+
+### Tile caching
 
 The service worker caches tiles in a separate persistent cache (`berkeley-paths-tiles`) that survives app updates. When you open a route, tiles for that route's bounding box (zoom 14–17) are pre-fetched in the background so the map works offline while walking.
 
