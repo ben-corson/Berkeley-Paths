@@ -1,7 +1,7 @@
 const { useState, useEffect, useRef } = React;
 
 const ROUTES_ENABLED = true;
-const VERSION = 'v143';
+const VERSION = 'v144';
 
 // Brand colors — keep in sync with Tailwind config in index.html
 const COLORS = {
@@ -74,6 +74,7 @@ const BerkeleyPathsTracker = () => {
   const [followMe, setFollowMe] = useState(false);
 
   const headerRef = useRef(null);
+  const [headerHeight, setHeaderHeight] = useState(56);
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markersRef = useRef({});
@@ -107,11 +108,15 @@ const BerkeleyPathsTracker = () => {
     return () => window.removeEventListener('swUpdateAvailable', handler);
   }, []);
 
-  // Keep header spacer in sync with actual header height
+  // Keep header spacer and headerHeight state in sync with actual header height
   useEffect(() => {
     if (!headerRef.current) return;
     const spacer = document.getElementById('header-spacer');
-    const update = () => { if (spacer) spacer.style.height = headerRef.current.offsetHeight + 'px'; };
+    const update = () => {
+      const h = headerRef.current.offsetHeight;
+      if (spacer) spacer.style.height = h + 'px';
+      setHeaderHeight(h);
+    };
     update();
     const ro = new ResizeObserver(update);
     ro.observe(headerRef.current);
@@ -1011,7 +1016,7 @@ const BerkeleyPathsTracker = () => {
                 )}
               </div>
             ) : (
-              <div className="fixed inset-0 flex flex-col" style={{top: headerRef.current ? headerRef.current.offsetHeight + 'px' : '56px'}}>
+              <div className="fixed inset-0 flex flex-col" style={{top: headerHeight + 'px'}}>
                 {/* Map - takes full screen */}
                 <div className="flex-1 relative">
                   <div
