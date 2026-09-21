@@ -1,7 +1,7 @@
 const { useState, useEffect, useRef } = React;
 
 const ROUTES_ENABLED = true;
-const VERSION = 'v144';
+const VERSION = 'v145';
 
 // Brand colors — keep in sync with Tailwind config in index.html
 const COLORS = {
