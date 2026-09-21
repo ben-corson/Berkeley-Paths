@@ -1,7 +1,7 @@
 const { useState, useEffect, useRef } = React;
 
 const ROUTES_ENABLED = true;
-const VERSION = 'v142';
+const VERSION = 'v143';
 
 // Brand colors — keep in sync with Tailwind config in index.html
 const COLORS = {
@@ -873,7 +873,7 @@ const BerkeleyPathsTracker = () => {
         </div>
       )}
       {/* Header */}
-      <header ref={headerRef} className="bg-berkeley-burgundy text-white shadow-lg sticky top-0" style={{zIndex: 9000, isolation: 'isolate'}}>
+      <header ref={headerRef} className="bg-berkeley-burgundy text-white shadow-lg sticky top-0" style={{zIndex: 9000, isolation: 'isolate', paddingTop: 'env(safe-area-inset-top)'}}>
         <div className="max-w-7xl mx-auto px-3 py-2">
           {/* Title - full width on one line */}
           <h1 className="text-lg font-bold mb-1.5">Berkeley Paths Navigator</h1>
