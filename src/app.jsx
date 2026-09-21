@@ -1,7 +1,7 @@
 const { useState, useEffect, useRef } = React;
 
 const ROUTES_ENABLED = true;
-const VERSION = 'v140';
+const VERSION = 'v141';
 
 // Brand colors — keep in sync with Tailwind config in index.html
 const COLORS = {
@@ -780,7 +780,7 @@ const BerkeleyPathsTracker = () => {
   const completionPercentage = getCompletionPercentage();
 
   return (
-    <div className="bg-gray-50 flex flex-col" style={{height: '100dvh', overflow: 'hidden'}}>
+    <div className="bg-gray-50 flex flex-col" style={{height: '100%', overflow: 'hidden'}}>
       {/* Install prompt modal */}
       {showInstallPrompt && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4" style={{background: 'rgba(0,0,0,0.5)'}}>
@@ -944,7 +944,7 @@ const BerkeleyPathsTracker = () => {
       </header>
 
       {/* Scrollable content area */}
-      <div className="flex-1 overflow-y-auto relative" id="scroll-container">
+      <div className="flex-1 overflow-y-auto relative" id="scroll-container" style={{WebkitOverflowScrolling: 'touch'}}>
       {/* Main content */}
       <main className={view === 'list' ? 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6' : 'h-full'}>
         {/* Location Error Alert */}
