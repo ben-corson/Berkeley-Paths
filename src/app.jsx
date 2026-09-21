@@ -1,7 +1,7 @@
 const { useState, useEffect, useRef } = React;
 
 const ROUTES_ENABLED = true;
-const VERSION = 'v138';
+const VERSION = 'v139';
 
 // Brand colors — keep in sync with Tailwind config in index.html
 const COLORS = {
@@ -73,6 +73,7 @@ const BerkeleyPathsTracker = () => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [followMe, setFollowMe] = useState(false);
 
+  const headerRef = useRef(null);
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markersRef = useRef({});
@@ -104,6 +105,17 @@ const BerkeleyPathsTracker = () => {
     const handler = () => setUpdateAvailable(true);
     window.addEventListener('swUpdateAvailable', handler);
     return () => window.removeEventListener('swUpdateAvailable', handler);
+  }, []);
+
+  // Keep header spacer in sync with actual header height
+  useEffect(() => {
+    if (!headerRef.current) return;
+    const spacer = document.getElementById('header-spacer');
+    const update = () => { if (spacer) spacer.style.height = headerRef.current.offsetHeight + 'px'; };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(headerRef.current);
+    return () => ro.disconnect();
   }, []);
 
   // Version check — fetch version.json from network on load and foreground
@@ -861,7 +873,7 @@ const BerkeleyPathsTracker = () => {
         </div>
       )}
       {/* Header */}
-      <header className="bg-berkeley-burgundy text-white shadow-lg sticky top-0" style={{zIndex: 9000}}>
+      <header ref={headerRef} className="bg-berkeley-burgundy text-white shadow-lg fixed top-0 left-0 right-0" style={{zIndex: 9000}}>
         <div className="max-w-7xl mx-auto px-3 py-2">
           {/* Title - full width on one line */}
           <h1 className="text-lg font-bold mb-1.5">Berkeley Paths Navigator</h1>
@@ -931,6 +943,9 @@ const BerkeleyPathsTracker = () => {
         </div>
       </header>
 
+      {/* Spacer to offset fixed header */}
+      <div id="header-spacer" style={{height: '0px'}} />
+
       {/* Main content */}
       <main className={view === 'list' ? 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6' : ''}>
         {/* Location Error Alert */}
@@ -998,7 +1013,7 @@ const BerkeleyPathsTracker = () => {
                 )}
               </div>
             ) : (
-              <div className="fixed inset-0 top-[56px] flex flex-col">
+              <div className="fixed inset-0 flex flex-col" style={{top: headerRef.current ? headerRef.current.offsetHeight + 'px' : '56px'}}>
                 {/* Map - takes full screen */}
                 <div className="flex-1 relative">
                   <div
@@ -1216,7 +1231,7 @@ const BerkeleyPathsTracker = () => {
 
         {/* Map View */}
         {view === 'map' && (
-          <div className="fixed inset-0 top-[56px] flex flex-col bg-white">
+          <div className="fixed inset-0 flex flex-col bg-white" style={{top: headerRef.current ? headerRef.current.offsetHeight + 'px' : '56px'}}>
             {/* Map - full screen */}
             <div className="flex-1 relative">
               <div
