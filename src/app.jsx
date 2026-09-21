@@ -1,7 +1,7 @@
-const { useState, useEffect, useRef } = React;
+const { useState, useEffect, useLayoutEffect, useRef } = React;
 
 const ROUTES_ENABLED = true;
-const VERSION = 'v146';
+const VERSION = 'v147';
 
 // Brand colors — keep in sync with Tailwind config in index.html
 const COLORS = {
@@ -109,7 +109,7 @@ const BerkeleyPathsTracker = () => {
   }, []);
 
   // Keep header spacer and headerHeight state in sync with actual header height
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!headerRef.current) return;
     const spacer = document.getElementById('header-spacer');
     const update = () => {
@@ -355,7 +355,8 @@ const BerkeleyPathsTracker = () => {
   useEffect(() => {
     if (view === 'map' && mapRef.current && !mapInstanceRef.current && paths.length > 0 && typeof L !== 'undefined') {
       setTimeout(() => {
-        const map = L.map(mapRef.current).setView([37.8715, -122.2730], 13);
+        const map = L.map(mapRef.current, { zoomControl: false }).setView([37.8715, -122.2730], 13);
+        L.control.zoom({ position: 'bottomleft' }).addTo(map);
         
         L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png?api_key=6dec55c5-d7bc-4209-b16a-14121ba4718a', {
           attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -420,7 +421,8 @@ const BerkeleyPathsTracker = () => {
   useEffect(() => {
     if (view === 'routes' && selectedRoute && mapRef.current && !mapInstanceRef.current && typeof L !== 'undefined') {
       setTimeout(() => {
-        const map = L.map(mapRef.current).setView([37.8870, -122.2600], 14);
+        const map = L.map(mapRef.current, { zoomControl: false }).setView([37.8870, -122.2600], 14);
+        L.control.zoom({ position: 'bottomleft' }).addTo(map);
         
         L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png?api_key=6dec55c5-d7bc-4209-b16a-14121ba4718a', {
           attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -1278,11 +1280,11 @@ const BerkeleyPathsTracker = () => {
                 </div>
               )}
 
-              {/* Compass enable button - always visible until enabled */}
+              {/* Compass enable button - above recenter button */}
               {!compassEnabled && (
                 <button
                   onClick={enableCompass}
-                  style={{ zIndex: 9999, position: 'absolute', top: '12px', right: '12px' }}
+                  style={{ zIndex: 9999, position: 'absolute', bottom: '112px', right: '12px' }}
                   className="bg-white px-2.5 py-1.5 rounded-lg shadow-lg hover:bg-gray-50 transition-colors text-lg"
                   title="Enable compass heading"
                 >
