@@ -1,7 +1,7 @@
 const { useState, useEffect, useRef } = React;
 
 const ROUTES_ENABLED = true;
-const VERSION = 'v139';
+const VERSION = 'v140';
 
 // Brand colors — keep in sync with Tailwind config in index.html
 const COLORS = {
@@ -780,7 +780,7 @@ const BerkeleyPathsTracker = () => {
   const completionPercentage = getCompletionPercentage();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-50 flex flex-col" style={{height: '100dvh', overflow: 'hidden'}}>
       {/* Install prompt modal */}
       {showInstallPrompt && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4" style={{background: 'rgba(0,0,0,0.5)'}}>
@@ -873,7 +873,7 @@ const BerkeleyPathsTracker = () => {
         </div>
       )}
       {/* Header */}
-      <header ref={headerRef} className="bg-berkeley-burgundy text-white shadow-lg fixed top-0 left-0 right-0" style={{zIndex: 9000}}>
+      <header ref={headerRef} className="bg-berkeley-burgundy text-white shadow-lg flex-shrink-0" style={{zIndex: 9000}}>
         <div className="max-w-7xl mx-auto px-3 py-2">
           {/* Title - full width on one line */}
           <h1 className="text-lg font-bold mb-1.5">Berkeley Paths Navigator</h1>
@@ -943,11 +943,10 @@ const BerkeleyPathsTracker = () => {
         </div>
       </header>
 
-      {/* Spacer to offset fixed header */}
-      <div id="header-spacer" style={{height: '0px'}} />
-
+      {/* Scrollable content area */}
+      <div className="flex-1 overflow-y-auto relative" id="scroll-container">
       {/* Main content */}
-      <main className={view === 'list' ? 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6' : ''}>
+      <main className={view === 'list' ? 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6' : 'h-full'}>
         {/* Location Error Alert */}
         {locationError && view === 'list' && (
           <div className="mb-6 bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
@@ -1013,7 +1012,7 @@ const BerkeleyPathsTracker = () => {
                 )}
               </div>
             ) : (
-              <div className="fixed inset-0 flex flex-col" style={{top: headerRef.current ? headerRef.current.offsetHeight + 'px' : '56px'}}>
+              <div className="absolute inset-0 flex flex-col">
                 {/* Map - takes full screen */}
                 <div className="flex-1 relative">
                   <div
@@ -1231,7 +1230,7 @@ const BerkeleyPathsTracker = () => {
 
         {/* Map View */}
         {view === 'map' && (
-          <div className="fixed inset-0 flex flex-col bg-white" style={{top: headerRef.current ? headerRef.current.offsetHeight + 'px' : '56px'}}>
+          <div className="absolute inset-0 flex flex-col bg-white">
             {/* Map - full screen */}
             <div className="flex-1 relative">
               <div
@@ -1422,6 +1421,7 @@ const BerkeleyPathsTracker = () => {
           </p>
         </div>
       </footer>
+      </div> {/* end scrollable content area */}
     </div>
   );
 };
