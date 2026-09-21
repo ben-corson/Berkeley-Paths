@@ -1,7 +1,7 @@
 const { useState, useEffect, useLayoutEffect, useRef } = React;
 
 const ROUTES_ENABLED = true;
-const VERSION = 'v147';
+const VERSION = 'v148';
 
 // Brand colors — keep in sync with Tailwind config in index.html
 const COLORS = {
@@ -1034,6 +1034,16 @@ const BerkeleyPathsTracker = () => {
                     ← Back
                   </button>
                   
+                  {/* Compass button - above follow-me button */}
+                  <button
+                    onClick={enableCompass}
+                    style={{ zIndex: 9999, position: 'absolute', bottom: '112px', right: '12px' }}
+                    className={`px-2.5 py-1.5 rounded-lg shadow-lg transition-colors text-lg ${compassEnabled ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-50'}`}
+                    title={compassEnabled ? 'Compass enabled' : 'Enable compass heading'}
+                  >
+                    🧭
+                  </button>
+
                   {/* Follow-me / location button */}
                   <button
                     onClick={() => {
@@ -1042,21 +1052,11 @@ const BerkeleyPathsTracker = () => {
                       setFollowMe(next);
                       if (next) mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 17);
                     }}
-                    style={{ zIndex: 9999, position: 'absolute', top: '12px', right: '12px' }}
+                    style={{ zIndex: 9999, position: 'absolute', bottom: '64px', right: '12px' }}
                     className={`px-2.5 py-1.5 rounded-lg shadow-lg transition-colors text-lg ${followMe ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-50'}`}
                     title={followMe ? 'Following your location' : 'Center on my location'}
                   >
                     📍
-                  </button>
-
-                  {/* Compass button */}
-                  <button
-                    onClick={enableCompass}
-                    style={{ zIndex: 9999, position: 'absolute', top: '56px', right: '12px' }}
-                    className={`px-2.5 py-1.5 rounded-lg shadow-lg transition-colors text-lg ${compassEnabled ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-50'}`}
-                    title={compassEnabled ? 'Compass enabled' : 'Enable compass heading'}
-                  >
-                    🧭
                   </button>
                 </div>
 
