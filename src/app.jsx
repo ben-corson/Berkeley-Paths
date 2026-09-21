@@ -1,7 +1,7 @@
 const { useState, useEffect, useRef } = React;
 
 const ROUTES_ENABLED = true;
-const VERSION = 'v136';
+const VERSION = 'v137';
 
 // Brand colors — keep in sync with Tailwind config in index.html
 const COLORS = {
@@ -1391,15 +1391,16 @@ const BerkeleyPathsTracker = () => {
       <footer className="bg-white border-t border-gray-200 mt-12 py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-600 text-sm">
           <p>
-            Data sourced from{' '}
+            Berkeley Paths Navigator is not affiliated with the{' '}
             <a
-              href="https://www.berkeleypath.org/"
+              href="https://berkeleypaths.org"
               target="_blank"
               rel="noopener noreferrer"
               className="text-berkeley-burgundy hover:underline"
             >
-              berkeleypath.org
+              Berkeley Path Wanderers Association
             </a>
+            , but we encourage you to support their work preserving, restoring, and creating public paths in Berkeley.
           </p>
           <p className="mt-2">
             Berkeley Paths Navigator {VERSION} | Made with ❤️ for Berkeley path explorers
