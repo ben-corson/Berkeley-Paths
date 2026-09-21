@@ -1,7 +1,7 @@
 const { useState, useEffect, useRef } = React;
 
 const ROUTES_ENABLED = true;
-const VERSION = 'v145';
+const VERSION = 'v146';
 
 // Brand colors — keep in sync with Tailwind config in index.html
 const COLORS = {
@@ -1234,7 +1234,7 @@ const BerkeleyPathsTracker = () => {
 
         {/* Map View */}
         {view === 'map' && (
-          <div className="absolute inset-0 flex flex-col bg-white">
+          <div className="fixed inset-0 flex flex-col bg-white" style={{top: headerHeight + 'px'}}>
             {/* Map - full screen */}
             <div className="flex-1 relative">
               <div
