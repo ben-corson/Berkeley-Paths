@@ -25,10 +25,6 @@ body.dark-mode {
     --map-filter: brightness(0.85) saturate(1.1);
 }
 
-html, body, #root {
-    height: 100%;
-}
-
 body {
     -webkit-user-select: none;
     -webkit-touch-callout: none;
